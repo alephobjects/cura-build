@@ -443,7 +443,7 @@ ExternalProject_Add(CuraEngine
     DEPENDS Arcus
     GIT_REPOSITORY https://code.alephobjects.com/diffusion/CTE/cura-engine.git
     GIT_TAG origin/${TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCURA_ENGINE_VERSION=${CURA_VERSION} -DPROTOBUF_PROTOC_EXECUTABLE=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/protoc -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCURA_ENGINE_VERSION=${CURA_VERSION} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
 )
 
 ExternalProject_Add(Uranium
@@ -618,18 +618,12 @@ elseif(BUILD_OS_LINUX)
     )
 
     set(package_dir "_CPack_Packages/Linux/${CPACK_GENERATOR}/Cura-${CURA_VERSION}-Linux/")
-    EXECUTE_PROCESS(COMMAND ${CMAKE_C_COMPILER} -print-file-name=libstdc++.so OUTPUT_VARIABLE _libstd_path)
-    if (_libstd_path)
-      STRING(STRIP ${_libstd_path} LIBSTD_PATH)
-    ELSE(_libstd_path)
-      SET(LIBSTD_PATH "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.20")
-    ENDIF(_libstd_path)
     set(CPACK_INSTALL_COMMANDS
         "${CMAKE_COMMAND} -E make_directory ${package_dir}/usr/bin"
         "${CMAKE_COMMAND} -E make_directory ${package_dir}/usr/share/applications"
         "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura ${package_dir}/usr/bin/"
         "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura.desktop ${package_dir}/usr/share/applications/"
-        "${CMAKE_COMMAND} -E copy ${LIBSTD_PATH} ${package_dir}/opt/cura/lib/libstdc++.so.6"
+        "${CMAKE_COMMAND} -E copy /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.20 ${package_dir}/opt/cura/lib/libstdc++.so.6"
     )
 endif()
 
