@@ -407,7 +407,8 @@ if(BUILD_ZEROCONF)
 
     ExternalProject_Add(PythonZeroconf
         DEPENDS PythonNetifaces
-        URL https://github.com/jstasiak/python-zeroconf/archive/0.17.5.tar.gz
+        GIT_REPOSITORY https://github.com/jstasiak/python-zeroconf
+        GIT_TAG 0.17.6
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
         INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
@@ -481,6 +482,16 @@ ExternalProject_Add(Cura-Doodle3D
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
 )
 
+
+ExternalProject_Add(fdm_materials
+    DEPENDS Cura
+    GIT_REPOSITORY https://github.com/ultimaker/fdm_materials
+    GIT_TAG origin/${TAG_OR_BRANCH}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
+)
+
+set(_last_repo fdm_materials) # To make sure ordering for extra repositories is preserved
+
 foreach(repo ${EXTRA_REPOSITORIES})
     separate_arguments(items UNIX_COMMAND "${repo}")
     list(GET items 0 name)
@@ -493,10 +504,13 @@ foreach(repo ${EXTRA_REPOSITORIES})
     endforeach()
 
     ExternalProject_Add(${name}
+        DEPENDS ${_last_repo}
         GIT_REPOSITORY ${repo}
         GIT_TAG origin/master
         CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} ${cmake}
     )
+
+    set(_last_repo ${name})
 endforeach()
 
 if(BUILD_OS_OSX)
