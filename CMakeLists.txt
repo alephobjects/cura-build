@@ -128,12 +128,14 @@ if(BUILD_PYTHON)
         # See http://bugs.python.org/issue21381
         # The interpreter crashes when MACOSX_DEPLOYMENT_TARGET=10.7 due to the increased stack size.
         set(patch_command sed -i".bak" "8704,8704d" <SOURCE_DIR>/configure)
+        set(PYTHON_CONFIGURE_CFLAGS "CFLAGS=-I/usr/local/opt/openssl/include")
+        set(PYTHON_CONFIGURE_LDFLAGS "LDFLAGS=-L/usr/local/opt/openssl/lib")
     endif()
 
     ExternalProject_Add(Python
         URL https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tgz
         PATCH_COMMAND ${patch_command}
-        CONFIGURE_COMMAND ./configure --prefix=${EXTERNALPROJECT_INSTALL_PREFIX} --enable-shared --with-threads --without-pymalloc
+        CONFIGURE_COMMAND ./configure --prefix=${EXTERNALPROJECT_INSTALL_PREFIX} --enable-shared --with-threads --without-pymalloc ${PYTHON_CONFIGURE_CFLAGS} ${PYTHON_CONFIGURE_LDFLAGS}
         BUILD_IN_SOURCE 1
     )
 
