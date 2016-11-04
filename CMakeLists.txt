@@ -78,7 +78,12 @@ endif()
 set(TAG_OR_BRANCH "master" CACHE STRING "The name of the tag or branch to build")
 set(EXTRA_REPOSITORIES "" CACHE STRING "Extra repositories to install. Expected to have a CMake based build system.")
 set(EXTERNALPROJECT_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/inst)
-set(EXTERNALPROJECT_SITEPACKAGES_DIR ${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3.4/site-packages)
+if(BUILD_OS_WINDOWS)
+  set(PYTHON_SITE_PACKAGES_DIR lib/python3.4/site-packages)
+else()
+  set(PYTHON_SITE_PACKAGES_DIR lib/python3/dist-packages)
+endif()
+set(EXTERNALPROJECT_SITEPACKAGES_DIR ${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
 
 # Create the version-related variables
 # These can optionally be overridden from the build enviroment.
@@ -115,7 +120,7 @@ message(STATUS "Building Cura ${CURA_VERSION}")
 
 if(BUILD_OS_WIN32)
     # To deal with stupid setuptools not creating install directories
-    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/inst/lib/python3.4/site-packages)
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/inst/${PYTHON_SITE_PACKAGES_DIR})
 endif()
 
 if(BUILD_PYTHON)
@@ -219,7 +224,7 @@ if(BUILD_SIP)
             configure.py
             --platform win32-g++
             --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin
-            --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3.4/site-packages
+            --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR}
             --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include
             --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip
             "CFLAGS+=${CMAKE_C_FLAGS}"
@@ -230,7 +235,7 @@ if(BUILD_SIP)
             ${PYTHON_EXECUTABLE}
             configure.py
             --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin
-            --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages
+            --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR}
             --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include
             --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip
         )
@@ -256,7 +261,7 @@ if(BUILD_PYQT)
             --sip ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/sip.exe
             --confirm-license
             --spec win32-g++
-            --destdir ${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3.4/site-packages
+            --destdir ${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR}
             --bindir ${EXTERNALPROJECT_INSTALL_PREFIX}/bin
             --sipdir ${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip
             "CFLAGS+=${CMAKE_C_FLAGS}"
@@ -268,7 +273,7 @@ if(BUILD_PYQT)
             --sip ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/sip
             --qmake ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/qmake
             --confirm-license
-            --destdir ${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages
+            --destdir ${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR}
             --bindir ${EXTERNALPROJECT_INSTALL_PREFIX}/bin
             --sipdir ${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip
         )
