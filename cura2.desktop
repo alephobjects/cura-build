@@ -1,12 +1,12 @@
 [Desktop Entry]
 Version=1
-Name=Cura
-Name[de]=Cura
+Name=Cura 2 LulzBot Edition
+Name[de]=Cura 2 LulzBot Edition
 GenericName=3D Printing Software
 GenericName[de]=3D-Druck-Software
 Comment=Cura converts 3D models into paths for a 3D printer. It prepares your print for maximum accuracy, minimum printing time and good reliability with many extra features that make your print come out great.
-Exec=/usr/bin/cura %F
-TryExec=/usr/bin/cura
+Exec=/usr/bin/cura2 %F
+TryExec=/usr/bin/cura2
 Icon=/opt/cura/share/cura/resources/images/cura-icon.png
 Terminal=false
 Type=Application
