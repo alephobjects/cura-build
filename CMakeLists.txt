@@ -633,34 +633,38 @@ elseif(BUILD_OS_LINUX)
     set(CPACK_INSTALL_CMAKE_PROJECTS "")
 
     set(CPACK_INSTALLED_DIRECTORIES
-        "${CMAKE_BINARY_DIR}/inst/bin;/opt/cura/bin"
-        "${CMAKE_BINARY_DIR}/inst/lib;/opt/cura/lib"
-        "${CMAKE_BINARY_DIR}/inst/share;/opt/cura/share"
+        "${CMAKE_BINARY_DIR}/inst/bin;/opt/cura2/bin"
+        "${CMAKE_BINARY_DIR}/inst/lib;/opt/cura2/lib"
+        "${CMAKE_BINARY_DIR}/inst/share;/opt/cura2/share"
     )
 
-    set(package_dir "_CPack_Packages/Linux/${CPACK_GENERATOR}/Cura-${CURA_VERSION}-Linux/")
+    set(package_dir "_CPack_Packages/Linux/${CPACK_GENERATOR}/Cura2-${CURA_VERSION}-Linux/")
     set(CPACK_INSTALL_COMMANDS
         "${CMAKE_COMMAND} -E make_directory ${package_dir}/usr/bin"
         "${CMAKE_COMMAND} -E make_directory ${package_dir}/usr/share/applications"
         "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura2 ${package_dir}/usr/bin/"
         "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura2.desktop ${package_dir}/usr/share/applications/"
-        "${CMAKE_COMMAND} -E copy /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.20 ${package_dir}/opt/cura/lib/libstdc++.so.6"
+        "${CMAKE_COMMAND} -E copy /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.20 ${package_dir}/opt/cura2/lib/libstdc++.so.6"
     )
 endif()
 
-set(CPACK_PACKAGE_NAME "Cura")
+message("CPACK_PACKAGE_VERSION_MAJOR ${CURA_MAJOR_VERSION}")
+message("CPACK_PACKAGE_VERSION_MINOR ${CURA_MINOR_VERSION}")
+message("CPACK_PACKAGE_VERSION_PATCH ${CURA_PATCH_VERSION}")
+
+set(CPACK_PACKAGE_NAME "Cura2")
 set(CPACK_PACKAGE_VENDOR "Ultimaker")
 set(CPACK_PACKAGE_VERSION_MAJOR ${CURA_MAJOR_VERSION})
 set(CPACK_PACKAGE_VERSION_MINOR ${CURA_MINOR_VERSION})
 set(CPACK_PACKAGE_VERSION_PATCH ${CURA_PATCH_VERSION})
 set(CPACK_PACKAGE_VERSION ${CURA_VERSION})
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cura 3D Printing Software")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cura2 3D Printing Software")
 set(CPACK_PACKAGE_CONTACT "Arjen Hiemstra <a.hiemstra@ultimaker.com>")
 if(NOT BUILD_OS_OSX)
     set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE)
 endif()
-set(CPACK_PACKAGE_EXECUTABLES Cura "Cura ${CURA_MAJOR_VERSION}.${CURA_MINOR_VERSION}.${CURA_PATCH_VERSION}")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "Cura ${CURA_MAJOR_VERSION}.${CURA_MINOR_VERSION}")
+set(CPACK_PACKAGE_EXECUTABLES Cura2 "Cura2 ${CURA_MAJOR_VERSION}.${CURA_MINOR_VERSION}.${CURA_PATCH_VERSION}")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "Cura2 ${CURA_MAJOR_VERSION}.${CURA_MINOR_VERSION}")
 
 set(RPM_REQUIRES
     "python3 >= 3.4.0"
@@ -680,7 +684,7 @@ string(REPLACE ";" "," DEB_DEPENDS "${DEB_DEPENDS}")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS ${DEB_DEPENDS})
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE amd64)
 # Set the right epoch so Debian knows this is a more recent version
-set(CPACK_DEBIAN_PACKAGE_VERSION "2:${CPACK_PACKAGE_VERSION}")
+#set(CPACK_DEBIAN_PACKAGE_VERSION "2:${CPACK_PACKAGE_VERSION}")
 
 set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 set(CPACK_NSIS_EXECUTABLES_DIRECTORY ".")
