@@ -427,7 +427,7 @@ endif()
 if(BUILD_OS_OSX)
     set(protobuf_cxx_flags "-fPIC -std=c++11 -stdlib=libc++")
 else()
-    set(protobuf_cxx_flags "-fPIC -std=c++11")
+    set(protobuf_cxx_flags "-fPIC -std=c++11 -static-libstdc++")
 endif()
 
 ExternalProject_Add(Protobuf
@@ -645,7 +645,6 @@ elseif(BUILD_OS_LINUX)
         "${CMAKE_COMMAND} -E make_directory ${package_dir}/usr/share/applications"
         "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura2 ${package_dir}/usr/bin/"
         "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura2.desktop ${package_dir}/usr/share/applications/"
-        "${CMAKE_COMMAND} -E copy /usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.20 ${package_dir}/opt/cura2/lib/libstdc++.so.6"
     )
 endif()
 
