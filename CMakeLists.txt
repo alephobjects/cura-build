@@ -79,11 +79,12 @@ set(TAG_OR_BRANCH "master" CACHE STRING "The name of the tag or branch to build"
 set(EXTRA_REPOSITORIES "" CACHE STRING "Extra repositories to install. Expected to have a CMake based build system.")
 set(EXTERNALPROJECT_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/inst)
 if(BUILD_OS_WINDOWS)
-  set(PYTHON_SITE_PACKAGES_DIR lib/python3.4/site-packages)
+    find_package(PythonInterp)
+    set(PYTHON_DIRECTORY "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
+    set(PYTHON_SITE_PACKAGES_DIR lib/${PYTHON_DIRECTORY}/site-packages)
 else()
-  set(PYTHON_SITE_PACKAGES_DIR lib/python3/dist-packages)
+    set(PYTHON_SITE_PACKAGES_DIR lib/python3/dist-packages)
 endif()
-set(EXTERNALPROJECT_SITEPACKAGES_DIR ${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
 
 # Create the version-related variables
 # These can optionally be overridden from the build enviroment.
@@ -312,7 +313,7 @@ if(BUILD_OS_WINDOWS)
     # Because setuptools is stupid and will interpret "C:/..." as a relative path
     string(REPLACE "/" "\\" native_prefix ${EXTERNALPROJECT_INSTALL_PREFIX})
     set(python_install
-        --install-lib=${native_prefix}\\lib\\python3.4\\site-packages 
+        --install-lib=${native_prefix}\\lib\\${PYTHON_DIRECTORY}\\site-packages
         --install-data=${native_prefix}\\share
         --install-scripts=${native_prefix}\\bin
     )
@@ -439,20 +440,26 @@ ExternalProject_Add(Protobuf
 if(BUILD_OS_WIN64)
     # Due to problems building Python modules on Win64 we currently need to disable building Arcus.
     set(ARCUS_EXTRA_ARGS -DBUILD_PYTHON=OFF)
+    set(ADDITIONAL_FLAGS " -DCMAKE_EXE_LINKER_FLAGS=\"-static-libstdc++\"")
 endif()
 
 ExternalProject_Add(Arcus
     DEPENDS Python Protobuf Sip
     GIT_REPOSITORY https://code.alephobjects.com/diffusion/LA/arcus.git
     GIT_TAG origin/${TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_EXAMPLES=OFF -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} -DPROTOBUF_PROTOC_EXECUTABLE=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/protoc -DPROTOBUF_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf.a -DPROTOBUF_LITE_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf-lite.a -DPROTOBUF_INCLUDE_DIR=${EXTERNALPROJECT_INSTALL_PREFIX}/include ${ARCUS_EXTRA_ARGS}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=-static-libstdc++ -DBUILD_EXAMPLES=OFF -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} -DPROTOBUF_PROTOC_EXECUTABLE=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/protoc -DPROTOBUF_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf.a -DPROTOBUF_LITE_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf-lite.a -DPROTOBUF_INCLUDE_DIR=${EXTERNALPROJECT_INSTALL_PREFIX}/include ${ARCUS_EXTRA_ARGS}
 )
 
+#if (BUILD_OS_WINDOWS)
+#    set(PROTOBUF_PROTOC_EXECUTABLE ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/protoc.exe)
+#else ()
+#    set(PROTOBUF_PROTOC_EXECUTABLE ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/protoc)
+#endif ()
 ExternalProject_Add(CuraEngine
     DEPENDS Arcus
     GIT_REPOSITORY https://code.alephobjects.com/diffusion/CTE/cura-engine.git
     GIT_TAG origin/${TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCURA_ENGINE_VERSION=${CURA_VERSION} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPROTOBUF_PROTOC_EXECUTABLE=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/protoc -DArcus_DIR=${EXTERNALPROJECT_INSTALL_PREFIX}/lib64/cmake/Arcus
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCURA_ENGINE_VERSION=${CURA_VERSION} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DArcus_DIR=${EXTERNALPROJECT_INSTALL_PREFIX}/lib64/cmake/Arcus
 )
 
 ExternalProject_Add(Uranium
@@ -609,7 +616,7 @@ elseif(BUILD_OS_WINDOWS)
     )
     add_custom_command(
         TARGET build_exe POST_BUILD
-        COMMAND ${PYTHON_EXECUTABLE} setup_win32.py py2exe
+        COMMAND ${PYTHON_EXECUTABLE} setup_win32.py build
         COMMENT "Running py2exe"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
