@@ -119,7 +119,7 @@ endif()
 
 message(STATUS "Building Cura ${CURA_VERSION}")
 
-if(BUILD_OS_WIN32)
+if(WIN32)
     # To deal with stupid setuptools not creating install directories
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/inst/${PYTHON_SITE_PACKAGES_DIR})
 endif()
@@ -153,7 +153,7 @@ if(BUILD_QT)
     set(qt_url http://download.qt.io/archive/qt/5.5/5.5.1/single/qt-everywhere-opensource-src-5.5.1.tar.gz)
     set(qt_md5 59f0216819152b77536cf660b015d784)
 
-    # Qt uses different sources for Windows 
+    # Qt uses different sources for Windows
     if(BUILD_OS_WINDOWS)
         set(qt_url http://download.qt.io/archive/qt/5.5/5.5.1/single/qt-everywhere-opensource-src-5.5.1.zip)
         set(qt_md5 d071cdaa1b8f34fb49f6deac94039c2c)
@@ -233,7 +233,7 @@ if(BUILD_SIP)
             --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip
             "CFLAGS+=${CMAKE_C_FLAGS}"
             "CXXFLAGS+=${CMAKE_CXX_FLAGS}"
-        )
+          )
     elseif(BUILD_OS_LINUX)
         set(sip_command
             ${PYTHON_EXECUTABLE}
@@ -440,7 +440,6 @@ ExternalProject_Add(Protobuf
 if(BUILD_OS_WIN64)
     # Due to problems building Python modules on Win64 we currently need to disable building Arcus.
     set(ARCUS_EXTRA_ARGS -DBUILD_PYTHON=OFF)
-    set(ADDITIONAL_FLAGS " -DCMAKE_EXE_LINKER_FLAGS=\"-static-libstdc++\"")
 endif()
 
 ExternalProject_Add(Arcus
@@ -595,13 +594,9 @@ elseif(BUILD_OS_WINDOWS)
         add_dependencies(build_exe ${name})
     endforeach()
 
-    # TODO: Find a variable which holds the needed "win32"/"win64"
-    if(BUILD_64BIT)
-        set(NSIS_SCRIPT_COPY_PATH "${CMAKE_BINARY_DIR}/_CPack_Packages/win64/${CPACK_GENERATOR}")
-    else()
-        set(NSIS_SCRIPT_COPY_PATH "${CMAKE_BINARY_DIR}/_CPack_Packages/win32/${CPACK_GENERATOR}")
-    endif()
-    
+    set(CPACK_TOPLEVEL_TAG win)
+    set(NSIS_SCRIPT_COPY_PATH "${CMAKE_BINARY_DIR}/_CPack_Packages/win/${CPACK_GENERATOR}")
+
     add_custom_command(
         TARGET build_exe POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/${CPACK_GENERATOR} ${NSIS_SCRIPT_COPY_PATH}
