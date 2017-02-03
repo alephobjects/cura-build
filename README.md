@@ -27,6 +27,8 @@ cmake ..
 make
 ```
 
+To debug Cura.app, you need the Console open (```open -a Console```) to see stdout and stderr.  You can filter the visible events to "Cura" in the Console Search bar.
+
 ## Windows
 
 On Windows, the following dependencies are needed for building:
