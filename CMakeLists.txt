@@ -28,6 +28,7 @@ set(BUILD_OS_LINUX OFF)
 set(BUILD_OS_WINDOWS OFF)
 set(BUILD_OS_WIN32 OFF)
 set(BUILD_OS_WIN64 OFF)
+set(SIP_VERSION 4.17)
 
 if(CYGWIN)
     message(FATAL_ERROR "Cygwin is not supported")
@@ -37,6 +38,9 @@ if(APPLE)
     set(BUILD_OS_OSX ON)
 elseif(WIN32)
     set(BUILD_OS_WINDOWS ON)
+    # Possibly all platforms could use SIP 4.19 but Windows is the only one that needs it right now in order to use
+    # the pip versions of PyQt5, which only support SIP 4.19.  (Versions of SIP cannot be mixed in the same app.)
+    set(SIP_VERSION 4.19)
     if(BUILD_64BIT)
         set(BUILD_OS_WIN64 ON)
     else()
@@ -249,7 +253,7 @@ if(BUILD_SIP)
 
     ExternalProject_Add(Sip
         DEPENDS Python
-        URL http://downloads.sourceforge.net/project/pyqt/sip/sip-4.17/sip-4.17.zip
+        URL http://downloads.sourceforge.net/project/pyqt/sip/sip-${SIP_VERSION}/sip-${SIP_VERSION}.zip
         CONFIGURE_COMMAND ${sip_command}
         BUILD_IN_SOURCE 1
     )
@@ -612,7 +616,7 @@ elseif(BUILD_OS_WINDOWS)
     add_custom_command(
         TARGET build_exe POST_BUILD
         COMMAND ${PYTHON_EXECUTABLE} setup_win32.py build
-        COMMENT "Running py2exe"
+        COMMENT "Running cx_Freeze"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
@@ -628,7 +632,7 @@ elseif(BUILD_OS_WINDOWS)
 
     include(CPackComponent)
     cpack_add_component(cura DISPLAY_NAME "Cura Executable and Data Files" REQUIRED)
-    cpack_add_component(vcredist DISPLAY_NAME "Install Visual Studio 2010 Redistributable")
+    cpack_add_component(vcredist DISPLAY_NAME "Install Visual Studio 2015 Redistributable")
     cpack_add_component(arduino DISPLAY_NAME "Install Arduino Drivers")
 elseif(BUILD_OS_LINUX)
     set(CPACK_GENERATOR "DEB")

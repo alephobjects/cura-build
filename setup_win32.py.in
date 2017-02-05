@@ -71,7 +71,9 @@ includes = [
     "xml.etree.ElementTree",
     "cura",
     "cura.OneAtATimeIterator",
-    "zeroconf"
+    "zeroconf",
+    "numpy.core._methods",
+    "numpy.lib.format"
 ]
 
 # Include all the UM modules in the includes. As py2exe fails to properly find all the dependencies due to the plugin architecture.
@@ -140,17 +142,17 @@ if os.path.exists("@EXTERNALPROJECT_INSTALL_PREFIX@/lib/plugins"):
 else:
     import PyQt5.QtCore
     qt_lib_dir = os.path.dirname(PyQt5.QtCore.__file__)
-    qt_bin_dir = os.path.dirname(PyQt5.QtCore.__file__)
+    qt_bin_dir = qt_lib_dir
+
+if not os.path.exists(os.path.join(qt_lib_dir, "plugins")):
+    qt_lib_dir = os.path.join(qt_lib_dir, "Qt")
+    qt_bin_dir = os.path.join(qt_lib_dir, "bin")
 
 print("Copying Qt5 plugins")
-if os.path.exists(os.path.join(qt_lib_dir, "plugins")):
-    copytree(os.path.join(qt_lib_dir, "plugins"), "dist/PyQt5/plugins")
-else:
-    copytree(os.path.join(qt_lib_dir, os.path.join("Qt", "plugins")), "dist/PyQt5/plugins")
+copytree(os.path.join(qt_lib_dir, "plugins"), "dist/PyQt5/plugins")
 
-if os.path.exists(os.path.join(qt_lib_dir, "plugins")):
-    print("Copying QtQuick plugins")
-    copytree(os.path.join(qt_lib_dir, "qml"), "dist/qml")
+print("Copying QtQuick plugins")
+copytree(os.path.join(qt_lib_dir, "qml"), "dist/qml")
 
 print("Copying Qt5 svg library")
 shutil.copy(os.path.join(qt_bin_dir, "Qt5Svg.dll"), "dist/Qt5Svg.dll")
@@ -175,3 +177,9 @@ except FileNotFoundError:
         shutil.copy("@compiler_dir@/libgcc_s_dw2-1.dll", "dist/libgcc_s_dw2-1.dll")
     except FileNotFoundError:
         shutil.copy("@compiler_dir@/libgcc_s_sjlj-1.dll", "dist/libgcc_s_sjlj-1.dll")
+
+# Due to a combination of three bugs (Python library reflection bug, cx_Freeze bug, and a bug in a particular distribution of scipy),
+# this file sometimes gets named with the wrong case and can't be found by Python.
+broken_ckdtree_path = 'dist/scipy/spatial/cKDTree.cp35-win32.pyd'
+if os.path.isfile(broken_ckdtree_path):
+    os.rename(broken_ckdtree_path, 'dist/scipy/spatial/ckdtree.cp35-win32.pyd')

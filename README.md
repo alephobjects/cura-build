@@ -38,6 +38,7 @@ On Windows, the following dependencies are needed for building:
     * Qt5 Installer (32bit only): You can install "MinGW 4.9.2" using their "Maintenance Tool" as a component from the category "Tools"
     * When looking for other resources, make sure you download the posix flavour of MinGW. It is the only version, which is C++11 compatible (for more info take a look at the Qt docs).
 * **Python** >= 3.5.2 (http://python.org/)
+  * This project supports Python 3.5.1 except for a bug in cx_Freeze.  Use Python 3.5.2 if possible.
   * You will need the latest version of pip `python -m pip install -U pip`
 * **cx_Freeze**
   * `pip install cx_Freeze`
@@ -66,11 +67,18 @@ On Windows, the following dependencies are needed for building:
   * This application is neeeded to create the installer.
   * You'll need to add the path to your NSIS folder to your system path. (You don't need to add NSIS/bin)
   * Be sure to include the Language files in the installation.
-* **SIP**
-  * `pip install SIP`
 * **PyQt 5.4**
-  * `pip install pyqt5`
+  * The pip PyQT 5.6 package is missing the needed qml files. PyQT 5.7.1 is the latest pip package as of this writing
+  * and future PyQt pip packages are not guaranteed to work with this project.
+  * `pip install pyqt5==5.7.1`
+* **SIP**
+  * SIP is installed when pip installing PyQT5, the below line is just included for reference.
+  * `pip install SIP`
 
+Here's all of the remote pip packages in a single line.  (Run this after installing the manually downloaded scipy and numpy packages)
+```
+pip install pyqt5==5.7.1 py2exe cx_Freeze zeroconf numpy-stl
+```
 
 Make sure these dependencies are available from your path.
 
