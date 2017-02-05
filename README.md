@@ -4,19 +4,30 @@ This repository contains build scripts used to build Cura and all dependencies f
 
 ## OS X
 
-1. Install CMake (available via [homebrew](http://brew.sh/) or [cmake.org](http://www.cmake.org/))
-2. Install latest version of Xcode.
-3. On Mac OS X > 10.10, execute command: *brew link openssl --force*
-4. Because Fortran is necessary: *brew install gcc*
-5. Run these commands:
-```shell
-git clone git@github.com:Ultimaker/cura-build.git
-cd cura-build
+1. Install latest version of Xcode.
+    * You may also need to run ```xcode-select --install``` for some XCode commands to be available from the command line.
+2. Install [homebrew](http://brew.sh/).
+3. Install CMake (```brew install cmake```).
+4. On Mac OS X > 10.10, run these commands (needed to build Python packaging libraries):
+```
+brew update
+brew install openssl
+brew link openssl --force
+```
+5. Because Fortran is necessary: *brew install gcc* (Fortran used to be a separate installation but not anymore.  Building gcc can take over 6 hours depending on your computer.)
+6. You may need to run the following to build Qt:
+```cd /Applications/Xcode.app/Contents/Developer/usr/bin/
+sudo ln -s xcodebuild xcrun
+```
+7. Run these commands from the Cura2Build directory:
+```
 mkdir build
 cd build
 cmake ..
 make
 ```
+
+To debug Cura.app, you need the Console open (```open -a Console```) to see stdout and stderr.  You can filter the visible events to "Cura" in the Console Search bar.
 
 ## Windows
 
@@ -120,7 +131,7 @@ mingw32-make package
 
 Before make package - copy arduino to cura-build/
   * This step may not be needed.  The arduino folder is already in the inst folder.
-  
+
 ## Ubuntu/Linux
 
 cura-build can build Ubuntu/Debian packages of Cura.
@@ -172,18 +183,18 @@ cura-build can build CentOS/RHEL packages of Cura.
 
 Dependencies:
 
-* gcc-gfortran 
-* python34.x86_64 
-* python34-devel.x86_64 
-* python34-numpy.x86_64 
-* pyserial.noarch 
-* PyOpenGL.noarch 
-* python34-setuptools.noarch 
-* wxPython.x86_64 
-* libstdc++-static.x86_64 
-* libstdc++-devel.x86_64 
-* openssl.x86_64 
-* openblas-devel.x86_64 
+* gcc-gfortran
+* python34.x86_64
+* python34-devel.x86_64
+* python34-numpy.x86_64
+* pyserial.noarch
+* PyOpenGL.noarch
+* python34-setuptools.noarch
+* wxPython.x86_64
+* libstdc++-static.x86_64
+* libstdc++-devel.x86_64
+* openssl.x86_64
+* openblas-devel.x86_64
 * python34-numpy-f2py.x86_64
 
 To build, make sure these dependencies are installed, then clone this repository and run the following commands from your clone:
@@ -198,7 +209,7 @@ sudo yum install gcc-gfortran python34.x86_64 python34-devel.x86_64 python34-num
 6. download and install sip from https://www.riverbankcomputing.com/software/sip/download make sure the verion is 4.18 or newer
 
 Alternative method for installing python at: https://edwards.sdsu.edu/research/installing-python3-4-and-the-scipy-stack-on-centos/ .
-Make sure, that the PYTHONPATH can find dist-packages. 
+Make sure, that the PYTHONPATH can find dist-packages.
 
 ```shell
 git clone http://github.com/Ultimaker/cura-build.git

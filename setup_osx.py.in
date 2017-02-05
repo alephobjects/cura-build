@@ -6,6 +6,10 @@
 # Usage:
 #    python setup.py py2app
 
+# Path to find Arcus
+import sys
+sys.path.append('inst/lib/python3/dist-packages')
+
 from setuptools import setup
 
 import UM
