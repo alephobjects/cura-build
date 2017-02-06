@@ -4,19 +4,30 @@ This repository contains build scripts used to build Cura and all dependencies f
 
 ## OS X
 
-1. Install CMake (available via [homebrew](http://brew.sh/) or [cmake.org](http://www.cmake.org/))
-2. Install latest version of Xcode.
-3. On Mac OS X > 10.10, execute command: *brew link openssl --force*
-4. Because Fortran is necessary: *brew install gcc*
-5. Run these commands:
-```shell
-git clone git@github.com:Ultimaker/cura-build.git
-cd cura-build
+1. Install latest version of Xcode.
+    * You may also need to run ```xcode-select --install``` for some XCode commands to be available from the command line.
+2. Install [homebrew](http://brew.sh/).
+3. Install CMake (```brew install cmake```).
+4. On Mac OS X > 10.10, run these commands (needed to build Python packaging libraries):
+```
+brew update
+brew install openssl
+brew link openssl --force
+```
+5. Because Fortran is necessary: *brew install gcc* (Fortran used to be a separate installation but not anymore.  Building gcc can take over 6 hours depending on your computer.)
+6. You may need to run the following to build Qt:
+```cd /Applications/Xcode.app/Contents/Developer/usr/bin/
+sudo ln -s xcodebuild xcrun
+```
+7. Run these commands from the Cura2Build directory:
+```
 mkdir build
 cd build
 cmake ..
 make
 ```
+
+To debug Cura.app, you need the Console open (```open -a Console```) to see stdout and stderr.  You can filter the visible events to "Cura" in the Console Search bar.
 
 ## Windows
 
@@ -37,12 +48,15 @@ On Windows, the following dependencies are needed for building:
       * Build revision := 1
     * Qt5 Installer (32bit only): You can install "MinGW 4.9.2" using their "Maintenance Tool" as a component from the category "Tools"
     * When looking for other resources, make sure you download the posix flavour of MinGW. It is the only version, which is C++11 compatible (for more info take a look at the Qt docs).
-* **Python** 3.4 (http://python.org/)
-  * __NOTE__: This current build process will not work with Python 3.5.  One of the biggest reasons is the lack of 3.5 support by py2exe.
+* **Python** >= 3.5.2 (http://python.org/)
+  * This project supports Python 3.5.1 except for a bug in cx_Freeze.  Use Python 3.5.2 if possible.
   * You will need the latest version of pip `python -m pip install -U pip`
+* **cx_Freeze**
+  * `pip install cx_Freeze`
+  * As of 1-26-2017 the latest version of cx_Freeze (5.0.1) does not support Python 3.5.1 without a patch: https://bitbucket.org/anthony_tuininga/cx_freeze/issues/225/cxfreeze-module-dis-has-no-attribute
 * **NumPy** (http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy)
   * __NOTE__: make sure to get the NON-MKL version!
-  * __NOTE__: CJ: In my case the build process would not work without MKL.
+  * __NOTE__: CJ: It looks like this needs MKL, the above link only provides MKL versions, and Ultimaker Cura uses MKL.
 * **SciPy** (http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy)
 * **Py2Exe** (https://pypi.python.org/pypi/py2exe/0.9.2.0/#downloads)
   * The easiest way to install this is to run the command `pip install py2exe`. The executable `build_exe.exe` should now be in your `<python dir>/Scripts` directory. You may have to add `<python dir>/Scripts` to you `%PATH%`.
@@ -51,7 +65,6 @@ On Windows, the following dependencies are needed for building:
 * **Zeroconf** (https://pypi.python.org/pypi/zeroconf)
   * Again the easiest way to install is via `pip3 install zeroconf`.
 * **Microsoft Visual Studio 2015 (community edition)**:
-  * __NOTE__: CJ: Not sure if VS2015 is needed.  Qt 5.5 only has source for VS2013 and I built it with VS2013.  I have both VS2013 and VS2015 on my computer so not sure when which was being used.
   Go to "custom installation" and choose:
     * Programming languages:
       * Visual c++ (all)
@@ -62,18 +75,21 @@ On Windows, the following dependencies are needed for building:
         * Windows 10 SDK 10.0.10586
         * Windows 10 SDK 10.0.10240
 * **NSIS 3** (http://nsis.sourceforge.net/Main_Page)
-  * This application is neeeded to create the installer 
-* **SIP** (https://www.riverbankcomputing.com/software/sip/download)
-  * Build and install from the Visual Studio Developer Command Prompt
-    * Make sure the Qt bin directory is in your path (Example: `set PATH=%PATH%;C:\dev\Qt\Qt5.5.1\5.5\msvc2013\bin`)
-    * `python configure.py`
-    * `nmake`
-    * `nmake install`
-* **PyQt 5.4** (https://www.riverbankcomputing.com/software/sip/download)
-  * Build and install from the Visual Studio Developer Command Prompt
-    * `python configure.py --disable=qtconnectivity --disable=qtdoc --disable=qtenginio --disable=qtlocation --disable=qtmultimedia --disable=qtquick1 --disable=qtscript --disable=qtsensors --disable=qtwebchannel --disable=qtwebengine --disable=qtwebkit --disable=qtwebsockets --disable=qtandroidextras --disable=qtactiveqt --disable=qttools --disable=qtxmlpatterns --disable=qt3d --disable=qtcanvas3d --disable=qtserialport --disable=qtwayland --disable=qtwebkit-examples`
-    * `nmake`
-    * `nmake install`
+  * This application is neeeded to create the installer.
+  * You'll need to add the path to your NSIS folder to your system path. (You don't need to add NSIS/bin)
+  * Be sure to include the Language files in the installation.
+* **PyQt 5.4**
+  * The pip PyQT 5.6 package is missing the needed qml files. PyQT 5.7.1 is the latest pip package as of this writing
+  * and future PyQt pip packages are not guaranteed to work with this project.
+  * `pip install pyqt5==5.7.1`
+* **SIP**
+  * SIP is installed when pip installing PyQT5, the below line is just included for reference.
+  * `pip install SIP`
+
+Here's all of the remote pip packages in a single line.  (Run this after installing the manually downloaded scipy and numpy packages)
+```
+pip install pyqt5==5.7.1 py2exe cx_Freeze zeroconf numpy-stl
+```
 
 Make sure these dependencies are available from your path.
 
@@ -89,9 +105,9 @@ compiler=mingw32
 
 ```shell
 REM 32-bit
-cd build
+mkdir build-32
+cd build-32
 cmake -G "MinGW Makefiles" -DCURA_MAJOR_VERSION=2 -DCURA_MINOR_VERSION=2 -DCURA_PATCH_VERSION=0 ..
-mingw32-make
 mingw32-make package
 ```
 
@@ -106,6 +122,8 @@ For 64-bit builds:
 
 ```shell
 REM 64-bit
+mkdir build-64
+cd build-64
 cmake -G "MinGW Makefiles" -DBUILD_64BIT=ON -DCURA_MAJOR_VERSION=2 -DCURA_MINOR_VERSION=2 -DCURA_PATCH_VERSION=0 ..
 mingw32-make
 mingw32-make package
@@ -113,7 +131,7 @@ mingw32-make package
 
 Before make package - copy arduino to cura-build/
   * This step may not be needed.  The arduino folder is already in the inst folder.
-  
+
 ## Ubuntu/Linux
 
 cura-build can build Ubuntu/Debian packages of Cura.
@@ -165,18 +183,18 @@ cura-build can build CentOS/RHEL packages of Cura.
 
 Dependencies:
 
-* gcc-gfortran 
-* python34.x86_64 
-* python34-devel.x86_64 
-* python34-numpy.x86_64 
-* pyserial.noarch 
-* PyOpenGL.noarch 
-* python34-setuptools.noarch 
-* wxPython.x86_64 
-* libstdc++-static.x86_64 
-* libstdc++-devel.x86_64 
-* openssl.x86_64 
-* openblas-devel.x86_64 
+* gcc-gfortran
+* python34.x86_64
+* python34-devel.x86_64
+* python34-numpy.x86_64
+* pyserial.noarch
+* PyOpenGL.noarch
+* python34-setuptools.noarch
+* wxPython.x86_64
+* libstdc++-static.x86_64
+* libstdc++-devel.x86_64
+* openssl.x86_64
+* openblas-devel.x86_64
 * python34-numpy-f2py.x86_64
 
 To build, make sure these dependencies are installed, then clone this repository and run the following commands from your clone:
@@ -191,7 +209,7 @@ sudo yum install gcc-gfortran python34.x86_64 python34-devel.x86_64 python34-num
 6. download and install sip from https://www.riverbankcomputing.com/software/sip/download make sure the verion is 4.18 or newer
 
 Alternative method for installing python at: https://edwards.sdsu.edu/research/installing-python3-4-and-the-scipy-stack-on-centos/ .
-Make sure, that the PYTHONPATH can find dist-packages. 
+Make sure, that the PYTHONPATH can find dist-packages.
 
 ```shell
 git clone http://github.com/Ultimaker/cura-build.git

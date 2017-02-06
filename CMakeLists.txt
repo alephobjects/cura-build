@@ -28,6 +28,7 @@ set(BUILD_OS_LINUX OFF)
 set(BUILD_OS_WINDOWS OFF)
 set(BUILD_OS_WIN32 OFF)
 set(BUILD_OS_WIN64 OFF)
+set(SIP_VERSION 4.17)
 
 if(CYGWIN)
     message(FATAL_ERROR "Cygwin is not supported")
@@ -37,6 +38,9 @@ if(APPLE)
     set(BUILD_OS_OSX ON)
 elseif(WIN32)
     set(BUILD_OS_WINDOWS ON)
+    # Possibly all platforms could use SIP 4.19 but Windows is the only one that needs it right now in order to use
+    # the pip versions of PyQt5, which only support SIP 4.19.  (Versions of SIP cannot be mixed in the same app.)
+    set(SIP_VERSION 4.19)
     if(BUILD_64BIT)
         set(BUILD_OS_WIN64 ON)
     else()
@@ -119,7 +123,7 @@ endif()
 
 message(STATUS "Building Cura ${CURA_VERSION}")
 
-if(BUILD_OS_WIN32)
+if(WIN32)
     # To deal with stupid setuptools not creating install directories
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/inst/${PYTHON_SITE_PACKAGES_DIR})
 endif()
@@ -153,7 +157,7 @@ if(BUILD_QT)
     set(qt_url http://download.qt.io/archive/qt/5.5/5.5.1/single/qt-everywhere-opensource-src-5.5.1.tar.gz)
     set(qt_md5 59f0216819152b77536cf660b015d784)
 
-    # Qt uses different sources for Windows 
+    # Qt uses different sources for Windows
     if(BUILD_OS_WINDOWS)
         set(qt_url http://download.qt.io/archive/qt/5.5/5.5.1/single/qt-everywhere-opensource-src-5.5.1.zip)
         set(qt_md5 d071cdaa1b8f34fb49f6deac94039c2c)
@@ -233,7 +237,7 @@ if(BUILD_SIP)
             --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip
             "CFLAGS+=${CMAKE_C_FLAGS}"
             "CXXFLAGS+=${CMAKE_CXX_FLAGS}"
-        )
+          )
     elseif(BUILD_OS_LINUX)
         set(sip_command
             ${PYTHON_EXECUTABLE}
@@ -249,7 +253,7 @@ if(BUILD_SIP)
 
     ExternalProject_Add(Sip
         DEPENDS Python
-        URL http://downloads.sourceforge.net/project/pyqt/sip/sip-4.17/sip-4.17.zip
+        URL http://downloads.sourceforge.net/project/pyqt/sip/sip-${SIP_VERSION}/sip-${SIP_VERSION}.zip
         CONFIGURE_COMMAND ${sip_command}
         BUILD_IN_SOURCE 1
     )
@@ -440,7 +444,6 @@ ExternalProject_Add(Protobuf
 if(BUILD_OS_WIN64)
     # Due to problems building Python modules on Win64 we currently need to disable building Arcus.
     set(ARCUS_EXTRA_ARGS -DBUILD_PYTHON=OFF)
-    set(ADDITIONAL_FLAGS " -DCMAKE_EXE_LINKER_FLAGS=\"-static-libstdc++\"")
 endif()
 
 ExternalProject_Add(Arcus
@@ -595,13 +598,9 @@ elseif(BUILD_OS_WINDOWS)
         add_dependencies(build_exe ${name})
     endforeach()
 
-    # TODO: Find a variable which holds the needed "win32"/"win64"
-    if(BUILD_64BIT)
-        set(NSIS_SCRIPT_COPY_PATH "${CMAKE_BINARY_DIR}/_CPack_Packages/win64/${CPACK_GENERATOR}")
-    else()
-        set(NSIS_SCRIPT_COPY_PATH "${CMAKE_BINARY_DIR}/_CPack_Packages/win32/${CPACK_GENERATOR}")
-    endif()
-    
+    set(CPACK_TOPLEVEL_TAG win)
+    set(NSIS_SCRIPT_COPY_PATH "${CMAKE_BINARY_DIR}/_CPack_Packages/win/${CPACK_GENERATOR}")
+
     add_custom_command(
         TARGET build_exe POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/${CPACK_GENERATOR} ${NSIS_SCRIPT_COPY_PATH}
@@ -617,7 +616,7 @@ elseif(BUILD_OS_WINDOWS)
     add_custom_command(
         TARGET build_exe POST_BUILD
         COMMAND ${PYTHON_EXECUTABLE} setup_win32.py build
-        COMMENT "Running py2exe"
+        COMMENT "Running cx_Freeze"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
@@ -633,7 +632,7 @@ elseif(BUILD_OS_WINDOWS)
 
     include(CPackComponent)
     cpack_add_component(cura DISPLAY_NAME "Cura Executable and Data Files" REQUIRED)
-    cpack_add_component(vcredist DISPLAY_NAME "Install Visual Studio 2010 Redistributable")
+    cpack_add_component(vcredist DISPLAY_NAME "Install Visual Studio 2015 Redistributable")
     cpack_add_component(arduino DISPLAY_NAME "Install Arduino Drivers")
 elseif(BUILD_OS_LINUX)
     set(CPACK_GENERATOR "DEB")
