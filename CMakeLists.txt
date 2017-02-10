@@ -619,6 +619,12 @@ elseif(BUILD_OS_WINDOWS)
         COMMENT "Running cx_Freeze"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
+    add_custom_command(
+      TARGET build_exe POST_BUILD
+      COMMAND ${PYTHON_EXECUTABLE} scripts/cura_version.py ${CURA_MAJOR_VERSION}.${CURA_MINOR_VERSION}.${CURA_PATCH_VERSION} "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/dist"
+      COMMENT "Generating version.json"
+      WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
 
     install(DIRECTORY ${CMAKE_BINARY_DIR}/dist/ DESTINATION "." USE_SOURCE_PERMISSIONS COMPONENT "cura")
 
