@@ -23,7 +23,7 @@ sudo ln -s xcodebuild xcrun
 ```
 mkdir build
 cd build
-cmake ..
+cmake -DMINIMUM_PYTHON_VERSION=3.4.0 ..
 make
 ```
 
@@ -107,7 +107,7 @@ compiler=mingw32
 REM 32-bit
 mkdir build-32
 cd build-32
-cmake -G "MinGW Makefiles" -DCURA_MAJOR_VERSION=2 -DCURA_MINOR_VERSION=2 -DCURA_PATCH_VERSION=0 ..
+cmake -G "MinGW Makefiles"
 mingw32-make package
 ```
 
@@ -219,7 +219,7 @@ cd cura-build
 ```shell
 mkdir build
 cd build
-cmake ..
+cmake -DMINIMUM_PYTHON_VERSION=3.4.0 ..
 make
 make package
 ```
