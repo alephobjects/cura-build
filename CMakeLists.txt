@@ -18,6 +18,20 @@ option(BUILD_PYSERIAL "Include PySerial" ON)
 option(BUILD_NUMPY_STL "Include Numpy-STL" ON)
 option(BUILD_ZEROCONF "Include python-zeroconf" ON)
 
+macro(string_option name info default_value)
+    if (${name})
+        set(${name} ${${name}} CACHE STRING "${info}")
+    else()
+        set(${name} ${default_value} CACHE STRING "${info}")
+    endif()
+endmacro()
+
+string_option(MINIMUM_PYTHON_VERSION "Minimum Python Version" "3.5.0")
+string_option(ARCUS_URL "Arcus Git Url" "https://code.alephobjects.com/diffusion/LA/arcus.git")
+string_option(CURA_URL "Cura Git Url" "https://code.alephobjects.com/diffusion/CT/Cura2.git")
+string_option(CURAENGINE_URL "CuraEngine Git Url" "https://code.alephobjects.com/diffusion/CTE/cura-engine.git")
+string_option(URANIUM_URL "Uranium Git Url" "https://code.alephobjects.com/diffusion/U/uranium.git")
+
 if(WIN32)
     option(BUILD_64BIT "Create a 64-bit build" OFF)
 endif()
@@ -101,13 +115,13 @@ endif()
 if(DEFINED ENV{CURA_MINOR_VERSION})
     set(CURA_MINOR_VERSION $ENV{CURA_MINOR_VERSION} CACHE STRING "Cura Minor Version" FORCE)
 else()
-    set(CURA_MINOR_VERSION "2" CACHE STRING "Cura Minor Version")
+    set(CURA_MINOR_VERSION "4" CACHE STRING "Cura Minor Version")
 endif()
 
 if(DEFINED ENV{CURA_PATCH_VERSION})
     set(CURA_PATCH_VERSION $ENV{CURA_PATCH_VERSION} CACHE STRING "Cura Patch Version" FORCE)
 else()
-    set(CURA_PATCH_VERSION "1" CACHE STRING "Cura Patch Version")
+    set(CURA_PATCH_VERSION "0" CACHE STRING "Cura Patch Version")
 endif()
 
 if(DEFINED ENV{CURA_EXTRA_VERSION})
@@ -148,7 +162,7 @@ if(BUILD_PYTHON)
     set(PYTHON_VERSION_MAJOR 3)
     set(PYTHON_VERSION_MINOR 4)
 else()
-    find_package(PythonInterp 3.4.0 REQUIRED)
+    find_package(PythonInterp ${MINIMUM_PYTHON_VERSION} REQUIRED)
     add_custom_target(Python)
 endif()
 
@@ -448,35 +462,30 @@ endif()
 
 ExternalProject_Add(Arcus
     DEPENDS Python Protobuf Sip
-    GIT_REPOSITORY https://code.alephobjects.com/diffusion/LA/arcus.git
+    GIT_REPOSITORY ${ARCUS_URL}
     GIT_TAG origin/${TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=-static-libstdc++ -DBUILD_EXAMPLES=OFF -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} -DPROTOBUF_PROTOC_EXECUTABLE=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/protoc -DPROTOBUF_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf.a -DPROTOBUF_LITE_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf-lite.a -DPROTOBUF_INCLUDE_DIR=${EXTERNALPROJECT_INSTALL_PREFIX}/include ${ARCUS_EXTRA_ARGS}
 )
 
-#if (BUILD_OS_WINDOWS)
-#    set(PROTOBUF_PROTOC_EXECUTABLE ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/protoc.exe)
-#else ()
-#    set(PROTOBUF_PROTOC_EXECUTABLE ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/protoc)
-#endif ()
 ExternalProject_Add(CuraEngine
     DEPENDS Arcus
-    GIT_REPOSITORY https://code.alephobjects.com/diffusion/CTE/cura-engine.git
+    GIT_REPOSITORY ${CURAENGINE_URL}
     GIT_TAG origin/${TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCURA_ENGINE_VERSION=${CURA_VERSION} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DArcus_DIR=${EXTERNALPROJECT_INSTALL_PREFIX}/lib64/cmake/Arcus
 )
 
 ExternalProject_Add(Uranium
     DEPENDS PyQt Arcus
-    GIT_REPOSITORY https://code.alephobjects.com/diffusion/U/uranium.git
+    GIT_REPOSITORY ${URANIUM_URL}
     GIT_TAG origin/${TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
-)
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING}
+        )
 
 ExternalProject_Add(Cura
     DEPENDS Uranium CuraEngine
-    GIT_REPOSITORY https://code.alephobjects.com/diffusion/CT/Cura2.git
+    GIT_REPOSITORY ${CURA_URL}
     GIT_TAG origin/${TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DURANIUM_SCRIPTS_DIR= -DCURA_VERSION=${CURA_VERSION} -DCMAKE_MODULE_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} -DURANIUM_SCRIPTS_DIR= -DCURA_VERSION=${CURA_VERSION} -DCMAKE_MODULE_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/
 )
 
 ExternalProject_Add(Cura-PostProcessing
@@ -679,7 +688,7 @@ set(CPACK_PACKAGE_EXECUTABLES Cura2 "Cura2 ${CURA_MAJOR_VERSION}.${CURA_MINOR_VE
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "Cura2 ${CURA_MAJOR_VERSION}.${CURA_MINOR_VERSION}")
 
 set(RPM_REQUIRES
-    "python3 >= 3.4.0"
+    "python3 >= ${MINIMUM_PYTHON_VERSION}"
     "python3-qt5 >= 5.4.0"
     "python3-numpy >= 1.9.0"
     "qt5-qtquickcontrols >= 5.4.0"
@@ -689,7 +698,7 @@ set(CPACK_RPM_PACKAGE_REQUIRES ${RPM_REQUIRES})
 set(CPACK_RPM_PACKAGE_RELOCATABLE OFF)
 
 set(DEB_DEPENDS
-    "python3 (>= 3.4.0)"
+    "python3 (>= ${MINIMUM_PYTHON_VERSION})"
     "libgfortran3"
 )
 string(REPLACE ";" "," DEB_DEPENDS "${DEB_DEPENDS}")
