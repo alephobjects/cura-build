@@ -202,6 +202,7 @@ if(BUILD_QT)
         -no-sql-sqlite2
         -no-sql-tds
 	-no-openssl
+	-qt-pcre
         -skip qtconnectivity
         -skip qtdoc
         -skip qtenginio
