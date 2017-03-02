@@ -172,8 +172,8 @@ endif()
 
 
 if(BUILD_QT)
-    set(qt_url http://download.qt.io/archive/qt/5.5/5.5.1/single/qt-everywhere-opensource-src-5.5.1.tar.gz)
-    set(qt_md5 59f0216819152b77536cf660b015d784)
+    set(qt_url http://download.qt.io/archive/qt/5.6/5.6.2/single/qt-everywhere-opensource-src-5.6.2.tar.gz)
+    set(qt_md5 1b1b1f929d0cd83680354a0c83d8e945)
 
     # Qt uses different sources for Windows
     if(BUILD_OS_WINDOWS)
@@ -181,58 +181,50 @@ if(BUILD_QT)
         set(qt_md5 d071cdaa1b8f34fb49f6deac94039c2c)
     endif()
 
-    set(qt_options
-        -release
-        -prefix ${EXTERNALPROJECT_INSTALL_PREFIX}
-        -archdatadir ${EXTERNALPROJECT_INSTALL_PREFIX}/lib
-        -datadir ${EXTERNALPROJECT_INSTALL_PREFIX}/share
-        -opensource
-        -confirm-license
-        -nomake examples
-        -nomake tests
-        -nomake tools
-        -no-cups
-        -no-sql-db2
-        -no-sql-ibase
-        -no-sql-mysql
-        -no-sql-oci
-        -no-sql-odbc
-        -no-sql-psql
-        -no-sql-sqlite
-        -no-sql-sqlite2
-        -no-sql-tds
-	-no-openssl
-	-qt-pcre
-        -skip qtconnectivity
-        -skip qtdoc
-        -skip qtenginio
-        -skip qtlocation
-        -skip qtmultimedia
-        -skip qtquick1
-        -skip qtscript
-        -skip qtsensors
-        -skip qtwebchannel
-        -skip qtwebengine
-        -skip qtwebkit
-        -skip qtwebsockets
-        -skip qtandroidextras
-        -skip qtactiveqt
-        -skip qttools
-        -skip qtxmlpatterns
-        -skip qt3d
-        -skip qtcanvas3d
-        -skip qtserialport
-        -skip qtwayland
-        -skip qtwebkit-examples
-    )
+    set(qt_options -release)
+# If one wants to build debuggable library:
+#    list(APPEND qt_options -force-debug-info)
+    list(APPEND qt_options -prefix ${EXTERNALPROJECT_INSTALL_PREFIX})
+    list(APPEND qt_options -archdatadir ${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+    list(APPEND qt_options -datadir ${EXTERNALPROJECT_INSTALL_PREFIX}/share)
+    list(APPEND qt_options -opensource -confirm-license )
+    list(APPEND qt_options -nomake examples -nomake tests -nomake tools )
+    list(APPEND qt_options -no-cups -no-sql-db2 -no-sql-ibase -no-sql-mysql)
+    list(APPEND qt_options -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2)
+    list(APPEND qt_options -no-sql-tds -no-openssl -qt-pcre)
+    list(APPEND qt_options -skip qtconnectivity -skip qtdoc -skip qtenginio -skip qtlocation -skip qtmultimedia)
+    list(APPEND qt_options -skip qtscript -skip qtsensors)
+    list(APPEND qt_options -skip qtwebchannel -skip qtwebengine -skip qtwebsockets)
+    list(APPEND qt_options -skip qtandroidextras -skip qtactiveqt -skip qttools -skip qtxmlpatterns)
+    list(APPEND qt_options -skip qt3d -skip qtcanvas3d -skip qtserialport -skip qtwayland)
+# AVD: These were for 5.5.1
+#    list(APPEND qt_options -skip qtquick1)
+#    list(APPEND qt_options -skip qtwebkit -skip qtwebkit-examples)
+# AVD: Added these for 5.6.2
+    list(APPEND qt_options -skip qtwebview )
+    list(APPEND qt_options -skip qtquickcontrols2)
+#    list(APPEND qt_options -skip qtquickcontrols)
+    list(APPEND qt_options -skip qtgraphicaleffects)
+    list(APPEND qt_options -skip qtserialbus)
+
+# Following are not disabled:
+# qtimageformats coin gnuwin32 qtbase qtdeclarative qtsvg qttranslations
 
     if(BUILD_OS_OSX)
         list(APPEND qt_options -no-framework)
+	list(APPEND qt_options -skip qtwinextras -skip qtx11extras)
+	list(APPEND qt_options -skip qtmacextras)
     elseif(BUILD_OS_WINDOWS)
         list(APPEND qt_options -opengl desktop)
+	list(APPEND qt_options -skip qtx11extras -skip qtmacextras)
+	list(APPEND qt_options -skip qtwinextras)
     elseif(BUILD_OS_LINUX)
         list(APPEND qt_options -no-rpath -qt-xcb)
+	list(APPEND qt_options -skip qtmacextras -skip qtwinextras)
+	list(APPEND qt_options -skip qtx11extras)
     endif()
+
+    message(STATUS "Qt config: ${qt_options}")
 
     ExternalProject_Add(Qt
         URL ${qt_url}
@@ -240,6 +232,7 @@ if(BUILD_QT)
         CONFIGURE_COMMAND ./configure ${qt_options}
         BUILD_IN_SOURCE 1
     )
+
 else()
     add_custom_target(Qt)
 endif()
@@ -259,17 +252,17 @@ if(BUILD_SIP)
             "CXXFLAGS+=${CMAKE_CXX_FLAGS}"
           )
     elseif(BUILD_OS_LINUX)
-        set(sip_command
-            ${PYTHON_EXECUTABLE}
-            configure.py
-            --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin
-            --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR}
-            --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include
-            --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip
-        )
+        set(sip_command ${PYTHON_EXECUTABLE} )
+	list(APPEND sip_command configure.py )
+	list(APPEND sip_command --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
+	list(APPEND sip_command --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+	list(APPEND sip_command --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include )
+	list(APPEND sip_command --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
     elseif(BUILD_OS_OSX)
         set(sip_command ${PYTHON_EXECUTABLE} configure.py --sysroot=${EXTERNALPROJECT_INSTALL_PREFIX})
     endif()
+
+    message(STATUS "SIP config: ${sip_command}")
 
     ExternalProject_Add(Sip
         DEPENDS Python
@@ -296,15 +289,16 @@ if(BUILD_PYQT)
             "CXXFLAGS+=${CMAKE_CXX_FLAGS}"
         )
     elseif(BUILD_OS_LINUX)
-        set(pyqt_command
-            ${PYTHON_EXECUTABLE} configure.py
-            --sip ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/sip
-            --qmake ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/qmake
-            --confirm-license
-            --destdir ${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR}
-            --bindir ${EXTERNALPROJECT_INSTALL_PREFIX}/bin
-            --sipdir ${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip
-        )
+        set(pyqt_command LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+	list(APPEND pyqt_command ${PYTHON_EXECUTABLE})
+	list(APPEND pyqt_command configure.py)
+	list(APPEND pyqt_command --sip=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/sip)
+	list(APPEND pyqt_command --qmake=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/qmake)
+	list(APPEND pyqt_command --confirm-license)
+	list(APPEND pyqt_command --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+	list(APPEND pyqt_command --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
+	list(APPEND pyqt_command --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip)
+	list(APPEND pyqt_command --verbose)
     elseif(BUILD_OS_OSX)
         set(pyqt_command
             ${PYTHON_EXECUTABLE} configure.py
@@ -314,7 +308,7 @@ if(BUILD_PYQT)
             --confirm-license
         )
     endif()
-
+    message(STATUS "PyQt config: ${pyqt_command}") 
     # This patches the PyQt 5.4.2 source code to remove the "disconnectNotify" method from QPyQmlObject.
     # This fixes a deadlock that could randomly occur when deleting QML items.
     # This workaround should be removed as soon as a new stable release of PyQt is available that includes the fix.
