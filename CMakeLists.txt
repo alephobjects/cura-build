@@ -16,6 +16,7 @@ option(BUILD_NUMPY "Include Numpy" ON)
 option(BUILD_SCIPY "Include Scipy" ON)
 option(BUILD_PYSERIAL "Include PySerial" ON)
 option(BUILD_NUMPY_STL "Include Numpy-STL" ON)
+option(BUILD_PYTHON_UTILS "Include Python-Utils" ON)
 option(BUILD_ZEROCONF "Include python-zeroconf" ON)
 
 macro(string_option name info default_value)
@@ -42,7 +43,7 @@ set(BUILD_OS_LINUX OFF)
 set(BUILD_OS_WINDOWS OFF)
 set(BUILD_OS_WIN32 OFF)
 set(BUILD_OS_WIN64 OFF)
-set(SIP_VERSION 4.17)
+set(SIP_VERSION 4.19.1)
 
 if(CYGWIN)
     message(FATAL_ERROR "Cygwin is not supported")
@@ -74,6 +75,7 @@ if(BUILD_OS_WINDOWS)
     set(BUILD_NUMPY OFF)
     set(BUILD_SCIPY OFF)
     set(BUILD_NUMPY_STL OFF)
+    set(BUILD_PYTHON_UTILS OFF)
     set(BUILD_ZEROCONF OFF)
 
     # On Win32, MinGW built Qt ignores environment variable changes made when running the
@@ -192,6 +194,7 @@ if(BUILD_QT)
     list(APPEND qt_options -no-cups -no-sql-db2 -no-sql-ibase -no-sql-mysql)
     list(APPEND qt_options -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2)
     list(APPEND qt_options -no-sql-tds -no-openssl -qt-pcre)
+#    list(APPEND qt_options -dbus-linked)
     list(APPEND qt_options -skip qtconnectivity -skip qtdoc -skip qtenginio -skip qtlocation -skip qtmultimedia)
     list(APPEND qt_options -skip qtscript -skip qtsensors)
     list(APPEND qt_options -skip qtwebchannel -skip qtwebengine -skip qtwebsockets)
@@ -299,6 +302,7 @@ if(BUILD_PYQT)
 	list(APPEND pyqt_command --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
 	list(APPEND pyqt_command --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip)
 	list(APPEND pyqt_command --verbose)
+        list(APPEND pyqt_command --no-python-dbus)
     elseif(BUILD_OS_OSX)
         set(pyqt_command
             ${PYTHON_EXECUTABLE} configure.py
@@ -312,13 +316,14 @@ if(BUILD_PYQT)
     # This patches the PyQt 5.4.2 source code to remove the "disconnectNotify" method from QPyQmlObject.
     # This fixes a deadlock that could randomly occur when deleting QML items.
     # This workaround should be removed as soon as a new stable release of PyQt is available that includes the fix.
-    set(pyqt_patch
-        patch qpy/QtQml/qpyqmlobject.cpp ${CMAKE_SOURCE_DIR}/qpyqmlobject.cpp.patch && patch qpy/QtQml/qpyqmlobject.h ${CMAKE_SOURCE_DIR}/qpyqmlobject.h.patch
-    )
+#    set(pyqt_patch
+#        patch qpy/QtQml/qpyqmlobject.cpp ${CMAKE_SOURCE_DIR}/qpyqmlobject.cpp.patch && patch qpy/QtQml/qpyqmlobject.h ${CMAKE_SOURCE_DIR}/qpyqmlobject.h.patch
+#    )
 
     ExternalProject_Add(PyQt
         DEPENDS Python Qt Sip
-	URL http://downloads.sourceforge.net/project/pyqt/PyQt5/PyQt-5.5.1/PyQt-gpl-5.5.1.tar.gz
+#	URL http://downloads.sourceforge.net/project/pyqt/PyQt5/PyQt-5.5.1/PyQt-gpl-5.5.1.tar.gz
+        URL https://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.8.1/PyQt5_gpl-5.8.1.tar.gz/download
         PATCH_COMMAND ${pyqt_patch}
         CONFIGURE_COMMAND ${pyqt_command}
         BUILD_IN_SOURCE 1
@@ -359,9 +364,15 @@ endif()
 
 if(BUILD_NUMPY)
     if(BUILD_OS_LINUX)
-        # Inform numpy about using OpenBLAS
-        set(build_numpy "OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so" ${PYTHON_EXECUTABLE} setup.py build)
-        set(install_numpy "OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so" ${PYTHON_EXECUTABLE} setup.py install ${python_install})
+        set(build_numpy LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        list(APPEND build_numpy PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+        list(APPEND build_numpy OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so)
+        list(APPEND build_numpy ${PYTHON_EXECUTABLE} setup.py build)
+
+        set(install_numpy LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        list(APPEND install_numpy PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+        list(APPEND install_numpy OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so)
+        list(APPEND install_numpy ${PYTHON_EXECUTABLE} setup.py install ${python_install})
     else()
         set(build_numpy ${PYTHON_EXECUTABLE} setup.py build)
         set(install_numpy ${PYTHON_EXECUTABLE} setup.py install ${python_install})
@@ -369,8 +380,10 @@ if(BUILD_NUMPY)
 
     ExternalProject_Add(Numpy
         DEPENDS Python OpenBLAS
-        URL http://downloads.sourceforge.net/project/numpy/NumPy/1.9.2/numpy-1.9.2.tar.gz
-        URL_MD5 a1ed53432dbcd256398898d35bc8e645
+#        URL http://downloads.sourceforge.net/project/numpy/NumPy/1.9.2/numpy-1.9.2.tar.gz
+#        URL_MD5 a1ed53432dbcd256398898d35bc8e645
+        URL http://downloads.sourceforge.net/project/numpy/NumPy/1.11.2/numpy-1.11.2.tar.gz
+        URL_MD5 03bd7927c314c43780271bf1ab795ebc
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_numpy}
         INSTALL_COMMAND ${install_numpy}
@@ -380,9 +393,15 @@ endif()
 
 if(BUILD_SCIPY)
     if(BUILD_OS_LINUX)
-        # Inform scipy about using OpenBLAS
-        set(build_scipy "OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so" "PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages/" "LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib" ${PYTHON_EXECUTABLE} setup.py build)
-        set(install_scipy "OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so" "PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages/" "LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib" ${PYTHON_EXECUTABLE} setup.py install ${python_install})
+        set(build_scipy LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        list(APPEND build_scipy OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so)
+        list(APPEND build_scipy PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+        list(APPEND build_scipy ${PYTHON_EXECUTABLE} setup.py build)
+
+        set(install_scipy LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        list(APPEND install_scipy OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so)
+        list(APPEND install_scipy PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+        list(APPEND install_scipy ${PYTHON_EXECUTABLE} setup.py install ${python_install})
     else()
         set(build_scipy ${PYTHON_EXECUTABLE} setup.py build)
         set(install_scipy  ${PYTHON_EXECUTABLE} setup.py install ${python_install})
@@ -411,13 +430,55 @@ if(BUILD_PYSERIAL)
 endif()
 
 if(BUILD_NUMPY_STL)
+    if(BUILD_OS_LINUX)
+        set(build_numpy_stl LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        set(install_numpy_stl LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+    else()
+        set(build_numpy_stl)
+        set(install_numpy_stl)
+    endif()
+
+    list(APPEND build_numpy_stl PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+    list(APPEND build_numpy_stl ${PYTHON_EXECUTABLE} setup.py build)
+
+    list(APPEND install_numpy_stl PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+    list(APPEND install_numpy_stl ${PYTHON_EXECUTABLE} setup.py install ${python_install})
+    
     ExternalProject_Add(NumpySTL
         DEPENDS Python
-        URL https://github.com/WoLpH/numpy-stl/archive/v1.9.0.tar.gz
-        URL_MD5 cda2531edecff4468a4bbe78c6a2833b
+#        URL https://github.com/WoLpH/numpy-stl/archive/v1.9.0.tar.gz
+#        URL_MD5 cda2531edecff4468a4bbe78c6a2833b
+        GIT_REPOSITORY https://github.com/WoLpH/numpy-stl.git
+        GIT_TAG origin/master
         CONFIGURE_COMMAND ""
-        BUILD_COMMAND "PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages/" ${PYTHON_EXECUTABLE} setup.py build
-        INSTALL_COMMAND "PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages/" ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+        BUILD_COMMAND ${build_numpy_stl}
+        INSTALL_COMMAND ${install_numpy_stl}
+        BUILD_IN_SOURCE 1
+    )
+endif()
+
+if(BUILD_PYTHON_UTILS)
+    if(BUILD_OS_LINUX)
+        set(build_python_utils LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        set(install_python_utils LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+    else()
+        set(build_python_utils)
+        set(install_python_utils)
+    endif()
+    
+    list(APPEND build_python_utils PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+    list(APPEND build_python_utils ${PYTHON_EXECUTABLE} setup.py build)
+
+    list(APPEND install_python_utils PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+    list(APPEND install_python_utils ${PYTHON_EXECUTABLE} setup.py install ${python_install})
+
+    ExternalProject_Add(PythonUtils
+        DEPENDS Python
+        GIT_REPOSITORY https://github.com/WoLpH/python-utils.git
+        GIT_TAG origin/master
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${build_python_utils}
+        INSTALL_COMMAND ${install_python_utils}
         BUILD_IN_SOURCE 1
     )
 endif()
