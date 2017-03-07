@@ -420,11 +420,39 @@ endif()
 if(BUILD_PYSERIAL)
     ExternalProject_Add(PySerial
         DEPENDS Python
-        URL https://pypi.python.org/packages/source/p/pyserial/pyserial-2.7.tar.gz
-        URL_MD5 794506184df83ef2290de0d18803dd11
+#        URL https://pypi.python.org/packages/source/p/pyserial/pyserial-2.7.tar.gz
+#        URL_MD5 794506184df83ef2290de0d18803dd11
+        GIT_REPOSITORY https://github.com/pyserial/pyserial.git
+        GIT_TAG origin/master
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
         INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+        BUILD_IN_SOURCE 1
+    )
+endif()
+
+if(BUILD_PYTHON_UTILS)
+    if(BUILD_OS_LINUX)
+        set(build_python_utils LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        set(install_python_utils LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+    else()
+        set(build_python_utils)
+        set(install_python_utils)
+    endif()
+
+    list(APPEND build_python_utils PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+    list(APPEND build_python_utils ${PYTHON_EXECUTABLE} setup.py build)
+
+    list(APPEND install_python_utils PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+    list(APPEND install_python_utils ${PYTHON_EXECUTABLE} setup.py install ${python_install})
+
+    ExternalProject_Add(PythonUtils
+        DEPENDS Python
+        GIT_REPOSITORY https://github.com/WoLpH/python-utils.git
+        GIT_TAG origin/master
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${build_python_utils}
+        INSTALL_COMMAND ${install_python_utils}
         BUILD_IN_SOURCE 1
     )
 endif()
@@ -445,7 +473,7 @@ if(BUILD_NUMPY_STL)
     list(APPEND install_numpy_stl ${PYTHON_EXECUTABLE} setup.py install ${python_install})
     
     ExternalProject_Add(NumpySTL
-        DEPENDS Python
+        DEPENDS Python Numpy PythonUtils
 #        URL https://github.com/WoLpH/numpy-stl/archive/v1.9.0.tar.gz
 #        URL_MD5 cda2531edecff4468a4bbe78c6a2833b
         GIT_REPOSITORY https://github.com/WoLpH/numpy-stl.git
@@ -453,32 +481,6 @@ if(BUILD_NUMPY_STL)
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_numpy_stl}
         INSTALL_COMMAND ${install_numpy_stl}
-        BUILD_IN_SOURCE 1
-    )
-endif()
-
-if(BUILD_PYTHON_UTILS)
-    if(BUILD_OS_LINUX)
-        set(build_python_utils LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
-        set(install_python_utils LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
-    else()
-        set(build_python_utils)
-        set(install_python_utils)
-    endif()
-    
-    list(APPEND build_python_utils PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
-    list(APPEND build_python_utils ${PYTHON_EXECUTABLE} setup.py build)
-
-    list(APPEND install_python_utils PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
-    list(APPEND install_python_utils ${PYTHON_EXECUTABLE} setup.py install ${python_install})
-
-    ExternalProject_Add(PythonUtils
-        DEPENDS Python
-        GIT_REPOSITORY https://github.com/WoLpH/python-utils.git
-        GIT_TAG origin/master
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${build_python_utils}
-        INSTALL_COMMAND ${install_python_utils}
         BUILD_IN_SOURCE 1
     )
 endif()
