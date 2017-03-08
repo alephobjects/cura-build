@@ -195,6 +195,7 @@ if(BUILD_QT)
     list(APPEND qt_options -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2)
     list(APPEND qt_options -no-sql-tds -no-openssl -qt-pcre)
 #    list(APPEND qt_options -dbus-linked)
+    list(APPEND qt_options -no-eglfs)
     list(APPEND qt_options -skip qtconnectivity -skip qtdoc -skip qtenginio -skip qtlocation -skip qtmultimedia)
     list(APPEND qt_options -skip qtscript -skip qtsensors)
     list(APPEND qt_options -skip qtwebchannel -skip qtwebengine -skip qtwebsockets)
@@ -303,6 +304,7 @@ if(BUILD_PYQT)
 	list(APPEND pyqt_command --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip)
 	list(APPEND pyqt_command --verbose)
         list(APPEND pyqt_command --no-python-dbus)
+        list(APPEND pyqt_command --no-designer-plugin)
     elseif(BUILD_OS_OSX)
         set(pyqt_command
             ${PYTHON_EXECUTABLE} configure.py
@@ -322,9 +324,9 @@ if(BUILD_PYQT)
 
     ExternalProject_Add(PyQt
         DEPENDS Python Qt Sip
-#	URL http://downloads.sourceforge.net/project/pyqt/PyQt5/PyQt-5.5.1/PyQt-gpl-5.5.1.tar.gz
+#        URL http://downloads.sourceforge.net/project/pyqt/PyQt5/PyQt-5.5.1/PyQt-gpl-5.5.1.tar.gz
         URL https://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.8.1/PyQt5_gpl-5.8.1.tar.gz/download
-        PATCH_COMMAND ${pyqt_patch}
+#        PATCH_COMMAND ${pyqt_patch}
         CONFIGURE_COMMAND ${pyqt_command}
         BUILD_IN_SOURCE 1
     )
