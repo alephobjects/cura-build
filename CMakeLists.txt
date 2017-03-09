@@ -738,10 +738,10 @@ elseif(BUILD_OS_LINUX)
     )
     # Generating version.json
     list(APPEND CPACK_INSTALL_COMMANDS
-	"${CMAKE_COMMAND} -E make_directory ${package_dir}opt/cura2/share/cura/resources"
+	"${CMAKE_COMMAND} -E make_directory ${package_dir}opt/cura2"
     )
     list(APPEND CPACK_INSTALL_COMMANDS 
-        "${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/cura_version.py ${CURA_VERSION} ${CMAKE_BINARY_DIR} ${package_dir}opt/cura2/share/cura/resources"
+        "${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/cura_version.py ${CURA_VERSION} ${CMAKE_BINARY_DIR} ${package_dir}opt/cura2"
     )
     
 endif()
