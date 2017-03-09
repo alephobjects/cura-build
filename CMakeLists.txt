@@ -425,8 +425,9 @@ endif()
 if(BUILD_PYSERIAL)
     ExternalProject_Add(PySerial
         DEPENDS Python
-        URL https://pypi.python.org/packages/source/p/pyserial/pyserial-2.7.tar.gz
-        URL_MD5 794506184df83ef2290de0d18803dd11
+#        URL https://pypi.python.org/packages/source/p/pyserial/pyserial-2.7.tar.gz
+#        URL_MD5 794506184df83ef2290de0d18803dd11
+        URL https://github.com/pyserial/pyserial/releases/download/v3.2.1/pyserial-3.2.1.tar.gz
 #        GIT_REPOSITORY https://github.com/pyserial/pyserial.git
 #        GIT_TAG origin/master
         CONFIGURE_COMMAND ""
