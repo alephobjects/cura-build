@@ -743,6 +743,30 @@ elseif(BUILD_OS_LINUX)
     list(APPEND CPACK_INSTALL_COMMANDS 
         "${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/cura_version.py ${CURA_VERSION} ${CMAKE_BINARY_DIR} ${package_dir}opt/cura2"
     )
+    # Removing files, that are not needed for runtime
+    # From bin dir
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/bin/qml*")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/bin/*.pl")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/bin/uic")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/bin/sip")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/bin/rcc")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/bin/qmake")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/bin/qlalr")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/bin/py*5")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/bin/qdbus")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/bin/protoc")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/bin/moc")
+    # From lib dir
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/lib/*.a")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/lib/*.la")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/lib/*.prl")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/lib/cmake")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/lib/mkspecs")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/lib/pkgconfig")
+    # From share dir
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/share/cmake-*")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/share/doc")
+    list(APPEND CPACK_INSTALL_COMMANDS "rm -Rf ${package_dir}opt/cura2/share/sip")
     
 endif()
 
