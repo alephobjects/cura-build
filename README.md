@@ -165,15 +165,22 @@ Dependencies:
 To build, make sure these dependencies are installed, then clone this repository and run the following commands from your clone:
 
 ```shell
-sudo apt-get install gfortran python3 python3-dev python3-pyqt5 python3-pyqt5.qtopengl python3-pyqt5.qtquick python3-pyqt5.qtsvg python3-numpy python3-serial python3-opengl python3-setuptools qml-module-qtquick2 qml-module-qtquick-window2 qml-module-qtquick-layouts qml-module-qtquick-dialogs qml-module-qtquick-controls gfortran pkg-config libxcb1-dev libx11-dev
-git clone http://github.com/Ultimaker/cura-build.git
-cd cura-build
+Install OpenGL dev libs:
+sudo apt-get install mesa-common-dev
+sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev
+
+sudo apt-get install gfortran python3 python3-dev python3-pyqt5 python3-pyqt5.qtopengl python3-pyqt5.qtquick python3-pyqt5.qtsvg python3-numpy python3-serial python3-opengl python3-setuptools qml-module-qtquick2 qml-module-qtquick-window2 qml-module-qtquick-layouts qml-module-qtquick-dialogs qml-module-qtquick-controls gfortran pkg-config libxcb1-dev libx11-dev 
+x11proto-gl-dev x11proto-composite-dev x11proto-core-dev x11proto-damage-dev x11proto-dri2-dev x11proto-fixes-dev x11proto-gl-dev x11proto-input-dev x11proto-kb-dev x11proto-randr-dev x11proto-record-dev x11proto-render-dev x11proto-xext-dev x11proto-xf86vidmode-dev x11proto-xinerama-dev
+
+git clone https://code.alephobjects.com/source/Cura2build.git
+
+cd Cura2build
 ```
 
 ```shell
 mkdir build
 cd build
-cmake ..
+cmake -DMINIMUM_PYTHON_VERSION=3.4.0 -DCURA_TAG_OR_BRANCH=devel -DURANIUM_TAG_OR_BRANCH=devel ..
 make
 make package
 ```
