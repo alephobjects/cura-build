@@ -58,6 +58,8 @@ On Windows, the following dependencies are needed for building:
   * __NOTE__: make sure to get the NON-MKL version!
   * __NOTE__: CJ: It looks like this needs MKL, the above link only provides MKL versions, and Ultimaker Cura uses MKL.
 * **SciPy** (http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy)
+* **PySerial** from https://pypi.python.org/pypi/pyserial/3.2.1
+  * It can be installed via `pip3 install pyserial`
 * **Py2Exe** (https://pypi.python.org/pypi/py2exe/0.9.2.0/#downloads)
   * The easiest way to install this is to run the command `pip install py2exe`. The executable `build_exe.exe` should now be in your `<python dir>/Scripts` directory. You may have to add `<python dir>/Scripts` to you `%PATH%`.
 * **Numpy-STL** (https://pypi.python.org/pypi/numpy-stl)
@@ -107,7 +109,7 @@ compiler=mingw32
 REM 32-bit
 mkdir build-32
 cd build-32
-cmake -G "MinGW Makefiles"
+cmake -G "MinGW Makefiles" -DBUILD_PYSERIAL=0FF ..
 mingw32-make package
 ```
 
@@ -124,7 +126,7 @@ For 64-bit builds:
 REM 64-bit
 mkdir build-64
 cd build-64
-cmake -G "MinGW Makefiles" -DBUILD_64BIT=ON -DCURA_MAJOR_VERSION=2 -DCURA_MINOR_VERSION=2 -DCURA_PATCH_VERSION=0 ..
+cmake -G "MinGW Makefiles" -DBUILD_64BIT=ON -DBUILD_PYSERIAL=0FF ..
 mingw32-make
 mingw32-make package
 ```

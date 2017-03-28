@@ -811,7 +811,7 @@ set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE amd64)
 
 set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 set(CPACK_NSIS_EXECUTABLES_DIRECTORY ".")
-set(CPACK_NSIS_MUI_FINISHPAGE_RUN "Cura.exe")
+set(CPACK_NSIS_MUI_FINISHPAGE_RUN "Cura2.exe")
 set(CPACK_NSIS_MENU_LINKS
     "https://ultimaker.com/en/support/software" "Cura Online Documentation"
     "https://github.com/ultimaker/cura" "Cura Development Resources"

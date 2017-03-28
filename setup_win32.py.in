@@ -97,13 +97,13 @@ shutil.rmtree("dist", True)
 executables = [
     Executable(script="@EXTERNALPROJECT_INSTALL_PREFIX@/bin/cura_app.py",
                base="Win32GUI",
-               targetName = "Cura.exe",
+               targetName = "Cura2.exe",
                icon="@CMAKE_SOURCE_DIR@/cura.ico"
                )
 ]
 
 setup(
-    name="Cura",
+    name="Cura2",
     version="@CURA_MAJOR_VERSION@.@CURA_MINOR_VERSION@.@CURA_PATCH_VERSION@",
     author="Ultimaker",
     author_email="a.hiemstra@ultimaker.com",
