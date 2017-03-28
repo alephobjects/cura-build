@@ -109,7 +109,7 @@ compiler=mingw32
 REM 32-bit
 mkdir build-32
 cd build-32
-cmake -G "MinGW Makefiles" -DBUILD_PYSERIAL=0FF ..
+cmake -G "MinGW Makefiles" -DBUILD_PYSERIAL=0 ..
 mingw32-make package
 ```
 
