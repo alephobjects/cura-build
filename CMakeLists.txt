@@ -423,6 +423,15 @@ if(BUILD_SCIPY)
 endif()
 
 if(BUILD_PYSERIAL)
+    set(build_pyserial PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+    set(install_pyserial PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+    if(BUILD_OS_LINUX)
+        list(APPEND build_pyserial LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        list(APPEND install_pyserial LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+    endif()
+    list(APPEND build_pyserial ${PYTHON_EXECUTABLE} setup.py build)
+    list(APPEND install_pyserial ${PYTHON_EXECUTABLE} setup.py install ${python_install})
+   
     ExternalProject_Add(PySerial
         DEPENDS Python
 #        URL https://pypi.python.org/packages/source/p/pyserial/pyserial-2.7.tar.gz
@@ -431,8 +440,8 @@ if(BUILD_PYSERIAL)
 #        GIT_REPOSITORY https://github.com/pyserial/pyserial.git
 #        GIT_TAG origin/master
         CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+        BUILD_COMMAND ${build_pyserial}
+        INSTALL_COMMAND ${install_pyserial}
         BUILD_IN_SOURCE 1
     )
 endif()
