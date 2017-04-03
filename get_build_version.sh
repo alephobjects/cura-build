@@ -1,2 +1,3 @@
 #!/usr/bin/env bash
-grep "SET(CPACK_PACKAGE_VERSION " build/CPackConfig.cmake | cut -d '"' -f 2
+cd build
+grep "SET(CPACK_PACKAGE_VERSION " CPackConfig.cmake | cut -d '"' -f 2
