@@ -25,6 +25,9 @@ def generate(cura_version, cmake_binary_dir, target_dir):
 
     with open(target_dir + "/version.json", 'w') as output_file:
         output_file.write(json.dumps(data, indent=4))
+    
+    with open(cmake_binary_dir + "/CURA2_VERSION", 'w') as text_file:
+        print("{}".format(cura_version), file=text_file)
 
 if __name__ == '__main__':
     generate(sys.argv[1], sys.argv[2], sys.argv[3])
