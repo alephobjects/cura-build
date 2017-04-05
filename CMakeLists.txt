@@ -105,7 +105,6 @@ set(EXTERNALPROJECT_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/inst)
 if(BUILD_OS_WINDOWS)
     find_package(PythonInterp)
     set(PYTHON_DIRECTORY "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
-#    set(PYTHON_DIRECTORY "python${PYTHON_VERSION_MAJOR}")
     set(PYTHON_SITE_PACKAGES_DIR lib/${PYTHON_DIRECTORY}/site-packages)
 else()
     set(PYTHON_SITE_PACKAGES_DIR lib/python3/dist-packages)
@@ -264,7 +263,10 @@ if(BUILD_SIP)
 	list(APPEND sip_command --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include )
 	list(APPEND sip_command --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
     elseif(BUILD_OS_OSX)
-        set(sip_command ${PYTHON_EXECUTABLE} configure.py --sysroot=${EXTERNALPROJECT_INSTALL_PREFIX})
+	set(sip_command LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        list(APPEND sip_command PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+        list(APPEND sip_command ${PYTHON_EXECUTABLE} configure.py
+		--sysroot=${EXTERNALPROJECT_INSTALL_PREFIX})
     endif()
 
     message(STATUS "SIP config: ${sip_command}")
@@ -310,13 +312,23 @@ if(BUILD_PYQT)
         list(APPEND pyqt_command --no-python-dbus)
         list(APPEND pyqt_command --no-designer-plugin)
     elseif(BUILD_OS_OSX)
-        set(pyqt_command
-            ${PYTHON_EXECUTABLE} configure.py
-            --sysroot ${EXTERNALPROJECT_INSTALL_PREFIX}
-            --qmake ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/qmake
-            --sip ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/sip
-            --confirm-license
-        )
+	set(pyqt_command LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        list(APPEND pyqt_command PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+	list(APPEND pyqt_command ${PYTHON_EXECUTABLE})
+        list(APPEND pyqt_command configure.py)
+# sysroot is the only one added
+	list(APPEND pyqt_command --sysroot ${EXTERNALPROJECT_INSTALL_PREFIX})
+        list(APPEND pyqt_command --sip=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/sip)
+        list(APPEND pyqt_command --qmake=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/qmake)
+        list(APPEND pyqt_command --confirm-license)
+        list(APPEND pyqt_command --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+        list(APPEND pyqt_command --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
+        list(APPEND pyqt_command --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip)
+        list(APPEND pyqt_command --stubsdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+#        list(APPEND pyqt_command  --no-stubs)
+        list(APPEND pyqt_command --verbose)
+        list(APPEND pyqt_command --no-python-dbus)
+        list(APPEND pyqt_command --no-designer-plugin)
     endif()
     message(STATUS "PyQt config: ${pyqt_command}") 
     # This patches the PyQt 5.4.2 source code to remove the "disconnectNotify" method from QPyQmlObject.
@@ -347,6 +359,11 @@ if(BUILD_OS_WINDOWS)
         --install-scripts=${native_prefix}\\bin
     )
 elseif(BUILD_OS_LINUX)
+    set(python_install
+        --root=${EXTERNALPROJECT_INSTALL_PREFIX}
+        --install-lib=lib/python3/dist-packages
+    )
+elseif(BUILD_OS_OSX)
     set(python_install
         --root=${EXTERNALPROJECT_INSTALL_PREFIX}
         --install-lib=lib/python3/dist-packages
@@ -432,14 +449,18 @@ if(BUILD_PYSERIAL)
 
 	list(APPEND install_pyserial PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
         list(APPEND install_pyserial LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+    elseif(BUILD_OS_OSX)
+	list(APPEND build_pyserial PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+        list(APPEND build_pyserial LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+
+        list(APPEND install_pyserial PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/python3/dist-packages)
+        list(APPEND install_pyserial LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
     endif()
     list(APPEND build_pyserial ${PYTHON_EXECUTABLE} setup.py build)
     list(APPEND install_pyserial ${PYTHON_EXECUTABLE} setup.py install ${python_install})
    
     ExternalProject_Add(PySerial
         DEPENDS Python
-#        URL https://pypi.python.org/packages/source/p/pyserial/pyserial-2.7.tar.gz
-#        URL_MD5 794506184df83ef2290de0d18803dd11
         URL https://github.com/pyserial/pyserial/releases/download/v3.2.1/pyserial-3.2.1.tar.gz
 #        GIT_REPOSITORY https://github.com/pyserial/pyserial.git
 #        GIT_TAG origin/master
@@ -452,6 +473,9 @@ endif()
 
 if(BUILD_PYTHON_UTILS)
     if(BUILD_OS_LINUX)
+        set(build_python_utils LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        set(install_python_utils LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+    elseif(BUILD_OS_OSX)
         set(build_python_utils LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
         set(install_python_utils LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
     else()
