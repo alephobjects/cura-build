@@ -93,6 +93,11 @@ if(BUILD_OS_WINDOWS)
     endif()
 elseif(BUILD_OS_LINUX)
     set(BUILD_PYTHON OFF)
+elseif(BUILD_OS_OSX)
+    # Turning NumPy/SciPy off for now
+    set(BUILD_NUMPY OFF)
+    set(BUILD_SCIPY OFF)
+    set(BUILD_NUMPY_STL OFF)
 endif()
 
 set(TAG_OR_BRANCH "master" CACHE STRING "The name of the tag or branch to build")
