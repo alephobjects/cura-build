@@ -359,7 +359,7 @@ elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
     )
 endif()
 
-if((BUILD_NUMPY OR BUILD_SCIPY) AND BUILD_OS_LINUX)
+if((BUILD_NUMPY OR BUILD_SCIPY) AND (BUILD_OS_LINUX OR BUILD_OS_OSX))
     # Fortran compiler is needed for OpenBLAS, but it does no check whether it is available.
     enable_language (Fortran)
     set(openblas_options DYNAMIC_ARCH=1 NO_STATIC=1)
@@ -392,8 +392,6 @@ if(BUILD_NUMPY)
 
     ExternalProject_Add(Numpy
         DEPENDS Python OpenBLAS
-#        URL http://downloads.sourceforge.net/project/numpy/NumPy/1.9.2/numpy-1.9.2.tar.gz
-#        URL_MD5 a1ed53432dbcd256398898d35bc8e645
         URL http://downloads.sourceforge.net/project/numpy/NumPy/1.11.2/numpy-1.11.2.tar.gz
         URL_MD5 03bd7927c314c43780271bf1ab795ebc
         CONFIGURE_COMMAND ""
@@ -445,8 +443,6 @@ if(BUILD_PYSERIAL)
     ExternalProject_Add(PySerial
         DEPENDS Python
         URL https://github.com/pyserial/pyserial/releases/download/v3.2.1/pyserial-3.2.1.tar.gz
-#        GIT_REPOSITORY https://github.com/pyserial/pyserial.git
-#        GIT_TAG origin/master
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_pyserial}
         INSTALL_COMMAND ${install_pyserial}
