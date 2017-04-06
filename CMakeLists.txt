@@ -96,7 +96,7 @@ elseif(BUILD_OS_LINUX)
 elseif(BUILD_OS_OSX)
 # Turning NumPy/SciPy off for now
 #    set(BUILD_NUMPY OFF)
-    set(BUILD_SCIPY OFF)
+#    set(BUILD_SCIPY OFF)
 #    set(BUILD_NUMPY_STL OFF)
 endif()
 
@@ -417,7 +417,7 @@ if(BUILD_NUMPY)
 endif()
 
 if(BUILD_SCIPY)
-    if(BUILD_OS_LINUX OR BUILD_OS_OSX)
+    if(BUILD_OS_LINUX)
         set(build_scipy LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
         list(APPEND build_scipy OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so)
         list(APPEND build_scipy PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
@@ -425,6 +425,14 @@ if(BUILD_SCIPY)
 
         set(install_scipy LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
         list(APPEND install_scipy OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so)
+        list(APPEND install_scipy PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+        list(APPEND install_scipy ${PYTHON_EXECUTABLE} setup.py install ${python_install})
+    elseif(BUILD_OS_OSX)
+	set(build_scipy LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        list(APPEND build_scipy PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+        list(APPEND build_scipy ${PYTHON_EXECUTABLE} setup.py build)
+
+	set(install_scipy LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
         list(APPEND install_scipy PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
         list(APPEND install_scipy ${PYTHON_EXECUTABLE} setup.py install ${python_install})
     else()
@@ -638,12 +646,20 @@ foreach(repo ${EXTRA_REPOSITORIES})
 endforeach()
 
 if(BUILD_OS_OSX)
+    set(build_py2app LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+    list(APPEND build_py2app PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+    list(APPEND build_py2app ${PYTHON_EXECUTABLE} setup.py build)
+
+    set(install_py2app LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+    list(APPEND install_py2app PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+    list(APPEND install_py2app ${PYTHON_EXECUTABLE} setup.py install)
+
     ExternalProject_Add(Py2App
         DEPENDS Python
         URL https://pypi.python.org/packages/source/p/py2app/py2app-0.9.tar.gz
         CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install
+        BUILD_COMMAND ${build_py2app}
+        INSTALL_COMMAND ${install_py2app}
         BUILD_IN_SOURCE 1
     )
 elseif(BUILD_OS_WINDOWS)
@@ -680,9 +696,13 @@ if(BUILD_OS_OSX)
         COMMENT "Cleaning old dist/ directory"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
+
+    set(run_py2app LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+    list(APPEND run_py2app PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+    list(APPEND run_py2app ${PYTHON_EXECUTABLE} setup_osx.py py2app)
     add_custom_command(
         TARGET build_app POST_BUILD
-        COMMAND ${PYTHON_EXECUTABLE} setup_osx.py py2app
+        COMMAND ${run_py2app}
         COMMENT "Running py2app"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
