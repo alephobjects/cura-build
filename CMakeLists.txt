@@ -107,13 +107,6 @@ set(CURA_ENGINE_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the Cur
 
 set(EXTRA_REPOSITORIES "" CACHE STRING "Extra repositories to install. Expected to have a CMake based build system.")
 set(EXTERNALPROJECT_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/inst)
-if(BUILD_OS_WINDOWS)
-    find_package(PythonInterp)
-    set(PYTHON_DIRECTORY "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
-    set(PYTHON_SITE_PACKAGES_DIR lib/${PYTHON_DIRECTORY}/site-packages)
-else()
-    set(PYTHON_SITE_PACKAGES_DIR lib/python3/dist-packages)
-endif()
 
 # Create the version-related variables
 # These can optionally be overridden from the build enviroment.
@@ -148,11 +141,6 @@ endif()
 
 message(STATUS "Building Cura ${CURA_VERSION}")
 
-if(WIN32)
-    # To deal with stupid setuptools not creating install directories
-    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/inst/${PYTHON_SITE_PACKAGES_DIR})
-endif()
-
 if(BUILD_PYTHON)
     if(APPLE)
         # See http://bugs.python.org/issue21381
@@ -184,6 +172,20 @@ else()
     find_package(PythonInterp ${MINIMUM_PYTHON_VERSION} REQUIRED)
     add_custom_target(Python)
     set(EXTRA_PYTHON_DEFINES)
+endif()
+
+if(BUILD_OS_WINDOWS)
+    set(PYTHON_DIRECTORY "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
+    set(PYTHON_SITE_PACKAGES_DIR lib/${PYTHON_DIRECTORY}/site-packages)
+elseif(BUILD_OS_LINUX)
+    set(PYTHON_SITE_PACKAGES_DIR lib/python${PYTHON_VERSION_MAJOR}/dist-packages)
+elseif(BUILD_OS_OSX)
+    set(PYTHON_SITE_PACKAGES_DIR lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/dist-packages)
+endif()
+
+if(WIN32)
+    # To deal with stupid setuptools not creating install directories
+    file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/inst/${PYTHON_SITE_PACKAGES_DIR})
 endif()
 
 
