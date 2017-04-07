@@ -154,7 +154,7 @@ if(BUILD_PYTHON)
     endif()
 
     ExternalProject_Add(Python
-        URL https://www.python.org/ftp/python/3.4.3/Python-3.4.3.tgz
+        URL https://www.python.org/ftp/python/3.5.3/Python-3.5.3.tgz
         PATCH_COMMAND ${patch_command}
         CONFIGURE_COMMAND ./configure --prefix=${EXTERNALPROJECT_INSTALL_PREFIX} --enable-shared --with-threads --without-pymalloc ${PYTHON_CONFIGURE_CFLAGS} ${PYTHON_CONFIGURE_LDFLAGS}
         BUILD_IN_SOURCE 1
