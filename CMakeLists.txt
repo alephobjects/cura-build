@@ -148,7 +148,7 @@ if(BUILD_PYTHON)
     if(APPLE)
         # See http://bugs.python.org/issue21381
         # The interpreter crashes when MACOSX_DEPLOYMENT_TARGET=10.7 due to the increased stack size.
-        set(patch_command sed -i".bak" "8704,8704d" <SOURCE_DIR>/configure)
+        # set(patch_command sed -i".bak" "8704,8704d" <SOURCE_DIR>/configure)
         set(PYTHON_CONFIGURE_CFLAGS "CFLAGS=-I/usr/local/opt/openssl/include")
         set(PYTHON_CONFIGURE_LDFLAGS "LDFLAGS=-L/usr/local/opt/openssl/lib")
     endif()
