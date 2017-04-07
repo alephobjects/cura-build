@@ -29,6 +29,7 @@ endmacro()
 
 string_option(MINIMUM_PYTHON_VERSION "Minimum Python Version" "3.5.0")
 string_option(ARCUS_URL "Arcus Git Url" "https://code.alephobjects.com/diffusion/LA/arcus.git")
+string_option(SAVITAR_URL "Savitar Git Url" "https://code.alephobjects.com/source/savitar.git")
 string_option(CURA_URL "Cura Git Url" "https://code.alephobjects.com/diffusion/CT/Cura2.git")
 string_option(CURAENGINE_URL "CuraEngine Git Url" "https://code.alephobjects.com/diffusion/CTE/cura-engine.git")
 string_option(URANIUM_URL "Uranium Git Url" "https://code.alephobjects.com/diffusion/U/uranium.git")
@@ -101,6 +102,7 @@ elseif(BUILD_OS_OSX)
 endif()
 
 set(TAG_OR_BRANCH "master" CACHE STRING "The name of the tag or branch to build")
+set(SAVITAR_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the Savitar tag or branch to build")
 set(CURA_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the Cura tag or branch to build")
 set(URANIUM_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the Uranium tag or branch to build")
 set(CURA_ENGINE_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the CuraEngine tag or branch to build")
@@ -119,13 +121,13 @@ endif()
 if(DEFINED ENV{CURA_MINOR_VERSION})
     set(CURA_MINOR_VERSION $ENV{CURA_MINOR_VERSION} CACHE STRING "Cura Minor Version" FORCE)
 else()
-    set(CURA_MINOR_VERSION "4" CACHE STRING "Cura Minor Version")
+    set(CURA_MINOR_VERSION "5" CACHE STRING "Cura Minor Version")
 endif()
 
 if(DEFINED ENV{CURA_PATCH_VERSION})
     set(CURA_PATCH_VERSION $ENV{CURA_PATCH_VERSION} CACHE STRING "Cura Patch Version" FORCE)
 else()
-    set(CURA_PATCH_VERSION "33" CACHE STRING "Cura Patch Version")
+    set(CURA_PATCH_VERSION "0" CACHE STRING "Cura Patch Version")
 endif()
 
 if(DEFINED ENV{CURA_EXTRA_VERSION})
@@ -565,6 +567,13 @@ if(BUILD_OS_WIN64)
     set(ARCUS_EXTRA_ARGS -DBUILD_PYTHON=OFF)
 endif()
 
+ExternalProject_Add(Savitar
+    DEPENDS Python Sip
+    GIT_REPOSITORY ${SAVITAR_URL}
+    GIT_TAG origin/${SAVITAR_TAG_OR_BRANCH}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=-static-libstdc++ -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} ${EXTRA_PYTHON_DEFINES} 
+)   
+
 ExternalProject_Add(Arcus
     DEPENDS Python Protobuf Sip
     GIT_REPOSITORY ${ARCUS_URL}
@@ -587,7 +596,7 @@ ExternalProject_Add(Uranium
 )
 
 ExternalProject_Add(Cura
-    DEPENDS Uranium CuraEngine
+    DEPENDS Uranium CuraEngine Savitar
     GIT_REPOSITORY ${CURA_URL}
     GIT_TAG origin/${CURA_TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} -DURANIUM_SCRIPTS_DIR= -DCURA_VERSION=${CURA_VERSION} -DCMAKE_MODULE_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/ ${EXTRA_PYTHON_DEFINES}
