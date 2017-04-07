@@ -18,6 +18,7 @@ option(BUILD_PYSERIAL "Include PySerial" ON)
 option(BUILD_NUMPY_STL "Include Numpy-STL" ON)
 option(BUILD_PYTHON_UTILS "Include Python-Utils" ON)
 option(BUILD_ZEROCONF "Include python-zeroconf" ON)
+option(BUILD_TYPING "Include python-typing" ON)
 
 macro(string_option name info default_value)
     if (${name})
@@ -547,6 +548,17 @@ if(BUILD_ZEROCONF)
         BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
         INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
         BUILD_IN_SOURCE 1
+    )
+endif()
+
+if(BUILD_TYPING)
+    ExternalProject_Add(PythonTyping
+	DEPENDS Python
+	URL https://pypi.python.org/packages/17/75/3698d7992a828ad6d7be99c0a888b75ed173a9280e53dbae67326029b60e/typing-3.6.1.tar.gz
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
+	INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+	BUILD_IN_SOURCE 1
     )
 endif()
 
