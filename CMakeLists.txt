@@ -737,7 +737,7 @@ if(BUILD_OS_OSX)
 
     set(run_py2app LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
     list(APPEND run_py2app PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
-    list(APPEND run_py2app ${PYTHON_EXECUTABLE} setup_osx.py py2app --excludes="PyQt5.uic.port_v2")
+    list(APPEND run_py2app ${PYTHON_EXECUTABLE} setup_osx.py py2app --excludes="PyQt5.uic")
     add_custom_command(
         TARGET build_app POST_BUILD
         COMMAND ${run_py2app}
