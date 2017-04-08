@@ -667,6 +667,8 @@ foreach(repo ${EXTRA_REPOSITORIES})
 endforeach()
 
 if(BUILD_OS_OSX)
+    
+
     set(build_py2app LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
     list(APPEND build_py2app PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
     list(APPEND build_py2app ${PYTHON_EXECUTABLE} setup.py build)
@@ -677,7 +679,8 @@ if(BUILD_OS_OSX)
 
     ExternalProject_Add(Py2App
         DEPENDS Python
-        URL https://pypi.python.org/packages/source/p/py2app/py2app-0.9.tar.gz
+        # URL https://pypi.python.org/packages/source/p/py2app/py2app-0.9.tar.gz
+	URL https://pypi.python.org/packages/d9/ff/48a8aede5e99db5983039fd0e6c54bb4c0806ef696430d2684348e78249f/py2app-0.12.tar.gz
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_py2app}
         INSTALL_COMMAND ${install_py2app}
