@@ -579,6 +579,54 @@ if(BUILD_OS_WIN64)
     set(ARCUS_EXTRA_ARGS -DBUILD_PYTHON=OFF)
 endif()
 
+#----- Installers Needs to be build inside Cura2 -----#
+if(BUILD_OS_OSX)
+    #It seems that py2app depends on The following:
+    # * setuptools or distribute
+    #   setuptools and distribute provide enhancements to distutils, as well as the mechanisms for creating and working with Python Eggs.
+    #   Distribute is a fork of setuptools that amongst others adds support for python 3. All testing of py2app is done using distribute.
+    # * macholib
+    #   macholib reads and writes the Mach-O object file format. Used by py2app to build a dependency graph of dyld and framework 
+    #         dependencies for your application
+    # * modulegraph
+    #   modulegraph is a replacement for the Python standard library modulefinder. Stores the module dependency tree in a graph data 
+    #         structure and allows for advanced filtering and analysis capabilities, such as GraphViz dot output.
+    # * altgraph
+    #   altgraph is a fork of Istvan Albert‘s graphlib, and it used internally by both macholib and modulegraph. It contains several 
+    #   small feature and performance enhancements over the original graphlib.
+
+    set(build_py2app LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+    list(APPEND build_py2app PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+    list(APPEND build_py2app ${PYTHON_EXECUTABLE} setup.py build)
+
+    set(install_py2app LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+    list(APPEND install_py2app PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+    list(APPEND install_py2app ${PYTHON_EXECUTABLE} setup.py install)
+
+    ExternalProject_Add(Py2App
+        DEPENDS Python
+        # URL https://pypi.python.org/packages/source/p/py2app/py2app-0.9.tar.gz
+        URL https://pypi.python.org/packages/d9/ff/48a8aede5e99db5983039fd0e6c54bb4c0806ef696430d2684348e78249f/py2app-0.12.tar.gz
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${build_py2app}
+        INSTALL_COMMAND ${install_py2app}
+        COMMENT "Building py2app :${build_py2app}"
+        BUILD_IN_SOURCE 1
+    )
+elseif(BUILD_OS_WINDOWS)
+    # Currently, py2exe can not be built with MinGW since the code apparently uses
+    # a lot of MSVC-isms. So instead, install py2exe in your Python installation and
+    # use that.
+    # ExternalProject_Add(Py2Exe
+        # DEPENDS Python
+        # URL https://pypi.python.org/packages/source/p/py2exe/py2exe-0.9.2.0.zip
+        # CONFIGURE_COMMAND ""
+        # BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
+        # INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+        # BUILD_IN_SOURCE 1
+    # )
+endif()
+
 ExternalProject_Add(Savitar
     DEPENDS Python Sip
     GIT_REPOSITORY ${SAVITAR_URL}
@@ -667,54 +715,6 @@ foreach(repo ${EXTRA_REPOSITORIES})
 endforeach()
 
 if(BUILD_OS_OSX)
-    #It seems that py2app depends on The following:
-    # * setuptools or distribute
-    #	setuptools and distribute provide enhancements to distutils, as well as the mechanisms for creating and working with Python Eggs.
-    #   Distribute is a fork of setuptools that amongst others adds support for python 3. All testing of py2app is done using distribute.
-    # * macholib
-    #   macholib reads and writes the Mach-O object file format. Used by py2app to build a dependency graph of dyld and framework 
-    #         dependencies for your application
-    # * modulegraph
-    #   modulegraph is a replacement for the Python standard library modulefinder. Stores the module dependency tree in a graph data 
-    #         structure and allows for advanced filtering and analysis capabilities, such as GraphViz dot output.
-    # * altgraph
-    #   altgraph is a fork of Istvan Albert‘s graphlib, and it used internally by both macholib and modulegraph. It contains several 
-    #   small feature and performance enhancements over the original graphlib.
-
-    set(build_py2app LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
-    list(APPEND build_py2app PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
-    list(APPEND build_py2app ${PYTHON_EXECUTABLE} setup.py build)
-
-    set(install_py2app LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
-    list(APPEND install_py2app PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
-    list(APPEND install_py2app ${PYTHON_EXECUTABLE} setup.py install)
-
-    ExternalProject_Add(Py2App
-        DEPENDS Python
-        # URL https://pypi.python.org/packages/source/p/py2app/py2app-0.9.tar.gz
-	URL https://pypi.python.org/packages/d9/ff/48a8aede5e99db5983039fd0e6c54bb4c0806ef696430d2684348e78249f/py2app-0.12.tar.gz
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${build_py2app}
-        INSTALL_COMMAND ${install_py2app}
-	COMMENT "Building py2app :${build_py2app}"
-        BUILD_IN_SOURCE 1
-    )
-
-elseif(BUILD_OS_WINDOWS)
-    # Currently, py2exe can not be built with MinGW since the code apparently uses
-    # a lot of MSVC-isms. So instead, install py2exe in your Python installation and
-    # use that.
-    # ExternalProject_Add(Py2Exe
-        # DEPENDS Python
-        # URL https://pypi.python.org/packages/source/p/py2exe/py2exe-0.9.2.0.zip
-        # CONFIGURE_COMMAND ""
-        # BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-        # INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
-        # BUILD_IN_SOURCE 1
-    # )
-endif()
-
-if(BUILD_OS_OSX)
     set(CPACK_GENERATOR "DragNDrop")
 
     configure_file(setup_osx.py.in setup_osx.py @ONLY)
@@ -739,7 +739,6 @@ if(BUILD_OS_OSX)
     list(APPEND run_py2app PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
     list(APPEND run_py2app ${PYTHON_EXECUTABLE} setup_osx.py py2app)
     add_custom_command(
-	DEPENDS Py2App
         TARGET build_app POST_BUILD
         COMMAND ${run_py2app}
         COMMENT "Running py2app :${run_py2app}"
