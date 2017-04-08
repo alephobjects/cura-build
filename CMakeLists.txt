@@ -739,6 +739,7 @@ if(BUILD_OS_OSX)
     list(APPEND run_py2app PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
     list(APPEND run_py2app ${PYTHON_EXECUTABLE} setup_osx.py py2app)
     add_custom_command(
+	DEPENDS Py2App
         TARGET build_app POST_BUILD
         COMMAND ${run_py2app}
         COMMENT "Running py2app :${run_py2app}"
