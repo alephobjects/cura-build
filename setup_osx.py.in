@@ -45,6 +45,7 @@ OPTIONS = {
         "xml.etree.ElementTree",
         "zeroconf",
         "uuid",
+	"Savitar",
     ],
     "resources": [
         "inst/lib/plugins",

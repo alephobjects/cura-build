@@ -409,7 +409,7 @@ if(BUILD_NUMPY)
     endif()
 
     ExternalProject_Add(Numpy
-        DEPENDS Python OpenBLAS
+        DEPENDS Python OpenBLAS PythonZeroconf
         URL http://downloads.sourceforge.net/project/numpy/NumPy/1.11.2/numpy-1.11.2.tar.gz
         URL_MD5 03bd7927c314c43780271bf1ab795ebc
         CONFIGURE_COMMAND ""
@@ -746,6 +746,7 @@ if(BUILD_OS_OSX)
     set(run_py2app LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
     list(APPEND run_py2app PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
     list(APPEND run_py2app ${PYTHON_EXECUTABLE} setup_osx.py py2app --excludes="PyQt5.uic")
+    
     add_custom_command(
         TARGET build_app POST_BUILD
         COMMAND ${run_py2app}
