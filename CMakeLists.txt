@@ -388,7 +388,7 @@ if(BUILD_PYQT)
 #    )
 
     ExternalProject_Add(PyQt
-        DEPENDS Python Qt Sip
+        DEPENDS Python Qt Sip PythonSix
 #        URL http://downloads.sourceforge.net/project/pyqt/PyQt5/PyQt-5.5.1/PyQt-gpl-5.5.1.tar.gz
         URL https://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.8.1/PyQt5_gpl-5.8.1.tar.gz/download
 #        PATCH_COMMAND ${pyqt_patch}
@@ -446,7 +446,7 @@ if(BUILD_NUMPY)
     endif()
 
     ExternalProject_Add(Numpy
-        DEPENDS Python OpenBLAS
+        DEPENDS Python OpenBLAS PythonSix
         URL http://downloads.sourceforge.net/project/numpy/NumPy/1.11.2/numpy-1.11.2.tar.gz
         URL_MD5 03bd7927c314c43780271bf1ab795ebc
         CONFIGURE_COMMAND ""
@@ -749,7 +749,7 @@ if(BUILD_OS_OSX)
     configure_file(setup_osx.py.in setup_osx.py @ONLY)
 
     add_custom_target(build_app ALL)
-    add_dependencies(build_app cura-binary-data)
+    add_dependencies(build_app ${_last_repo})
 
     foreach(repo ${EXTRA_REPOSITORIES})
         separate_arguments(items UNIX_COMMAND "${repo}")
@@ -784,7 +784,7 @@ elseif(BUILD_OS_WINDOWS)
     configure_file(setup_win32.py.in setup_win32.py @ONLY)
 
     add_custom_target(build_exe ALL)
-    add_dependencies(build_exe cura-binary-data)
+    add_dependencies(build_exe ${_last_repo})
 
     foreach(repo ${EXTRA_REPOSITORIES})
         separate_arguments(items UNIX_COMMAND "${repo}")
