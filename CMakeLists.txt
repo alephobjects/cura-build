@@ -314,13 +314,24 @@ elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
 endif()
 
 if(BUILD_ZEROCONF)
+    if(BUILD_OS_LINUX OR BUILD_OS_OSX)
+        set(build_python_zeroconf LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        set(install_python_zeroconf LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        list(APPEND build_python_zeroconf PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+        list(APPEND install_python_zeroconf PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+    else()
+        set(build_python_zeroconf)
+        set(install_python_zeroconf)
+    endif()
+    list(APPEND build_python_zeroconf ${PYTHON_EXECUTABLE} setup.py build)
+    list(APPEND install_python_zeroconf ${PYTHON_EXECUTABLE} setup.py install ${python_install})
 
     ExternalProject_Add(PythonNetifaces
         DEPENDS Python
         URL https://pypi.python.org/packages/18/fa/dd13d4910aea339c0bb87d2b3838d8fd923c11869b1f6e741dbd0ff3bc00/netifaces-0.10.4.tar.gz
         CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+        BUILD_COMMAND ${build_python_zeroconf}
+        INSTALL_COMMAND ${install_python_zeroconf}
         BUILD_IN_SOURCE 1
     )
 
@@ -328,8 +339,8 @@ if(BUILD_ZEROCONF)
         DEPENDS Python
         URL https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz
         CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+        BUILD_COMMAND ${build_python_zeroconf}
+        INSTALL_COMMAND ${install_python_zeroconf}
         BUILD_IN_SOURCE 1
     )
 
@@ -338,8 +349,8 @@ if(BUILD_ZEROCONF)
         GIT_REPOSITORY https://github.com/jstasiak/python-zeroconf
         GIT_TAG 0.17.6
         CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+        BUILD_COMMAND ${build_python_zeroconf}
+        INSTALL_COMMAND ${install_python_zeroconf}
         BUILD_IN_SOURCE 1
     )
 else()
@@ -399,7 +410,7 @@ else()
     add_custom_target(PyQt)
 endif()
 
-if((BUILD_NUMPY OR BUILD_SCIPY) AND (BUILD_OS_LINUX))
+if((BUILD_NUMPY OR BUILD_SCIPY) AND (BUILD_OS_LINUX OR BUILD_OS_OSX))
     # Fortran compiler is needed for OpenBLAS, but it does no check whether it is available.
     enable_language (Fortran)
     if(BUILD_OS_LINUX)
@@ -636,7 +647,7 @@ ExternalProject_Add(Uranium
 )
 
 ExternalProject_Add(Cura
-    DEPENDS Uranium CuraEngine Savitar
+    DEPENDS Uranium CuraEngine Savitar NumpySTL PythonTyping PySerial PythonZeroconf
     GIT_REPOSITORY ${CURA_URL}
     GIT_TAG origin/${CURA_TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} -DURANIUM_SCRIPTS_DIR= -DCURA_VERSION=${CURA_VERSION} -DCMAKE_MODULE_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/ ${EXTRA_PYTHON_DEFINES}
@@ -749,7 +760,7 @@ if(BUILD_OS_OSX)
     configure_file(setup_osx.py.in setup_osx.py @ONLY)
 
     add_custom_target(build_app ALL)
-    add_dependencies(build_app ${_last_repo})
+    add_dependencies(build_app ${_last_repo} Py2App)
 
     foreach(repo ${EXTRA_REPOSITORIES})
         separate_arguments(items UNIX_COMMAND "${repo}")
