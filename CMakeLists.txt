@@ -775,6 +775,18 @@ if(BUILD_OS_OSX)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
+    set(command_generate_version LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+    list(APPEND command_generate_version PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+    list(APPEND command_generate_version ${PYTHON_EXECUTABLE} scripts/cura_version.py)
+    list(APPEND command_generate_version ${CURA_MAJOR_VERSION}.${CURA_MINOR_VERSION}.${CURA_PATCH_VERSION})
+    list(APPEND command_generate_version "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/dist")
+    add_custom_command(
+	TARGET build_app POST_BUILD
+	COMMAND ${command_generate_version}
+	COMMENT "Generating version.json"
+	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    )
+
     install(DIRECTORY ${CMAKE_BINARY_DIR}/dist/Cura.app DESTINATION "." USE_SOURCE_PERMISSIONS)
 
 elseif(BUILD_OS_WINDOWS)
