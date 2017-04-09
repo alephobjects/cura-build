@@ -296,6 +296,35 @@ else()
     add_custom_target(Sip)
 endif()
 
+if(BUILD_ZEROCONF)
+    ExternalProject_Add(PythonNetifaces
+        DEPENDS Python
+        URL https://pypi.python.org/packages/18/fa/dd13d4910aea339c0bb87d2b3838d8fd923c11869b1f6e741dbd0ff3bc00/netifaces-0.10.4.tar.gz
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
+        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+        BUILD_IN_SOURCE 1
+    )
+    ExternalProject_Add(PythonSix
+        DEPENDS Python
+        URL https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
+        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+        BUILD_IN_SOURCE 1
+    )
+
+    ExternalProject_Add(PythonZeroconf
+        DEPENDS PythonNetifaces PythonSix
+        GIT_REPOSITORY https://github.com/jstasiak/python-zeroconf
+        GIT_TAG 0.17.6
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
+        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+        BUILD_IN_SOURCE 1
+    )
+endif()
+
 if(BUILD_PYQT)
     set(pyqt_command "")
     if(BUILD_OS_WINDOWS)
@@ -409,7 +438,7 @@ if(BUILD_NUMPY)
     endif()
 
     ExternalProject_Add(Numpy
-        DEPENDS Python OpenBLAS PythonZeroconf
+        DEPENDS Python OpenBLAS
         URL http://downloads.sourceforge.net/project/numpy/NumPy/1.11.2/numpy-1.11.2.tar.gz
         URL_MD5 03bd7927c314c43780271bf1ab795ebc
         CONFIGURE_COMMAND ""
@@ -526,35 +555,6 @@ if(BUILD_NUMPY_STL)
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_numpy_stl}
         INSTALL_COMMAND ${install_numpy_stl}
-        BUILD_IN_SOURCE 1
-    )
-endif()
-
-if(BUILD_ZEROCONF)
-    ExternalProject_Add(PythonNetifaces
-        DEPENDS Python
-        URL https://pypi.python.org/packages/18/fa/dd13d4910aea339c0bb87d2b3838d8fd923c11869b1f6e741dbd0ff3bc00/netifaces-0.10.4.tar.gz
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
-        BUILD_IN_SOURCE 1
-    )
-    ExternalProject_Add(PythonSix
-	DEPENDS Python
-	URL https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz
-	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-	INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
-	BUILD_IN_SOURCE 1
-    )
-
-    ExternalProject_Add(PythonZeroconf
-        DEPENDS PythonNetifaces PythonSix
-        GIT_REPOSITORY https://github.com/jstasiak/python-zeroconf
-        GIT_TAG 0.17.6
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
         BUILD_IN_SOURCE 1
     )
 endif()
