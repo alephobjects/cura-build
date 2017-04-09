@@ -296,7 +296,24 @@ else()
     add_custom_target(Sip)
 endif()
 
+
+if(BUILD_OS_WINDOWS)
+    # Because setuptools is stupid and will interpret "C:/..." as a relative path
+    string(REPLACE "/" "\\" native_prefix ${EXTERNALPROJECT_INSTALL_PREFIX})
+    set(python_install
+        --install-lib=${native_prefix}\\lib\\${PYTHON_DIRECTORY}\\site-packages
+        --install-data=${native_prefix}\\share
+        --install-scripts=${native_prefix}\\bin
+    )
+elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
+    set(python_install
+        --root=${EXTERNALPROJECT_INSTALL_PREFIX}
+        --install-lib=${PYTHON_SITE_PACKAGES_DIR}
+    )
+endif()
+
 if(BUILD_ZEROCONF)
+
     ExternalProject_Add(PythonNetifaces
         DEPENDS Python
         URL https://pypi.python.org/packages/18/fa/dd13d4910aea339c0bb87d2b3838d8fd923c11869b1f6e741dbd0ff3bc00/netifaces-0.10.4.tar.gz
@@ -305,6 +322,7 @@ if(BUILD_ZEROCONF)
         INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
         BUILD_IN_SOURCE 1
     )
+
     ExternalProject_Add(PythonSix
         DEPENDS Python
         URL https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz
@@ -374,21 +392,6 @@ if(BUILD_PYQT)
     )
 else()
     add_custom_target(PyQt)
-endif()
-
-if(BUILD_OS_WINDOWS)
-    # Because setuptools is stupid and will interpret "C:/..." as a relative path
-    string(REPLACE "/" "\\" native_prefix ${EXTERNALPROJECT_INSTALL_PREFIX})
-    set(python_install
-        --install-lib=${native_prefix}\\lib\\${PYTHON_DIRECTORY}\\site-packages
-        --install-data=${native_prefix}\\share
-        --install-scripts=${native_prefix}\\bin
-    )
-elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
-    set(python_install
-        --root=${EXTERNALPROJECT_INSTALL_PREFIX}
-        --install-lib=${PYTHON_SITE_PACKAGES_DIR}
-    )
 endif()
 
 if((BUILD_NUMPY OR BUILD_SCIPY) AND (BUILD_OS_LINUX))
