@@ -69,7 +69,7 @@ endif()
 
 # Explicitly disable unsupported options
 if(BUILD_OS_WINDOWS)
-    # set(BUILD_PYTHON OFF)
+    set(BUILD_PYTHON OFF)
 
     # Disable building of Numpy and Scipy due to build failures.
     # set(BUILD_NUMPY OFF)
