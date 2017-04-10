@@ -461,10 +461,9 @@ if(BUILD_NUMPY)
 	list(APPEND install_numpy PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
 	list(APPEND install_numpy ${PYTHON_EXECUTABLE} setup.py install ${python_install})
     else()
-        set(build_numpy ${PYTHON_EXECUTABLE} setup.py build)
-	list(APPEND build_numpy --compiler=mingw32  )
+        set( build_numpy ${PYTHON_EXECUTABLE} setup.py )
+	list(APPEND build_numpy config --compiler=mingw32 build --compiler=mingw32  )
         set(install_numpy ${PYTHON_EXECUTABLE} setup.py install ${python_install} )
-	list(APPEND install_numpy --compiler=mingw32 )
     endif()
 
     ExternalProject_Add(Numpy
