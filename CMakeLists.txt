@@ -45,7 +45,6 @@ set(BUILD_OS_LINUX OFF)
 set(BUILD_OS_WINDOWS OFF)
 set(BUILD_OS_WIN32 OFF)
 set(BUILD_OS_WIN64 OFF)
-set(SIP_VERSION 4.19.1)
 
 if(CYGWIN)
     message(FATAL_ERROR "Cygwin is not supported")
@@ -57,7 +56,6 @@ elseif(WIN32)
     set(BUILD_OS_WINDOWS ON)
     # Possibly all platforms could use SIP 4.19 but Windows is the only one that needs it right now in order to use
     # the pip versions of PyQt5, which only support SIP 4.19.  (Versions of SIP cannot be mixed in the same app.)
-    set(SIP_VERSION 4.19)
     if(BUILD_64BIT)
         set(BUILD_OS_WIN64 ON)
     else()
@@ -284,11 +282,19 @@ if(BUILD_SIP)
 	list(APPEND sip_command --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
     endif()
 
+    set(SIP_VERSION 0x041301)
+    set(SIP_VERSION_STR 4.19.1 )
+    # set(SIP_VERSION_NUM )
+    set(SIP_BINARY_PATH ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/sip )
+    set(SIP_DEFAULT_SIP_DIR ${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
+    set(SIP_INCLUDE_DIR ${EXTERNALPROJECT_INSTALL_PREFIX}/include )
+    set(SIP_FOUND True)
+
     message(STATUS "SIP config: ${sip_command}")
 
     ExternalProject_Add(Sip
         DEPENDS Python
-        URL http://downloads.sourceforge.net/project/pyqt/sip/sip-${SIP_VERSION}/sip-${SIP_VERSION}.zip
+        URL http://downloads.sourceforge.net/project/pyqt/sip/sip-${SIP_VERSION_STR}/sip-${SIP_VERSION_STR}.zip
         CONFIGURE_COMMAND ${sip_command}
         BUILD_IN_SOURCE 1
     )
