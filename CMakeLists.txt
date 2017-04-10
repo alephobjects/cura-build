@@ -72,11 +72,11 @@ if(BUILD_OS_WINDOWS)
     set(BUILD_PYTHON OFF)
 
     # Disable building of Numpy and Scipy due to build failures.
-    set(BUILD_NUMPY OFF)
-    set(BUILD_SCIPY OFF)
-    set(BUILD_NUMPY_STL OFF)
-    set(BUILD_PYTHON_UTILS OFF)
-    set(BUILD_ZEROCONF OFF)
+    # set(BUILD_NUMPY OFF)
+    # set(BUILD_SCIPY OFF)
+    # set(BUILD_NUMPY_STL OFF)
+    # set(BUILD_PYTHON_UTILS OFF)
+    # set(BUILD_ZEROCONF OFF)
 
     # On Win32, MinGW built Qt ignores environment variable changes made when running the
     # application. Since we need that to disable the threaded renderer, we need to use an
