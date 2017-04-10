@@ -9,6 +9,7 @@ include(GNUInstallDirs)
 
 # Define Options
 option(BUILD_PYTHON "Include Python" ON)
+option(BUILD_CYTHON "Include Cython" ON)
 option(BUILD_QT "Include Qt" ON)
 option(BUILD_SIP "Include SIP" ON)
 option(BUILD_PYQT "Include PyQt" ON)
@@ -184,6 +185,7 @@ elseif(BUILD_OS_OSX)
     set(PYTHON_SITE_PACKAGES_DIR lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/dist-packages)
 endif()
 
+
 if(WIN32)
     # To deal with stupid setuptools not creating install directories
     file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/inst/${PYTHON_SITE_PACKAGES_DIR})
@@ -317,6 +319,31 @@ elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
         --root=${EXTERNALPROJECT_INSTALL_PREFIX}
         --install-lib=${PYTHON_SITE_PACKAGES_DIR}
     )
+endif()
+
+if (BUILD_CYTHON)
+    if(BUILD_OS_LINUX OR BUILD_OS_OSX)
+        set(build_cython LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        set(install_cython LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+        list(APPEND build_cython PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+        list(APPEND install_cython PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+    else()
+        set(build_cython)
+        set(install_cython)
+    endif()
+    list(APPEND build_cython ${PYTHON_EXECUTABLE} setup.py build)
+    list(APPEND install_cython ${PYTHON_EXECUTABLE} setup.py install ${python_install})
+
+    ExternalProject_Add(Cython
+        DEPENDS Python
+        URL https://pypi.python.org/packages/b7/67/7e2a817f9e9c773ee3995c1e15204f5d01c8da71882016cac10342ef031b/Cython-0.25.2.tar.gz
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${build_cython}
+        INSTALL_COMMAND ${install_cython}
+        BUILD_IN_SOURCE 1
+    )
+else()
+    add_custom_target(Cython)
 endif()
 
 if(BUILD_ZEROCONF)
@@ -467,9 +494,11 @@ if(BUILD_NUMPY)
     endif()
 
     ExternalProject_Add(Numpy
-        DEPENDS Python OpenBLAS PythonSix Sip
-        URL http://downloads.sourceforge.net/project/numpy/NumPy/1.11.2/numpy-1.11.2.tar.gz
-        URL_MD5 03bd7927c314c43780271bf1ab795ebc
+        DEPENDS Python OpenBLAS PythonSix Sip Cython
+        # URL http://downloads.sourceforge.net/project/numpy/NumPy/1.11.2/numpy-1.11.2.tar.gz
+        # URL_MD5 03bd7927c314c43780271bf1ab795ebc
+	GIT_REPOSITORY git://github.com/numpy/numpy.git
+        GIT_TAG 32776774fd6d7f0e62e68ff191b8f834a77932a4
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_numpy}
         INSTALL_COMMAND ${install_numpy}
