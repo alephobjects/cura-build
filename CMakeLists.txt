@@ -466,7 +466,7 @@ if(BUILD_NUMPY)
     endif()
 
     ExternalProject_Add(Numpy
-        DEPENDS Python OpenBLAS PythonSix
+        DEPENDS Python OpenBLAS PythonSix Sip
         URL http://downloads.sourceforge.net/project/numpy/NumPy/1.11.2/numpy-1.11.2.tar.gz
         URL_MD5 03bd7927c314c43780271bf1ab795ebc
         CONFIGURE_COMMAND ""
@@ -628,11 +628,18 @@ if(BUILD_OS_WIN64)
     set(ARCUS_EXTRA_ARGS -DBUILD_PYTHON=OFF)
 endif()
 
+if(BUILD_OS_OSX)
+    set(savitar_cxx_flags "-fPIC -std=c++11 -stdlib=libc++")
+elseif(BUILD_OS_WINDOWS)
+    set(savitar_cxx_flags "-std=c++11 -static-libstdc++")
+else()
+    set(savitar_cxx_flags "-fPIC -std=c++11 -static-libstdc++")
+endif()
 ExternalProject_Add(Savitar
     DEPENDS Python Sip Numpy
     GIT_REPOSITORY ${SAVITAR_URL}
     GIT_TAG origin/${SAVITAR_TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=-static-libstdc++ -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} ${EXTRA_PYTHON_DEFINES} 
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=-static-libstdc++ -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} ${EXTRA_PYTHON_DEFINES} -DCMAKE_CXX_FLAGS=${savitar_cxx_flags}
 )   
 
 ExternalProject_Add(Arcus
