@@ -334,6 +334,10 @@ if (BUILD_CYTHON)
     list(APPEND build_cython ${PYTHON_EXECUTABLE} setup.py build)
     list(APPEND install_cython ${PYTHON_EXECUTABLE} setup.py install ${python_install})
 
+    if(BUILD_OS_WINDOWS)
+	list(APPEND build_cython --compiler=mingw32)
+    endif()
+
     ExternalProject_Add(Cython
         DEPENDS Python
         URL https://pypi.python.org/packages/b7/67/7e2a817f9e9c773ee3995c1e15204f5d01c8da71882016cac10342ef031b/Cython-0.25.2.tar.gz
