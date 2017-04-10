@@ -612,10 +612,11 @@ endif()
 
 if(BUILD_OS_OSX)
     set(protobuf_cxx_flags "-fPIC -std=c++11 -stdlib=libc++")
+elseif(BUILD_OS_WINDOWS)
+    set(protobuf_cxx_flags "-std=c++11 -static-libstdc++")
 else()
     set(protobuf_cxx_flags "-fPIC -std=c++11 -static-libstdc++")
 endif()
-
 ExternalProject_Add(Protobuf
     URL https://github.com/google/protobuf/archive/v3.0.0.tar.gz
     URL_MD5 d4f6ca65aadc6310b3872ee421e79fa6
