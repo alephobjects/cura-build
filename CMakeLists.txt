@@ -462,9 +462,9 @@ if(BUILD_NUMPY)
 	list(APPEND install_numpy ${PYTHON_EXECUTABLE} setup.py install ${python_install})
     else()
         set(build_numpy ${PYTHON_EXECUTABLE} setup.py build)
-	list(APPEND build_numpy --platform win32-g++ "CFLAGS+=${CMAKE_C_FLAGS}" "CXXFLAGS+=${CMAKE_CXX_FLAGS}" )
+	list(APPEND build_numpy --compiler=mingw32  )
         set(install_numpy ${PYTHON_EXECUTABLE} setup.py install ${python_install} )
-	list(APPEND install_numpy --platform win32-g++ "CFLAGS+=${CMAKE_C_FLAGS}" "CXXFLAGS+=${CMAKE_CXX_FLAGS}" )
+	list(APPEND install_numpy --compiler=mingw32 )
     endif()
 
     ExternalProject_Add(Numpy
