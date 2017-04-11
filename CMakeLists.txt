@@ -20,6 +20,7 @@ option(BUILD_NUMPY_STL "Include Numpy-STL" ON)
 option(BUILD_PYTHON_UTILS "Include Python-Utils" ON)
 option(BUILD_ZEROCONF "Include python-zeroconf" ON)
 option(BUILD_TYPING "Include python-typing" ON)
+option(BUILD_SAVITAR "Include Savitar Library" ON)
 
 macro(string_option name info default_value)
     if (${name})
@@ -72,12 +73,19 @@ endif()
 if(BUILD_OS_WINDOWS)
     set(BUILD_PYTHON OFF)
 
-    # Disable building of Numpy and Scipy due to build failures.
-    # set(BUILD_NUMPY OFF)
-    # set(BUILD_SCIPY OFF)
-    # set(BUILD_NUMPY_STL OFF)
-    # set(BUILD_PYTHON_UTILS OFF)
-    # set(BUILD_ZEROCONF OFF)
+    # Disable building of Numpy and Scipy due to dependency on Fortran
+    set(BUILD_NUMPY OFF)
+    set(BUILD_SCIPY OFF)
+    # 
+    # Disable everything that depends on NumPy or SciPy
+    set(BUILD_NUMPY_STL OFF)
+    set(BUILD_SAVITAR OFF)
+    set(BUILD_PYTHON_UTILS OFF)
+    set(BUILD_ZEROCONF OFF)
+    set(BUILD_TYPING OFF)
+
+    # There is no reason to build CYTHON because NUMPY, NUMPY_STL and SAVITAR are disabled
+    set(BUILD_CYTHON OFF)
 
     # On Win32, MinGW built Qt ignores environment variable changes made when running the
     # application. Since we need that to disable the threaded renderer, we need to use an
@@ -271,6 +279,7 @@ if(BUILD_SIP)
             --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR}
             --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include
             --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip
+	    
             "CFLAGS+=${CMAKE_C_FLAGS}"
             "CXXFLAGS+=${CMAKE_CXX_FLAGS}"
           )
@@ -313,6 +322,7 @@ if(BUILD_OS_WINDOWS)
         --install-lib=${native_prefix}\\lib\\${PYTHON_DIRECTORY}\\site-packages
         --install-data=${native_prefix}\\share
         --install-scripts=${native_prefix}\\bin
+	--compiler=mingw32
     )
 elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
     set(python_install
@@ -334,9 +344,9 @@ if (BUILD_CYTHON)
     list(APPEND build_cython ${PYTHON_EXECUTABLE} setup.py build)
     list(APPEND install_cython ${PYTHON_EXECUTABLE} setup.py install ${python_install})
 
-    if(BUILD_OS_WINDOWS)
-	list(APPEND build_cython --compiler=mingw32)
-    endif()
+    # if(BUILD_OS_WINDOWS)
+    #	list(APPEND build_cython --compiler=mingw32)
+    # endif()
 
     ExternalProject_Add(Cython
         DEPENDS Python
@@ -493,7 +503,7 @@ if(BUILD_NUMPY)
 	list(APPEND install_numpy ${PYTHON_EXECUTABLE} setup.py install ${python_install})
     else()
         set( build_numpy ${PYTHON_EXECUTABLE} setup.py )
-	list(APPEND build_numpy config --compiler=mingw32 build --compiler=mingw32  )
+	list(APPEND build_numpy build --compiler=mingw32  )
         set(install_numpy ${PYTHON_EXECUTABLE} setup.py install ${python_install} )
     endif()
 
@@ -532,7 +542,7 @@ if(BUILD_SCIPY)
         list(APPEND install_scipy PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
         list(APPEND install_scipy ${PYTHON_EXECUTABLE} setup.py install ${python_install})
     else()
-        set(build_scipy ${PYTHON_EXECUTABLE} setup.py build)
+        set(build_scipy ${PYTHON_EXECUTABLE} setup.py build --compiler=mingw32)
         set(install_scipy  ${PYTHON_EXECUTABLE} setup.py install ${python_install})
     endif()
 
@@ -662,19 +672,21 @@ if(BUILD_OS_WIN64)
     set(ARCUS_EXTRA_ARGS -DBUILD_PYTHON=OFF)
 endif()
 
-if(BUILD_OS_OSX)
+if(BUILD_SAVITAR)
+  if(BUILD_OS_OSX)
     set(savitar_cxx_flags "-fPIC -std=c++11 -stdlib=libc++")
-elseif(BUILD_OS_WINDOWS)
-    set(savitar_cxx_flags "-std=c++11 -static-libstdc++")
-else()
+  elseif(BUILD_OS_WINDOWS)
     set(savitar_cxx_flags "-fPIC -std=c++11 -static-libstdc++")
+  else()
+    set(savitar_cxx_flags "-fPIC -std=c++11 -static-libstdc++")
+  endif()
+  ExternalProject_Add(Savitar
+	DEPENDS Python Sip Numpy
+    	GIT_REPOSITORY ${SAVITAR_URL}
+    	GIT_TAG origin/${SAVITAR_TAG_OR_BRANCH}
+    	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=${savitar_cxx_flags} -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} ${EXTRA_PYTHON_DEFINES}
+  )
 endif()
-ExternalProject_Add(Savitar
-    DEPENDS Python Sip Numpy
-    GIT_REPOSITORY ${SAVITAR_URL}
-    GIT_TAG origin/${SAVITAR_TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=${savitar_cxx_flags} -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} ${EXTRA_PYTHON_DEFINES}
-)   
 
 ExternalProject_Add(Arcus
     DEPENDS Python Protobuf Sip
@@ -779,7 +791,7 @@ if(BUILD_OS_OSX)
 
     set(install_py2app LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
     list(APPEND install_py2app PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
-    list(APPEND install_py2app ${PYTHON_EXECUTABLE} setup.py install)
+    list(APPEND install_py2app ${PYTHON_EXECUTABLE} setup.py install ${python_install})
 
     ExternalProject_Add(Py2App
         DEPENDS Python
