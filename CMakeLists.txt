@@ -322,7 +322,6 @@ if(BUILD_OS_WINDOWS)
         --install-lib=${native_prefix}\\lib\\${PYTHON_DIRECTORY}\\site-packages
         --install-data=${native_prefix}\\share
         --install-scripts=${native_prefix}\\bin
-	--compiler=mingw32
     )
 elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
     set(python_install
@@ -342,11 +341,11 @@ if (BUILD_CYTHON)
         set(install_cython)
     endif()
     list(APPEND build_cython ${PYTHON_EXECUTABLE} setup.py build)
-    list(APPEND install_cython ${PYTHON_EXECUTABLE} setup.py install ${python_install})
+    list(APPEND install_cython ${PYTHON_EXECUTABLE} setup.py install ${python_install} )
 
-    # if(BUILD_OS_WINDOWS)
-    #	list(APPEND build_cython --compiler=mingw32)
-    # endif()
+    if(BUILD_OS_WINDOWS)
+	list(APPEND build_cython --compiler=mingw32)
+    endif()
 
     ExternalProject_Add(Cython
         DEPENDS Python
@@ -596,6 +595,7 @@ if(BUILD_PYTHON_UTILS)
 
     list(APPEND build_python_utils ${PYTHON_EXECUTABLE} setup.py build)
     list(APPEND install_python_utils ${PYTHON_EXECUTABLE} setup.py install ${python_install})
+
 
     ExternalProject_Add(PythonUtils
         DEPENDS Python
