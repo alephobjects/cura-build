@@ -95,6 +95,7 @@ if(BUILD_OS_WINDOWS)
     # use it at all.
     set(BUILD_QT OFF)
     set(BUILD_PYQT OFF)
+
     if(BUILD_OS_WIN64)
         # Sip is required to build the Arcus python bindings, which works fine on Win32
         # but fails on Win64. So we need an externally built SIP and Arcus bindings on Win64.
@@ -161,7 +162,7 @@ if(BUILD_PYTHON)
     endif()
 
     ExternalProject_Add(Python
-        URL https://www.python.org/ftp/python/3.5.2/Python-3.5.2.tgz
+        URL https://www.python.org/ftp/python/3.5.3/Python-3.5.3.tgz
         PATCH_COMMAND ${patch_command}
         CONFIGURE_COMMAND ./configure --prefix=${EXTERNALPROJECT_INSTALL_PREFIX} --enable-shared --with-threads --without-pymalloc ${PYTHON_CONFIGURE_CFLAGS} ${PYTHON_CONFIGURE_LDFLAGS}
         BUILD_IN_SOURCE 1
