@@ -104,6 +104,7 @@ if(BUILD_OS_WINDOWS)
 elseif(BUILD_OS_LINUX)
     set(BUILD_PYTHON OFF)
 elseif(BUILD_OS_OSX)
+    set(BUILD_PYTHON OFF)
 # Turning NumPy/SciPy off for now
 #    set(BUILD_NUMPY OFF)
 #    set(BUILD_SCIPY OFF)
@@ -121,24 +122,25 @@ set(EXTERNALPROJECT_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/inst)
 
 # Create the version-related variables
 # These can optionally be overridden from the build enviroment.
+unset(CURA_MAJOR_VERSION CACHE)
 if(DEFINED ENV{CURA_MAJOR_VERSION})
     set(CURA_MAJOR_VERSION $ENV{CURA_MAJOR_VERSION} CACHE STRING "Cura Major Version" FORCE)
 else()
     set(CURA_MAJOR_VERSION "2" CACHE STRING "Cura Major Version")
 endif()
-
+unset(CURA_MINOR_VERSION CACHE)
 if(DEFINED ENV{CURA_MINOR_VERSION})
     set(CURA_MINOR_VERSION $ENV{CURA_MINOR_VERSION} CACHE STRING "Cura Minor Version" FORCE)
 else()
     set(CURA_MINOR_VERSION "5" CACHE STRING "Cura Minor Version")
 endif()
-
+unset(CURA_PATCH_VERSION CACHE)
 if(DEFINED ENV{CURA_PATCH_VERSION})
     set(CURA_PATCH_VERSION $ENV{CURA_PATCH_VERSION} CACHE STRING "Cura Patch Version" FORCE)
 else()
     set(CURA_PATCH_VERSION "1" CACHE STRING "Cura Patch Version")
 endif()
-
+unset(CURA_EXTRA_VERSION CACHE)
 if(DEFINED ENV{CURA_EXTRA_VERSION})
     set(CURA_EXTRA_VERSION $ENV{CURA_EXTRA_VERSION} CACHE STRING "Cura Extra Version Information" FORCE)
 else()
@@ -156,28 +158,71 @@ if(BUILD_PYTHON)
     if(BUILD_OS_OSX)
         # See http://bugs.python.org/issue21381
         # The interpreter crashes when MACOSX_DEPLOYMENT_TARGET=10.7 due to the increased stack size.
-        set(patch_command sed -i".bak" "8704,8704d" <SOURCE_DIR>/configure)
+        # set(patch_command sed -i".bak" "8704,8704d" <SOURCE_DIR>/configure)
+        set(python_patch_command)
         set(PYTHON_CONFIGURE_CFLAGS "CFLAGS=-I/usr/local/opt/openssl/include")
         set(PYTHON_CONFIGURE_LDFLAGS "LDFLAGS=-L/usr/local/opt/openssl/lib")
+    else()
+	set(python_patch_command)
+        set(PYTHON_CONFIGURE_CFLAGS)
+        set(PYTHON_CONFIGURE_LDFLAGS)
     endif()
-
-    ExternalProject_Add(Python
-        URL https://www.python.org/ftp/python/3.5.3/Python-3.5.3.tgz
-        PATCH_COMMAND ${patch_command}
-        CONFIGURE_COMMAND ./configure --prefix=${EXTERNALPROJECT_INSTALL_PREFIX} --enable-shared --with-threads --without-pymalloc ${PYTHON_CONFIGURE_CFLAGS} ${PYTHON_CONFIGURE_LDFLAGS}
-        BUILD_IN_SOURCE 1
-    )
-
     set(PYTHON_VERSION_MAJOR 3)
     set(PYTHON_VERSION_MINOR 5)
     set(PYTHON_EXECUTABLE ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
     set(PYTHONINTERP_FOUND True)
-
     set(EXTRA_PYTHON_DEFINES
-	-DBUILD_PYTHON=True
-	-DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
-	-DPYTHON_VERSION_MAJOR=${PYTHON_VERSION_MAJOR}
-	-DPYTHON_VERSION_MINOR=${PYTHON_VERSION_MINOR}
+        -DBUILD_PYTHON=True
+        -DPYTHON_EXECUTABLE=${PYTHON_EXECUTABLE}
+        -DPYTHON_VERSION_MAJOR=${PYTHON_VERSION_MAJOR}
+        -DPYTHON_VERSION_MINOR=${PYTHON_VERSION_MINOR}
+    )
+
+    set(python_configure_command
+	./configure
+	#	--with-cxx-main
+		--prefix=${EXTERNALPROJECT_INSTALL_PREFIX} # install architecture-independent files in PREFIX [/usr/local]
+		--exec-prefix=${EXTERNALPROJECT_INSTALL_PREFIX} # install architecture-dependent files in EPREFIX [PREFIX]
+
+	#	--datarootdir=${EXTERNALPROJECT_INSTALL_PREFIX} 
+	#	--includedir=${EXTERNALPROJECT_INSTALL_PREFIX}/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
+	#	--oldincludedir=${EXTERNALPROJECT_INSTALL_PREFIX}/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
+	#	--libdir=${EXTERNALPROJECT_INSTALL_PREFIX}/lib
+	#	--libexecdir=${EXTERNALPROJECT_INSTALL_PREFIX}
+	
+	#=== The following keys are available:
+	#	--bindir=DIR            user executables [EPREFIX/bin]
+  	#	--sbindir=DIR           system admin executables [EPREFIX/sbin]
+	#	--libexecdir=DIR        program executables [EPREFIX/libexec]
+	#	--sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+	#	--sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
+	#	--localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+	#	--runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
+	#	--libdir=DIR            object code libraries [EPREFIX/lib]
+	#	--includedir=DIR        C header files [PREFIX/include]
+	#	--oldincludedir=DIR     C header files for non-gcc [/usr/include]
+	#	--datarootdir=DIR       read-only arch.-independent data root [PREFIX/share]
+	#	--datadir=DIR           read-only architecture-independent data [DATAROOTDIR]
+	#	--infodir=DIR           info documentation [DATAROOTDIR/info]
+	#	--localedir=DIR         locale-dependent data [DATAROOTDIR/locale]
+	#	--mandir=DIR            man documentation [DATAROOTDIR/man]
+	#	--docdir=DIR            documentation root [DATAROOTDIR/doc/python]
+	#	--htmldir=DIR           html documentation [DOCDIR]
+	#	--dvidir=DIR            dvi documentation [DOCDIR]
+	# 	--pdfdir=DIR            pdf documentation [DOCDIR]
+  	#	--psdir=DIR             ps documentation [DOCDIR]
+		--enable-shared 
+		--with-threads 
+		--without-pymalloc 
+		${PYTHON_CONFIGURE_CFLAGS} 
+		${PYTHON_CONFIGURE_LDFLAGS}
+    )
+
+    ExternalProject_Add(Python
+        URL https://www.python.org/ftp/python/3.5.3/Python-3.5.3.tgz
+        PATCH_COMMAND ${python_patch_command}
+        CONFIGURE_COMMAND ${python_configure_command}
+        BUILD_IN_SOURCE 1
     )
 else()
     find_package(PythonInterp ${MINIMUM_PYTHON_VERSION} REQUIRED)
@@ -189,7 +234,12 @@ if(BUILD_OS_WINDOWS)
     set(PYTHON_DIRECTORY "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
     set(PYTHON_SITE_PACKAGES_DIR lib/${PYTHON_DIRECTORY}/site-packages)
 elseif(BUILD_OS_LINUX)
-    set(PYTHON_SITE_PACKAGES_DIR lib/python${PYTHON_VERSION_MAJOR}/dist-packages)
+    # Set the packages dir to a standard 3.X dir if building Python ourselves
+    if (BUILD_PYTHON)
+	set(PYTHON_SITE_PACKAGES_DIR lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/dist-packages)
+    else()
+	set(PYTHON_SITE_PACKAGES_DIR lib/python${PYTHON_VERSION_MAJOR}/dist-packages)
+    endif()
 elseif(BUILD_OS_OSX)
     set(PYTHON_SITE_PACKAGES_DIR lib/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/dist-packages)
 endif()
@@ -643,6 +693,17 @@ else()
 endif()
 
 if(BUILD_TYPING)
+    if(BUILD_OS_LINUX OR BUILD_OS_OSX)
+	set(build_python_typing LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+	set(install_python_typing LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
+	list(APPEND build_python_typing PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+	list(APPEND install_python_typing PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+    else()
+        set(build_python_typing)
+        set(install_python_typing)
+    endif()
+    
+    
     ExternalProject_Add(PythonTyping
 	DEPENDS Python
 	URL https://pypi.python.org/packages/17/75/3698d7992a828ad6d7be99c0a888b75ed173a9280e53dbae67326029b60e/typing-3.6.1.tar.gz
