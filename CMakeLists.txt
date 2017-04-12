@@ -71,7 +71,7 @@ endif()
 
 # Explicitly disable unsupported options
 if(BUILD_OS_WINDOWS)
-    set(BUILD_PYTHON OFF)
+    # set(BUILD_PYTHON OFF)
 
     # Disable building of Numpy and Scipy due to dependency on Fortran
     set(BUILD_NUMPY OFF)
@@ -104,7 +104,7 @@ if(BUILD_OS_WINDOWS)
 elseif(BUILD_OS_LINUX)
     set(BUILD_PYTHON OFF)
 elseif(BUILD_OS_OSX)
-    set(BUILD_PYTHON OFF)
+    # set(BUILD_PYTHON OFF)
 # Turning NumPy/SciPy off for now
 #    set(BUILD_NUMPY OFF)
 #    set(BUILD_SCIPY OFF)
