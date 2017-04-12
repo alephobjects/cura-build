@@ -177,19 +177,22 @@ if(BUILD_PYTHON)
         -DPYTHON_VERSION_MAJOR=${PYTHON_VERSION_MAJOR}
         -DPYTHON_VERSION_MINOR=${PYTHON_VERSION_MINOR}
     )
-
-    set(python_configure_command
-	./configure
+    if(BUILD_OS_WINDOWS)
+	set( python_configure_command configure )
+    else()
+	set( python_configure_command ./configure )
+    endif()
+    list(APPEND python_configure_command --prefix=${EXTERNALPROJECT_INSTALL_PREFIX})
+    list(APPEND python_configure_command --exec-prefix=${EXTERNALPROJECT_INSTALL_PREFIX})
+	#
 	#	--with-cxx-main
-		--prefix=${EXTERNALPROJECT_INSTALL_PREFIX} # install architecture-independent files in PREFIX [/usr/local]
-		--exec-prefix=${EXTERNALPROJECT_INSTALL_PREFIX} # install architecture-dependent files in EPREFIX [PREFIX]
-
+	#	--prefix=${EXTERNALPROJECT_INSTALL_PREFIX} # install architecture-independent files in PREFIX [/usr/local]
+	#	--exec-prefix=${EXTERNALPROJECT_INSTALL_PREFIX} # install architecture-dependent files in EPREFIX [PREFIX]
 	#	--datarootdir=${EXTERNALPROJECT_INSTALL_PREFIX} 
 	#	--includedir=${EXTERNALPROJECT_INSTALL_PREFIX}/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
 	#	--oldincludedir=${EXTERNALPROJECT_INSTALL_PREFIX}/include/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}
 	#	--libdir=${EXTERNALPROJECT_INSTALL_PREFIX}/lib
 	#	--libexecdir=${EXTERNALPROJECT_INSTALL_PREFIX}
-	
 	#=== The following keys are available:
 	#	--bindir=DIR            user executables [EPREFIX/bin]
   	#	--sbindir=DIR           system admin executables [EPREFIX/sbin]
@@ -211,6 +214,8 @@ if(BUILD_PYTHON)
 	#	--dvidir=DIR            dvi documentation [DOCDIR]
 	# 	--pdfdir=DIR            pdf documentation [DOCDIR]
   	#	--psdir=DIR             ps documentation [DOCDIR]
+
+    list(APPEND python_configure_command 
 		--enable-shared 
 		--with-threads 
 		--without-pymalloc 
