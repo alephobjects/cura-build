@@ -190,7 +190,7 @@ if(BUILD_PYTHON)
 	-DPython_ADDITIONAL_VERSIONS=${Python_ADDITIONAL_VERSIONS}	
     )
     if(BUILD_OS_WINDOWS)
-	set( python_configure_command configure )
+	set( python_configure_command configure.exe )
     else()
 	set( python_configure_command ./configure )
     endif()
@@ -560,7 +560,9 @@ if(BUILD_SCIPY)
     message(STATUS "---> SciPy install: ${install_scipy}")
     ExternalProject_Add(Scipy
         DEPENDS Python Numpy
-        URL http://downloads.sourceforge.net/project/scipy/scipy/0.16.1/scipy-0.16.1.tar.gz
+        # URL http://downloads.sourceforge.net/project/scipy/scipy/0.16.1/scipy-0.16.1.tar.gz
+	GIT_REPOSITORY git://github.com/scipy/scipy.git
+	GIT_TAG 46cbf563f5010b27017324ca66e1daffb6d21c47
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_scipy}
         INSTALL_COMMAND ${install_scipy}
@@ -788,7 +790,14 @@ elseif(BUILD_OS_WINDOWS)
         # BUILD_IN_SOURCE 1
     # )
 elseif(BUILD_OS_LINUX)
-    # 
+    ExternalProject_Add( cxFreeze
+	DEPENDS Python
+	URL https://pypi.python.org/packages/d0/6d/9492644452727094543575de9846af5a2b9c764f760e2d414af7c876618c/cx_Freeze-5.0.1.tar.gz
+	CONFIGURE_COMMAND ""
+	BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
+	INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+	BUILD_IN_SOURCE 1
+    )
 endif()
 
 if(BUILD_OS_OSX)
@@ -900,11 +909,37 @@ elseif(BUILD_OS_LINUX)
     set(CPACK_INSTALL_CMAKE_PROJECTS "")
 
     set(CPACK_INSTALLED_DIRECTORIES
-        "${CMAKE_BINARY_DIR}/inst/bin;/opt/cura2/bin"
-        "${CMAKE_BINARY_DIR}/inst/lib;/opt/cura2/lib"
-        "${CMAKE_BINARY_DIR}/inst/share;/opt/cura2/share"
+        "${CMAKE_BINARY_DIR}/dist/bin;/opt/cura2/bin"
+        "${CMAKE_BINARY_DIR}/dist/lib;/opt/cura2/lib"
+        "${CMAKE_BINARY_DIR}/dist/share;/opt/cura2/share"
+    )
+#---
+    configure_file(setup_linux.py.in setup_linux.py @ONLY)
+
+    add_custom_target(build_app ALL)
+    add_dependencies(build_app ${_last_repo} cxFreeze)
+
+    foreach(repo ${EXTRA_REPOSITORIES})
+        separate_arguments(items UNIX_COMMAND "${repo}")
+        list(GET items 0 name)
+        add_dependencies(build_app ${name})
+    endforeach()
+
+    add_custom_command(
+        TARGET build_app PRE_LINK
+        COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/dist
+        COMMENT "---> Cleaning old \"dist\" directory"
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
+    set(run_cx_freeze ${PYTHON_EXECUTABLE} setup_linux.py build --build-exe=${CMAKE_BINARY_DIR}/dist)
+    add_custom_command(
+        TARGET build_app POST_BUILD
+        COMMAND ${run_cx_freeze}
+        COMMENT "---> Running cx_Freeze :${run_cx_freeze}"
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+#---
     set(package_dir "_CPack_Packages/Linux/${CPACK_GENERATOR}/Cura2-${CURA_VERSION}-Linux/")
     set(CPACK_INSTALL_COMMANDS
         "${CMAKE_COMMAND} -E make_directory ${package_dir}/usr/bin"
@@ -922,28 +957,28 @@ elseif(BUILD_OS_LINUX)
     # Removing files, that are not needed for runtime
     # From bin dir
     set(CPACK_IGNORE_FILES "")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/qml.*")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/.*\\.pl")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/uic")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/sip")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/rcc")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/qmake")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/qlalr")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/py.*5")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/qdbus")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/protoc")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/moc")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/qml.*")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/.*\\.pl")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/uic")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/sip")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/rcc")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/qmake")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/qlalr")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/py.*5")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/qdbus")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/protoc")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/moc")
     # From lib dir
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/.*\\.a")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/.*\\.la")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/.*\\.prl")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/cmake")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/mkspecs")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/pkgconfig")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/.*\\.a")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/.*\\.la")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/.*\\.prl")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/cmake")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/mkspecs")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/pkgconfig")
     # From share dir
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/share/cmake-.*")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/share/doc")
-    list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/share/sip")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/share/cmake-.*")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/share/doc")
+    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/share/sip")
     
 endif()
 
