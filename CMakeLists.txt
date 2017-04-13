@@ -354,7 +354,7 @@ if(BUILD_SIP)
     list(APPEND sip_command --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
 
     if(BUILD_OS_WINDOWS)
-	list(APPEND --platform win32-g++)
+	list(APPEND sip_command --platform win32-g++)
 	list(APPEND sip_command "CFLAGS+=${CMAKE_C_FLAGS}")
 	list(APPEND sip_command "CXXFLAGS+=${CMAKE_CXX_FLAGS}")
     endif()
