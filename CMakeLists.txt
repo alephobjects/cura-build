@@ -247,7 +247,7 @@ if(BUILD_PYTHON)
     SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} " )
 else()
     find_package(PythonInterp ${MINIMUM_PYTHON_VERSION} REQUIRED)
-    # add_custom_target(Python)
+    add_custom_target(Python) # In order to satisfy dependencies
     set(EXTRA_PYTHON_DEFINES)
 endif()
 message(STATUS "---> Python executable: ${PYTHON_EXECUTABLE}")
