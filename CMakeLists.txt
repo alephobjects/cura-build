@@ -103,8 +103,10 @@ if(BUILD_OS_WINDOWS)
     endif()
 elseif(BUILD_OS_LINUX)
     # set(BUILD_PYTHON OFF)
+	set(BUILD_TYPING OFF)
 elseif(BUILD_OS_OSX)
     # set(BUILD_PYTHON OFF)
+	set(BUILD_TYPING OFF)
 # Turning NumPy/SciPy off for now
 #    set(BUILD_NUMPY OFF)
 #    set(BUILD_SCIPY OFF)
@@ -197,11 +199,12 @@ if(BUILD_PYTHON)
     if (BUILD_OS_OSX OR BUILD_OS_LINUX )
 	list(APPEND python_configure_command --prefix=${EXTERNALPROJECT_INSTALL_PREFIX})
 	list(APPEND python_configure_command --exec-prefix=${EXTERNALPROJECT_INSTALL_PREFIX})
-	list(APPEND python_configure_command --datarootdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share)
 
-	list(APPEND python_configure_command --sbindir=${EXTERNALPROJECT_INSTALL_PREFIX}/sbin)
+	list(APPEND python_configure_command --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
+	list(APPEND python_configure_command --datarootdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share)
+	list(APPEND python_configure_command --sbindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
 	list(APPEND python_configure_command --libdir=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
-	list(APPEND python_configure_command --libexecdir=${EXTERNALPROJECT_INSTALL_PREFIX}/libexec)
+	list(APPEND python_configure_command --libexecdir=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
 	list(APPEND python_configure_command --includedir=${EXTERNALPROJECT_INSTALL_PREFIX}/include)
 	list(APPEND python_configure_command --oldincludedir=${EXTERNALPROJECT_INSTALL_PREFIX}/include)
     endif()
@@ -392,18 +395,19 @@ if(BUILD_OS_WINDOWS)
 elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
     set(python_install
         --root=${EXTERNALPROJECT_INSTALL_PREFIX}
-        --install-lib=${PYTHON_SITE_PACKAGES_DIR}
+        # --install-lib=${PYTHON_SITE_PACKAGES_DIR}
     )
 endif()
 message(STATUS "---> Python Install: ${python_install}")
 
 if (BUILD_CYTHON)
     set(build_cython ${PYTHON_EXECUTABLE} setup.py build)
-    set(install_cython ${PYTHON_EXECUTABLE} setup.py install --prefix=${EXTERNALPROJECT_INSTALL_PREFIX} )
+    set(install_cython ${PYTHON_EXECUTABLE} setup.py install ${python_install} )
     if(BUILD_OS_WINDOWS)
 	list(APPEND build_cython --compiler=mingw32)
     endif()
-    message(STATUS "---> Cython will be build")
+    message(STATUS "---> Cython Build: ${build_cython}")
+    message(STATUS "---> Cython Install: ${install_cython}")
     ExternalProject_Add(Cython
         DEPENDS Python
         URL https://pypi.python.org/packages/b7/67/7e2a817f9e9c773ee3995c1e15204f5d01c8da71882016cac10342ef031b/Cython-0.25.2.tar.gz
@@ -509,7 +513,7 @@ if(BUILD_NUMPY OR BUILD_SCIPY)
 	GIT_TAG 20a413e154948d8b7fc47e7a6d9f13cae98e3856
         CONFIGURE_COMMAND ""
         BUILD_COMMAND make ${openblas_options}
-        INSTALL_COMMAND make PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} ${openblas_options} install
+        INSTALL_COMMAND make PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} install
         BUILD_IN_SOURCE 1
     )
 else()
@@ -518,7 +522,7 @@ endif()
 
 if(BUILD_NUMPY)
     set(build_numpy ${PYTHON_EXECUTABLE} setup.py build)
-    set(install_numpy ${PYTHON_EXECUTABLE} setup.py install ${python_install})
+    set(install_numpy ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed ${python_install})
     if(BUILD_OS_LINUX)
 #        list(APPEND build_numpy OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so)
 #        list(APPEND install_numpy OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so)
@@ -547,9 +551,9 @@ endif()
 
 if(BUILD_SCIPY)
     set(build_scipy ${PYTHON_EXECUTABLE} setup.py build)
-    set(install_scipy  ${PYTHON_EXECUTABLE} setup.py install ${python_install})
+    set(install_scipy  ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed ${python_install})
     if(BUILD_OS_LINUX)
-        # list(APPEND build_scipy OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so)
+	# list(APPEND build_scipy OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so)
         # list(APPEND install_scipy OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so)
     elseif(BUILD_OS_OSX)
 	#
@@ -564,9 +568,9 @@ if(BUILD_SCIPY)
 	GIT_REPOSITORY git://github.com/scipy/scipy.git
 	GIT_TAG 46cbf563f5010b27017324ca66e1daffb6d21c47
         CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${build_scipy}
+	BUILD_COMMAND ${build_scipy}
         INSTALL_COMMAND ${install_scipy}
-        BUILD_IN_SOURCE 1
+	BUILD_IN_SOURCE 1
     )
 else()
     add_custom_target(Scipy)
@@ -594,7 +598,7 @@ if(BUILD_PYTHON_UTILS)
         GIT_TAG origin/master
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed ${python_install}
         BUILD_IN_SOURCE 1
     )
 else()
@@ -611,7 +615,7 @@ if(BUILD_NUMPY_STL)
         GIT_TAG origin/master
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed ${python_install}
         BUILD_IN_SOURCE 1
     )
 else()
@@ -619,13 +623,13 @@ else()
 endif()
 
 if(BUILD_TYPING)
-     message(STATUS "---> PythonTyping will be build")
+    message(STATUS "---> PythonTyping will be build")
     ExternalProject_Add(PythonTyping
 	DEPENDS Python
 	URL https://pypi.python.org/packages/17/75/3698d7992a828ad6d7be99c0a888b75ed173a9280e53dbae67326029b60e/typing-3.6.1.tar.gz
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-	INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+	INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed ${python_install}
 	BUILD_IN_SOURCE 1
     )
 else()
@@ -659,7 +663,8 @@ if(BUILD_SAVITAR)
 	DEPENDS Python Sip Numpy
     	GIT_REPOSITORY ${SAVITAR_URL}
     	GIT_TAG origin/${SAVITAR_TAG_OR_BRANCH}
-    	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=${savitar_cxx_flags} -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} ${EXTRA_PYTHON_DEFINES}
+    	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=${savitar_cxx_flags} -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} 
+# ${EXTRA_PYTHON_DEFINES}
   )
 else()
   add_custom_target(Savitar)
@@ -688,14 +693,16 @@ ExternalProject_Add(Uranium
     DEPENDS PyQt Arcus
     GIT_REPOSITORY ${URANIUM_URL}
     GIT_TAG origin/${URANIUM_TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} ${EXTRA_PYTHON_DEFINES}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} 
+# ${EXTRA_PYTHON_DEFINES}
 )
 
 ExternalProject_Add(Cura
     DEPENDS Uranium CuraEngine Savitar NumpySTL PythonTyping PySerial PythonZeroconf
     GIT_REPOSITORY ${CURA_URL}
     GIT_TAG origin/${CURA_TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} -DURANIUM_SCRIPTS_DIR= -DCURA_VERSION=${CURA_VERSION} -DCMAKE_MODULE_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/ ${EXTRA_PYTHON_DEFINES}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} -DURANIUM_SCRIPTS_DIR= -DCURA_VERSION=${CURA_VERSION} -DCMAKE_MODULE_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/ 
+#${EXTRA_PYTHON_DEFINES}
 )
 
 ExternalProject_Add(Cura-PostProcessing

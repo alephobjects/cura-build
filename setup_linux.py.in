@@ -2,10 +2,13 @@ import encodings
 import os
 import warnings
 import sys
-sys.path.append('inst/lib/python3.5/dist-packages')
-sys.path.append('inst/lib/python3.5/site-packages')
-sys.path.append('inst/lib/python3/site-packages')
-sys.path.append('inst/lib/python3/dist-packages')
+#sys.path.append('inst/lib/python3.5/dist-packages')
+#sys.path.append('inst/lib/python3.5/site-packages')
+#sys.path.append('inst/lib/python3/site-packages')
+# This is a fix for UM and cura installing into 3 instead of 3.5
+# This happens for Linux DEB only
+sys.path.append("@CMAKE_BINARY_DIR@/inst/lib/python3/dist-packages")
+print(sys.path)
 from cx_Freeze import setup, Executable
 
 includes = [
@@ -21,11 +24,6 @@ import os
 import glob
 import shutil
 
-
-# NumPy fixes
-# import scipy
-# scipy_path = os.path.dirname(scipy.__file__)
-# includes.append(scipy_path)
 
 buildOptions = dict(
 	packages = [], 
