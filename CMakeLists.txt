@@ -71,7 +71,7 @@ endif()
 
 # Explicitly disable unsupported options
 if(BUILD_OS_WINDOWS)
-    set(BUILD_PYTHON OFF)
+    # set(BUILD_PYTHON OFF)
 
     # Disable building of Numpy and Scipy due to dependency on Fortran
     set(BUILD_NUMPY OFF)
@@ -329,11 +329,11 @@ if(BUILD_QT)
     elseif(BUILD_OS_WINDOWS)
         list(APPEND qt_options -opengl desktop)
 	list(APPEND qt_options -skip qtx11extras -skip qtmacextras)
-	list(APPEND qt_options -skip qtwinextras)
+	# list(APPEND qt_options -skip qtwinextras)
     elseif(BUILD_OS_LINUX)
         list(APPEND qt_options -no-rpath -qt-xcb)
 	list(APPEND qt_options -skip qtmacextras -skip qtwinextras)
-	list(APPEND qt_options -skip qtx11extras)
+	# list(APPEND qt_options -skip qtx11extras)
     endif()
 
     message(STATUS "---> Qt config: ${qt_options}")
@@ -355,6 +355,7 @@ if(BUILD_SIP)
     list(APPEND sip_command --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
     list(APPEND sip_command --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include )
     list(APPEND sip_command --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
+    list(APPEND sip_command --stubsdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
 
     if(BUILD_OS_WINDOWS)
 	list(APPEND sip_command --platform win32-g++)
@@ -402,7 +403,12 @@ message(STATUS "---> Python Install: ${python_install}")
 
 if (BUILD_CYTHON)
     set(build_cython ${PYTHON_EXECUTABLE} setup.py build)
-    set(install_cython ${PYTHON_EXECUTABLE} setup.py install ${python_install} )
+    set(install_cython ${PYTHON_EXECUTABLE} setup.py install)
+    list(APPEND install_cython --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
+    list(APPEND install_cython --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    list(APPEND install_cython --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include )
+    list(APPEND install_cython --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
+    list(APPEND install_cython --stubsdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
     if(BUILD_OS_WINDOWS)
 	list(APPEND build_cython --compiler=mingw32)
     endif()
@@ -417,21 +423,33 @@ if (BUILD_CYTHON)
         BUILD_IN_SOURCE 1
     )
 else()
+    message(STATUS "---> System Cython will be used")
     add_custom_target(Cython)
 endif()
 
-if(BUILD_ZEROCONF)
-    set(build_python_zeroconf ${PYTHON_EXECUTABLE} setup.py build)
-    set(install_python_zeroconf ${PYTHON_EXECUTABLE} setup.py install ${python_install})
-    message(STATUS "---> Netifaces will be build")
+if(BUILD_NETIFACES)
+    set(build_python_netifaces ${PYTHON_EXECUTABLE} setup.py build)
+    set(install_python_netifaces ${PYTHON_EXECUTABLE} setup.py install)
+    list(APPEND install_python_netifaces --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
+    list(APPEND install_python_netifaces --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    list(APPEND install_python_netifaces --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include )
+    list(APPEND install_python_netifaces --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
+    list(APPEND install_python_netifaces --stubsdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    message(STATUS "---> PythonNetifaces Build: ${build_python_netifaces}")
+    message(STATUS "---> PythonNetifaces Install: ${install_python_netifaces}")
     ExternalProject_Add(PythonNetifaces
         DEPENDS Python
         URL https://pypi.python.org/packages/18/fa/dd13d4910aea339c0bb87d2b3838d8fd923c11869b1f6e741dbd0ff3bc00/netifaces-0.10.4.tar.gz
         CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${build_python_zeroconf}
-        INSTALL_COMMAND ${install_python_zeroconf}
+        BUILD_COMMAND ${build_python_netifaces}
+        INSTALL_COMMAND ${install_python_netifaces}
         BUILD_IN_SOURCE 1
     )
+else()
+    message(STATUS "---> System NetIfaces will be used")
+    add_custom_target(PythonNetifaces)
+endif()
+    # We should not need it, leaving here just in case
     #ExternalProject_Add(PythonSix
     #    DEPENDS Python
     #    URL https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz
@@ -440,7 +458,16 @@ if(BUILD_ZEROCONF)
     #    INSTALL_COMMAND ${install_python_zeroconf}
     #    BUILD_IN_SOURCE 1
     #)
-    message(STATUS "---> ZeroConf will be build")
+if(BUILD_ZEROCONF)
+    set(build_python_zeroconf ${PYTHON_EXECUTABLE} setup.py build)
+    set(install_python_zeroconf ${PYTHON_EXECUTABLE} setup.py install)
+    list(APPEND install_python_zeroconf --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
+    list(APPEND install_python_zeroconf --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    list(APPEND install_python_zeroconf --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include )
+    list(APPEND install_python_zeroconf --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
+    list(APPEND install_python_zeroconf --stubsdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    message(STATUS "---> PythonZeroconf Build: ${build_python_zeroconf}")
+    message(STATUS "---> PythonZeroconf Install: ${install_python_zeroconf}")
     ExternalProject_Add(PythonZeroconf
         DEPENDS PythonNetifaces
         GIT_REPOSITORY https://github.com/jstasiak/python-zeroconf
@@ -451,9 +478,8 @@ if(BUILD_ZEROCONF)
         BUILD_IN_SOURCE 1
     )
 else()
+    message(STATUS "---> System ZeroConf will be used")
     add_custom_target(PythonZeroconf)
-    # add_custom_target(PythonSix)
-    add_custom_target(PythonNetifaces)
 endif()
 
 if(BUILD_PYQT)
@@ -461,6 +487,7 @@ if(BUILD_PYQT)
     list(APPEND pyqt_command --confirm-license)
     list(APPEND pyqt_command --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
     list(APPEND pyqt_command --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
+    list(APPEND pyqt_command --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include)
     list(APPEND pyqt_command --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip)
     list(APPEND pyqt_command --stubsdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
 #    list(APPEND pyqt_command  --no-stubs)
@@ -495,6 +522,7 @@ if(BUILD_PYQT)
         BUILD_IN_SOURCE 1
     )
 else()
+    message(STATUS "---> System PyQt will be used")
     add_custom_target(PyQt)
 endif()
 
@@ -517,12 +545,18 @@ if(BUILD_NUMPY OR BUILD_SCIPY)
         BUILD_IN_SOURCE 1
     )
 else()
+    message(STATUS "---> System OpenBLAS will be used")
     add_custom_target(OpenBLAS)
 endif()
 
 if(BUILD_NUMPY)
     set(build_numpy ${PYTHON_EXECUTABLE} setup.py build)
-    set(install_numpy ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed ${python_install})
+    set(install_numpy ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed)
+    list(APPEND install_numpy --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
+    list(APPEND install_numpy --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    list(APPEND install_numpy --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include )
+    list(APPEND install_numpy --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
+    list(APPEND install_numpy --stubsdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
     if(BUILD_OS_LINUX)
 #        list(APPEND build_numpy OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so)
 #        list(APPEND install_numpy OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so)
@@ -546,15 +580,20 @@ if(BUILD_NUMPY)
         BUILD_IN_SOURCE 1
     )
 else()
+    message(STATUS "---> System NumPy will be used")
     add_custom_target(Numpy)
 endif()
 
 if(BUILD_SCIPY)
     set(build_scipy ${PYTHON_EXECUTABLE} setup.py build)
-    set(install_scipy  ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed ${python_install})
+    set(install_scipy  ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed)
+    list(APPEND install_scipy --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
+    list(APPEND install_scipy --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    list(APPEND install_scipy --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include )
+    list(APPEND install_scipy --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
+    list(APPEND install_scipy --stubsdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
     if(BUILD_OS_LINUX)
-	# list(APPEND build_scipy OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so)
-        # list(APPEND install_scipy OPENBLAS=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libopenblas.so)
+	#
     elseif(BUILD_OS_OSX)
 	#
     elseif(BUILD_OS_WINDOWS)
@@ -573,40 +612,67 @@ if(BUILD_SCIPY)
 	BUILD_IN_SOURCE 1
     )
 else()
+    message(STATUS "---> System SciPy will be used")
     add_custom_target(Scipy)
 endif()
 
 if(BUILD_PYSERIAL)
-    message(STATUS "---> PySerial will be build")
+    set(build_pyserial ${PYTHON_EXECUTABLE} setup.py build)
+    set(install_pyserial ${PYTHON_EXECUTABLE} setup.py install)
+    list(APPEND install_pyserial --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
+    list(APPEND install_pyserial --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    list(APPEND install_pyserial --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include )
+    list(APPEND install_pyserial --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
+    list(APPEND install_pyserial --stubsdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    message(STATUS "---> PySerial Build: ${build_pyserial}")
+    message(STATUS "---> PySerial Install: ${install_pyserial}")
     ExternalProject_Add(PySerial
         DEPENDS Python
         URL https://github.com/pyserial/pyserial/releases/download/v3.2.1/pyserial-3.2.1.tar.gz
         CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+        BUILD_COMMAND ${build_pyserial}
+        INSTALL_COMMAND ${install_pyserial}
         BUILD_IN_SOURCE 1
     )
 else()
+    message(STATUS "---> System PySerial will be used")
     add_custom_target(PySerial)
 endif()
 
 if(BUILD_PYTHON_UTILS)
-    message(STATUS "---> PythonUtils will be build")
+    set(build_python_utils ${PYTHON_EXECUTABLE} setup.py build)
+    set(install_python_utils ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed)
+    list(APPEND install_python_utils --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
+    list(APPEND install_python_utils --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    list(APPEND install_python_utils --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include )
+    list(APPEND install_python_utils --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
+    list(APPEND install_python_utils --stubsdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    message(STATUS "---> PythonUtils Build: ${build_python_utils}")
+    message(STATUS "---> PythonUtils Install: ${install_python_utils}")
     ExternalProject_Add(PythonUtils
         DEPENDS Python
         GIT_REPOSITORY https://github.com/WoLpH/python-utils.git
         GIT_TAG origin/master
         CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed ${python_install}
+        BUILD_COMMAND ${build_python_utils}
+        INSTALL_COMMAND ${install_python_utils} setup.py install
         BUILD_IN_SOURCE 1
     )
 else()
+    message(STATUS "---> System PythonUtils will be used")
     add_custom_target(PythonUtils)
 endif()
 
 if(BUILD_NUMPY_STL)
-    message(STATUS "---> NumpySTL will be build")
+    set(build_numpystl ${PYTHON_EXECUTABLE} setup.py build)
+    set(install_numpystl ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed)
+    list(APPEND install_numpystl --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
+    list(APPEND install_numpystl --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    list(APPEND install_numpystl --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include )
+    list(APPEND install_numpystl --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
+    list(APPEND install_numpystl --stubsdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    message(STATUS "---> NumpySTL Build: ${build_numpystl}")
+    message(STATUS "---> NumpySTL Install: ${install_numpystl}")
     ExternalProject_Add(NumpySTL
         DEPENDS Python Numpy PythonUtils
 #        URL https://github.com/WoLpH/numpy-stl/archive/v1.9.0.tar.gz
@@ -614,36 +680,46 @@ if(BUILD_NUMPY_STL)
         GIT_REPOSITORY https://github.com/WoLpH/numpy-stl.git
         GIT_TAG origin/master
         CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed ${python_install}
+        BUILD_COMMAND ${build_numpystl}
+        INSTALL_COMMAND ${install_numpystl}
         BUILD_IN_SOURCE 1
     )
 else()
+    message(STATUS "---> System NumpySTL will be used")
     add_custom_target(NumpySTL)
 endif()
 
 if(BUILD_TYPING)
-    message(STATUS "---> PythonTyping will be build")
+    set(build_typing ${PYTHON_EXECUTABLE} setup.py build)
+    set(install_typing ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed)
+    list(APPEND install_typing --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
+    list(APPEND install_typing --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    list(APPEND install_typing --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include )
+    list(APPEND install_typing --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
+    list(APPEND install_typing --stubsdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    message(STATUS "---> PythonTyping Build: ${build_typing}")
+    message(STATUS "---> PythonTyping Install: ${install_typing}")
     ExternalProject_Add(PythonTyping
 	DEPENDS Python
 	URL https://pypi.python.org/packages/17/75/3698d7992a828ad6d7be99c0a888b75ed173a9280e53dbae67326029b60e/typing-3.6.1.tar.gz
 	CONFIGURE_COMMAND ""
-	BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-	INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed ${python_install}
+	BUILD_COMMAND ${build_typing}
+	INSTALL_COMMAND ${install_typing}
 	BUILD_IN_SOURCE 1
     )
 else()
+    message(STATUS "---> System PythonTyping will be used")
     add_custom_target(PythonTyping)
 endif()
 
 if(BUILD_OS_OSX)
     set(protobuf_cxx_flags "-fPIC -std=c++11 -stdlib=libc++")
 elseif(BUILD_OS_WINDOWS)
+    # All of the code is PIC on Windows, so -fPIC produces just the bug
     set(protobuf_cxx_flags "-std=c++11 -static-libstdc++")
 else()
     set(protobuf_cxx_flags "-fPIC -std=c++11 -static-libstdc++")
 endif()
-
 ExternalProject_Add(Protobuf
     URL https://github.com/google/protobuf/archive/v3.0.0.tar.gz
     URL_MD5 d4f6ca65aadc6310b3872ee421e79fa6
@@ -658,7 +734,7 @@ if(BUILD_SAVITAR)
   else()
     set(savitar_cxx_flags "-fPIC -std=c++11 -static-libstdc++")
   endif()
-  
+  message(STATUS "---> Savitar will be build") 
   ExternalProject_Add(Savitar
 	DEPENDS Python Sip Numpy
     	GIT_REPOSITORY ${SAVITAR_URL}
@@ -667,6 +743,7 @@ if(BUILD_SAVITAR)
 # ${EXTRA_PYTHON_DEFINES}
   )
 else()
+  message(STATUS "---> Savitar will not be build")
   add_custom_target(Savitar)
 endif()
 
@@ -780,7 +857,7 @@ if(BUILD_OS_OSX)
         URL https://pypi.python.org/packages/d9/ff/48a8aede5e99db5983039fd0e6c54bb4c0806ef696430d2684348e78249f/py2app-0.12.tar.gz
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install
         COMMENT "Building py2app"
         BUILD_IN_SOURCE 1
     )
@@ -802,7 +879,8 @@ elseif(BUILD_OS_LINUX)
 	URL https://pypi.python.org/packages/d0/6d/9492644452727094543575de9846af5a2b9c764f760e2d414af7c876618c/cx_Freeze-5.0.1.tar.gz
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-	INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
+	INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install
+	COMMENT "Building cxFreeze"
 	BUILD_IN_SOURCE 1
     )
 endif()
