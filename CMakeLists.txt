@@ -13,6 +13,7 @@ option(BUILD_CYTHON "Include Cython" ON)
 option(BUILD_QT "Include Qt" ON)
 option(BUILD_SIP "Include SIP" ON)
 option(BUILD_PYQT "Include PyQt" ON)
+option(BUILD_OPENBLAS "Include OpenBLAS" ON)
 option(BUILD_NUMPY "Include Numpy" ON)
 option(BUILD_SCIPY "Include Scipy" ON)
 option(BUILD_PYSERIAL "Include PySerial" ON)
@@ -71,7 +72,10 @@ endif()
 
 # Explicitly disable unsupported options
 if(BUILD_OS_WINDOWS)
+    # Checked. "./configure" needs to work
     set(BUILD_PYTHON OFF)
+    # Checked: MSYS should be installed (missing grep etc)
+    set(BUILD_OPENBLAS OFF)
 
     # Disable building of Numpy and Scipy due to dependency on Fortran
     #set(BUILD_NUMPY OFF)
@@ -530,7 +534,7 @@ endif()
 
 
 
-if(BUILD_NUMPY OR BUILD_SCIPY)
+if(BUILD_OPENBLAS)
     # Fortran compiler is needed for OpenBLAS, but it does no check whether it is available.
     enable_language (Fortran)
     set(openblas_options DYNAMIC_ARCH=1 NO_STATIC=1)
