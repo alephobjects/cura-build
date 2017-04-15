@@ -256,6 +256,13 @@ endif()
 message(STATUS "---> Python executable: ${PYTHON_EXECUTABLE}")
 
 if(BUILD_OS_WINDOWS)
+    set(MAKE_EXECUTABLE mingw32-make)
+elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
+    set(MAKE_EXECUTABLE make)
+endif()
+message(STATUS "---> Make executable: ${MAKE_EXECUTABLE}")
+
+if(BUILD_OS_WINDOWS)
     set(PYTHON_DIRECTORY "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
     set(PYTHON_SITE_PACKAGES_DIR lib/${PYTHON_DIRECTORY}/site-packages)
 elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
@@ -535,8 +542,8 @@ if(BUILD_NUMPY OR BUILD_SCIPY)
 	GIT_REPOSITORY git://github.com/xianyi/OpenBLAS.git
 	GIT_TAG 20a413e154948d8b7fc47e7a6d9f13cae98e3856
         CONFIGURE_COMMAND ""
-        BUILD_COMMAND make ${openblas_options}
-        INSTALL_COMMAND make PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} install
+        BUILD_COMMAND ${MAKE_EXECUTABLE} ${openblas_options}
+        INSTALL_COMMAND ${MAKE_EXECUTABLE} PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} install
         BUILD_IN_SOURCE 1
     )
 else()
