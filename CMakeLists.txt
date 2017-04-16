@@ -989,12 +989,12 @@ elseif(BUILD_OS_LINUX)
 
     set(CPACK_INSTALL_CMAKE_PROJECTS "")
     
-    install(FILES "${CMAKE_BINARY_DIR}/dist/cura2" DESTINATION "/usr/bin")
-    install(FILES "${CMAKE_BINARY_DIR}/dist/CuraEngine" DESTINATION "/usr/bin")
+    #install(FILES "${CMAKE_BINARY_DIR}/dist/cura2" DESTINATION "/usr/bin")
+    #install(FILES "${CMAKE_BINARY_DIR}/dist/CuraEngine" DESTINATION "/usr/bin")
     set(CPACK_INSTALLED_DIRECTORIES
-        "${CMAKE_BINARY_DIR}/dist/cura2;/usr/bin/cura2"
-        "${CMAKE_BINARY_DIR}/dist/lib;/opt/cura2/lib"
-        "${CMAKE_BINARY_DIR}/dist/share;/opt/cura2/share"
+       "${CMAKE_BINARY_DIR}/dist;/usr/share/cura2"
+#       "${CMAKE_BINARY_DIR}/dist/lib;/opt/cura2/lib"
+#       "${CMAKE_BINARY_DIR}/dist/share;/opt/cura2/share"
     )
 #---
     configure_file(setup_linux.py.in setup_linux.py @ONLY)
@@ -1015,19 +1015,20 @@ elseif(BUILD_OS_LINUX)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
-    set(run_cx_freeze ${PYTHON_EXECUTABLE} setup_linux.py build --build-exe=${CMAKE_BINARY_DIR}/dist)
+    set(run_cx_freeze ${PYTHON_EXECUTABLE} setup_linux.py build --build-exe=${CMAKE_BINARY_DIR}/dist/usr/share/cura2)
     add_custom_command(
         TARGET build_app POST_BUILD
         COMMAND ${run_cx_freeze}
         COMMENT "---> Running cx_Freeze :${run_cx_freeze}"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
+
 #---
     set(package_dir "_CPack_Packages/Linux/${CPACK_GENERATOR}/Cura2-${CURA_VERSION}-Linux/")
     set(CPACK_INSTALL_COMMANDS
         "${CMAKE_COMMAND} -E make_directory ${package_dir}/usr/bin"
         "${CMAKE_COMMAND} -E make_directory ${package_dir}/usr/share/applications"
-#        "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura2 ${package_dir}/usr/bin/"
+        "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura2 ${package_dir}/usr/bin/"
         "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura2.desktop ${package_dir}/usr/share/applications/"
     )
     # Generating version.json
