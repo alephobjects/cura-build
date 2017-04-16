@@ -22,6 +22,7 @@ option(BUILD_PYTHON_UTILS "Include Python-Utils" ON)
 option(BUILD_ZEROCONF "Include python-zeroconf" ON)
 option(BUILD_TYPING "Include python-typing" ON)
 option(BUILD_SAVITAR "Include Savitar Library" ON)
+option(BUILD_APPDIRS "Include AppDirs Library" ON)
 
 macro(string_option name info default_value)
     if (${name})
@@ -407,14 +408,19 @@ if(BUILD_OS_WINDOWS)
         --install-lib=${native_prefix}\\lib\\${PYTHON_DIRECTORY}\\site-packages
         --install-data=${native_prefix}\\share
         --install-scripts=${native_prefix}\\bin
+	--single-version-externally-managed
+	--record=${native_prefix}\\lib\\${PYTHON_DIRECTORY}\\record.txt
     )
 elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
     set(python_install
 	--install-lib=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR}
 	--install-data=${EXTERNALPROJECT_INSTALL_PREFIX}/share
 	--install-scripts=${EXTERNALPROJECT_INSTALL_PREFIX}/bin
+	--single-version-externally-managed 
+	--record=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR}/record.txt
     )
 endif()
+# include_dirs
 message(STATUS "---> Python Install: ${python_install}")
 
 if ( BUILD_CYTHON )
@@ -439,18 +445,32 @@ else()
     add_custom_target(Cython)
 endif()
 
+if(BUILD_APPDIRS)
+    set(build_python_appdirs ${PYTHON_EXECUTABLE} setup.py build)
+    set(install_python_appdirs ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
+    message(STATUS "---> PythonAppDirs Build: ${build_python_appdirs}")
+    message(STATUS "---> PythonAppDirs Install: ${install_python_appdirs}")
+    ExternalProject_Add(PythonAppDirs
+        DEPENDS Python
+	GIT_REPOSITORY git://github.com/ActiveState/appdirs.git
+        GIT_TAG 859eac40ac7d0b5f3260068c4810d027012f0488
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${build_python_appdirs}
+        INSTALL_COMMAND ${install_python_appdirs}
+        BUILD_IN_SOURCE 1
+    )
+else()
+    message(STATUS "---> System AppDirs will be used")
+    add_custom_target(PythonAppDirs)
+endif()
+
 if(BUILD_NETIFACES)
     set(build_python_netifaces ${PYTHON_EXECUTABLE} setup.py build)
     set(install_python_netifaces ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
-#    list(APPEND install_python_netifaces --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
-#    list(APPEND install_python_netifaces --destdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
-#    list(APPEND install_python_netifaces --incdir=${EXTERNALPROJECT_INSTALL_PREFIX}/include )
-#    list(APPEND install_python_netifaces --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
-#    list(APPEND install_python_netifaces --stubsdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
     message(STATUS "---> PythonNetifaces Build: ${build_python_netifaces}")
     message(STATUS "---> PythonNetifaces Install: ${install_python_netifaces}")
     ExternalProject_Add(PythonNetifaces
-        DEPENDS Python
+        DEPENDS Python PythonAppDirs
         URL https://pypi.python.org/packages/18/fa/dd13d4910aea339c0bb87d2b3838d8fd923c11869b1f6e741dbd0ff3bc00/netifaces-0.10.4.tar.gz
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_python_netifaces}
@@ -542,6 +562,7 @@ if(BUILD_OPENBLAS)
     # Let's Use the git untill we have next release
     message(STATUS "---> OpenBLAS config: ${openblas_options}")
     ExternalProject_Add(OpenBLAS
+#	DEPENDS 
         # URL https://github.com/xianyi/OpenBLAS/archive/v0.2.19.tar.gz
 	GIT_REPOSITORY git://github.com/xianyi/OpenBLAS.git
 	GIT_TAG 20a413e154948d8b7fc47e7a6d9f13cae98e3856
@@ -550,6 +571,7 @@ if(BUILD_OPENBLAS)
         INSTALL_COMMAND ${MAKE_EXECUTABLE} PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} install
         BUILD_IN_SOURCE 1
     )
+    # SET(OpenBLAS_LIBRARIES ${CMAKE_BINARY_DIR}/inst/lib/libopenblas*)
 else()
     message(STATUS "---> System OpenBLAS will be used")
     add_custom_target(OpenBLAS)
@@ -563,7 +585,8 @@ if(BUILD_NUMPY)
     elseif(BUILD_OS_WINDOWS)
 #	list(APPEND build_numpy --compiler=mingw32  )
     endif()
-    set(install_numpy ${PYTHON_EXECUTABLE} setup.py install --prefix ${EXTERNALPROJECT_INSTALL_PREFIX})
+#    set(install_numpy ${PYTHON_EXECUTABLE} setup.py install --prefix ${EXTERNALPROJECT_INSTALL_PREFIX})
+    set(install_numpy ${PYTHON_EXECUTABLE} setup.py install --prefix=${EXTERNALPROJECT_INSTALL_PREFIX})
     message(STATUS "---> NumPy build: ${build_numpy}")
     message(STATUS "---> NumPy install: ${install_numpy}")
     ExternalProject_Add(Numpy
@@ -583,13 +606,14 @@ else()
 endif()
 
 if(BUILD_SCIPY)
-    set(build_scipy ${PYTHON_EXECUTABLE} setup.py build_ext -j 2 --inplace)
+    set(build_scipy ${PYTHON_EXECUTABLE} setup.py build_ext -i -j 1)
     if(BUILD_OS_LINUX)
     elseif(BUILD_OS_OSX)
     elseif(BUILD_OS_WINDOWS)
 #        list(APPEND build_scipy --compiler=mingw32  )
     endif()
-    set(install_scipy ${PYTHON_EXECUTABLE} setup.py install --prefix ${EXTERNALPROJECT_INSTALL_PREFIX})
+#    set(install_scipy ${PYTHON_EXECUTABLE} setup.py install --prefix ${EXTERNALPROJECT_INSTALL_PREFIX})
+    set(install_scipy ${PYTHON_EXECUTABLE} setup.py install --prefix=${EXTERNALPROJECT_INSTALL_PREFIX})
 
     message(STATUS "---> SciPy build: ${build_scipy}")
     message(STATUS "---> SciPy install: ${install_scipy}")
@@ -964,9 +988,11 @@ elseif(BUILD_OS_LINUX)
     set(CPACK_GENERATOR "DEB")
 
     set(CPACK_INSTALL_CMAKE_PROJECTS "")
-
+    
+    install(FILES "${CMAKE_BINARY_DIR}/dist/cura2" DESTINATION "/usr/bin")
+    install(FILES "${CMAKE_BINARY_DIR}/dist/CuraEngine" DESTINATION "/usr/bin")
     set(CPACK_INSTALLED_DIRECTORIES
-        "${CMAKE_BINARY_DIR}/dist/bin;/opt/cura2/bin"
+        "${CMAKE_BINARY_DIR}/dist/cura2;/usr/bin/cura2"
         "${CMAKE_BINARY_DIR}/dist/lib;/opt/cura2/lib"
         "${CMAKE_BINARY_DIR}/dist/share;/opt/cura2/share"
     )
@@ -1001,15 +1027,15 @@ elseif(BUILD_OS_LINUX)
     set(CPACK_INSTALL_COMMANDS
         "${CMAKE_COMMAND} -E make_directory ${package_dir}/usr/bin"
         "${CMAKE_COMMAND} -E make_directory ${package_dir}/usr/share/applications"
-        "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura2 ${package_dir}/usr/bin/"
+#        "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura2 ${package_dir}/usr/bin/"
         "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura2.desktop ${package_dir}/usr/share/applications/"
     )
     # Generating version.json
     list(APPEND CPACK_INSTALL_COMMANDS
-	"${CMAKE_COMMAND} -E make_directory ${package_dir}opt/cura2"
+	"${CMAKE_COMMAND} -E make_directory ${package_dir}usr/share/cura2"
     )
     list(APPEND CPACK_INSTALL_COMMANDS 
-        "${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/cura_version.py ${CURA_VERSION} ${CMAKE_BINARY_DIR} ${package_dir}opt/cura2"
+        "${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/cura_version.py ${CURA_VERSION} ${CMAKE_BINARY_DIR} ${package_dir}usr/share/cura2"
     )
     # Removing files, that are not needed for runtime
     # From bin dir

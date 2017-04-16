@@ -1,140 +1,131 @@
-import encodings
-import os
-import warnings
 import sys
-#sys.path.append('inst/lib/python3.5/dist-packages')
-#sys.path.append('inst/lib/python3.5/site-packages')
-#sys.path.append('inst/lib/python3/site-packages')
-# This is a fix for UM and cura installing into 3 instead of 3.5
-# This happens for Linux DEB only
-sys.path.append("@CMAKE_BINARY_DIR@/inst/lib/python3/dist-packages")
-print(sys.path)
-from cx_Freeze import setup, Executable
+import os.path
 
-includes = [
-	'numpy.core._methods',
-	'numpy.lib.format']
-excludes = []
-packages = []
-path = []
+from cx_Freeze import setup, Executable, hooks
 
-import UM
-import cura
-import os
-import glob
-import shutil
+def load_scipy(finder, module):
+    finder.IncludePackage("scipy._lib")
+    finder.IncludePackage("scipy.misc")
+    finder.IncludePackage("scipy.sparse.csgraph._validation")
+    finder.IncludePackage("scipy.sparse._csparsetools")
 
+hooks.load_scipy = load_scipy
 
-buildOptions = dict(
-	packages = [], 
-	excludes = [])
+def load_pyqt5_qtgui(finder, module):
+    finder.IncludeModule("PyQt5.QtCore")
+
+hooks.load_PyQt5_QtGui = load_pyqt5_qtgui
+
+def load_pyqt5_qtquick(finder, module):
+    finder.IncludeModule("PyQt5.QtCore")
+    finder.IncludeModule("PyQt5.QtGui")
+    finder.IncludeModule("PyQt5.QtQml")
+    finder.IncludeModule("PyQt5.QtNetwork")
+    finder.IncludeModule("PyQt5._QOpenGLFunctions_2_0")
+    finder.IncludeModule("PyQt5._QOpenGLFunctions_4_1_Core")
+
+hooks.load_PyQt5_QtQuick = load_pyqt5_qtquick
+
+search_path = sys.path.copy()
+search_path.insert(1, "@EXTERNALPROJECT_INSTALL_PREFIX@/lib/python3/dist-packages/")
+search_path.insert(2, "@EXTERNALPROJECT_INSTALL_PREFIX@/lib/python3.5/site-packages/")
+
+# Dependencies are automatically detected, but it might need
+# fine tuning.
+build_options = {
+    "build_exe": "dist",
+    "path": search_path,
+    "packages": [
+        "xml.etree",
+        "uuid",
+        "UM",
+        "cura",
+        "zeroconf",
+        "serial",
+        "Savitar",
+        "stl",
+        "appdirs",
+    ],
+    "include_files": [
+        ("@EXTERNALPROJECT_INSTALL_PREFIX@/bin/CuraEngine", 				""),	
+        ("@EXTERNALPROJECT_INSTALL_PREFIX@/lib/cura", 					"plugins"),
+        ("@EXTERNALPROJECT_INSTALL_PREFIX@/lib/uranium", 				"plugins"),
+        ("@EXTERNALPROJECT_INSTALL_PREFIX@/lib/python3/dist-packages/UM/Qt/qml/UM", 	"qml/UM"),
+        ("@EXTERNALPROJECT_INSTALL_PREFIX@/share/cura/resources", 			"resources"),
+        ("@EXTERNALPROJECT_INSTALL_PREFIX@/share/uranium/resources", 			"resources"),
+        ("@EXTERNALPROJECT_INSTALL_PREFIX@/lib/plugins", 				"qt/plugins"),
+        ("@EXTERNALPROJECT_INSTALL_PREFIX@/lib/qml", 					"qt/qml"),
+    ],
+    "includes": [
+        "numpy.core._methods",
+        "numpy.lib.format",
+    ],
+    "optimize": 2,
+    "bin_path_includes": [
+	"/usr/share/cura2/lib",
+        "/lib",
+        "/lib64",
+        "/usr/lib",
+        "/usr/lib64",
+    ],
+    "bin_excludes": [
+        "linux-vdso.so.1",
+        "libpthread.so.0",
+        "libdl.so.2",
+        "librt.so.1",
+        "libstdc++.so.6",
+        "libm.so.6",
+        "libgcc_s.so.1",
+        "libc.so.6",
+        "ld-linux-x86-64.so.2",
+        "libz.so.1",
+        "libgcc_s.so.1",
+        "libglib-2.0",
+        "librt.so.1",
+        "libcap.so.2",
+        "libGL.so.1",
+        "libglapi.so.0",
+        "libXext.so.6",
+        "libXdamage.so.1",
+        "libXfixes.so.3",
+        "libX11-xcb.so.1",
+        "libX11.so.6",
+        "libxcb-glx.so.0",
+        "libxcb-dri2.so.0",
+        "libxcb.so.1",
+        "libXxf86vm.so.1",
+        "libdrm.so.2",
+        "libexpat.so.1",
+        "libXau.so.6",
+        "libglib-2.0.so.0",
+        "libgssapi_krb5.so.",
+        "libgthread-2.0.so.0",
+        "libk5crypto.so.3",
+        "libkeyutils.so.1",
+        "libkrb5.so.3",
+        "libkrb5support.so.0",
+        "libresolv.so.2",
+        "libutil.so.1",
+        "libXrender.so.1",
+        "libcom_err.so.2",
+        "libgssapi_krb5.so.2",
+    ]
+}
+
+base = "Win32GUI" if sys.platform == "win32" else None
 
 executables = [
-    Executable(
-	script = "inst/bin/cura2",
-	targetName = "cura2"
-	)
+    Executable(os.path.join("@EXTERNALPROJECT_INSTALL_PREFIX@", "bin", "cura2"), base = base)
 ]
 
-setup(name='Cura2',
-      version = "@CURA_MAJOR_VERSION@.@CURA_MINOR_VERSION@.@CURA_PATCH_VERSION@",
-      description = 'Cura2 Description',
-      options = {"build_exe": {	"includes": includes,
-				"excludes": excludes,
-				"packages": packages,
-				"path": path }
-			
-		},
-      executables = executables
+setup(
+    name = "Cura2",
+    version = "@CURA_MAJOR_VERSION@.@CURA_MINOR_VERSION@.@CURA_PATCH_VERSION@",
+    author = "Ultimaker B.V.",
+    url="http://software.ultimaker.com/",
+    description = "3D Slicer Software",
+    license="GNU AFFERO GENERAL PUBLIC LICENSE (AGPL)",
+
+    options = { "build_exe": build_options },
+    executables = executables
 )
-
-
-#OPTIONS = {
-#    "build_exe": {
-#        "includes": [
-#		"sip",
-#		"ctypes",
-#		"UM",
-#		"cura",
-#		"PyQt5.QtNetwork", 
-#		"PyQt5._QOpenGLFunctions_2_0", 
-#		"serial", 
-#		"Arcus", 
-#		"xml.etree", 
-#		"xml.etree.ElementTree",
-#		"zeroconf",
-#		"uuid",
-#		"Savitar",
-#       ],
-#        'path': sys.path + ['modules']
-#    }
-#}
-
-# Extend options.includes to include all files from the UM package.
-#for dirpath, dirnames, filenames in os.walk(os.path.dirname(UM.__file__)):
-#    if "__" in dirpath:
-#        continue
-#    module_path = dirpath.replace(os.path.dirname(UM.__file__), "UM")
-#    module_path = module_path.split(os.path.sep)
-#    module_name = ".".join(module_path)
-#    if os.path.isfile(dirpath + "/__init__.py"):
-#        OPTIONS["includes"] += [module_name]
-#        for filename in filenames:
-#            if "__" in filename or not filename.endswith(".py"):
-#                continue
-#            OPTIONS["includes"] += [module_name + "." + os.path.splitext(filename)[0]]
-#
-#for dirpath, dirnames, filenames in os.walk(os.path.dirname(cura.__file__)):
-#    if "__" in dirpath:
-#        continue
-#    module_path = dirpath.replace(os.path.dirname(cura.__file__), "cura")
-#    module_path = module_path.split(os.path.sep)
-#    module_name = ".".join(module_path)
-#    if os.path.isfile(dirpath + "/__init__.py"):
-#        OPTIONS["includes"] += [module_name]
-#        for filename in filenames:
-#            if "__" in filename or not filename.endswith(".py"):
-#                continue
-#            OPTIONS["includes"] += [module_name + "." + os.path.splitext(filename)[0]]
-#
-#setup(
-#    name="Cura",
-#    app=["inst/bin/cura_app.py"],
-#    version="@CURA_MAJOR_VERSION@.@CURA_MINOR_VERSION@.@CURA_PATCH_VERSION@",
-#    author="Ultimaker",
-#    url="http://software.ultimaker.com/",
-#    license="GNU AFFERO GENERAL PUBLIC LICENSE (AGPL)",
-#    options={"build_exe": OPTIONS},
-#    setup_requires=['py2app'],
-#)
-
-# Copy the backend executable
-#print("Copying CuraEngine to Contents/MacOS")
-#shutil.copy("inst/bin/CuraEngine", "dist/Cura.app/Contents/MacOS/CuraEngine")
-
-# Remove all *_debug.x.dylib files since we do not need them but py2app copies 
-# them anyway.
-#for path, dirs, files in os.walk("dist/Cura.app/Contents"):
-#    for file in files:
-#        if "debug" in file:
-#            print("Removing {0}".format(file))
-#            os.remove(os.path.join(path, file))
-
-# Py2App does not handle @rpath properly and fails to find the required libraries.
-# So we need to copy it manually.
-#shutil.copy("inst/lib/libQt5Core.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Core.5.dylib")
-#shutil.copy("inst/lib/libQt5Gui.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Gui.5.dylib")
-#shutil.copy("inst/lib/libQt5MacExtras.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5MacExtras.5.dylib")
-#shutil.copy("inst/lib/libQt5Network.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Network.5.dylib")
-#shutil.copy("inst/lib/libQt5OpenGL.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5OpenGL.5.dylib")
-#shutil.copy("inst/lib/libQt5Qml.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Qml.5.dylib")
-#shutil.copy("inst/lib/libQt5Quick.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Quick.5.dylib")
-#shutil.copy("inst/lib/libQt5QuickWidgets.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5QuickWidgets.5.dylib")
-#shutil.copy("inst/lib/libQt5Svg.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Svg.5.dylib")
-#shutil.copy("inst/lib/libQt5Widgets.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Widgets.5.dylib")
-#shutil.copy("inst/lib/libQt5Xml.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Xml.5.dylib")
-#shutil.copy("inst/lib/libQt5DBus.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5DBus.5.dylib")
-#shutil.copy("inst/lib/libQt5PrintSupport.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5PrintSupport.5.dylib")
-
-# Ensure we set the right @rpath value.
-#os.system("install_name_tool -add_rpath @executable_path/../Frameworks dist/Cura.app/Contents/MacOS/Cura")
