@@ -25,6 +25,8 @@ option(BUILD_SAVITAR "Include Savitar Library" ON)
 option(BUILD_APPDIRS "Include AppDirs Library" ON)
 option(BUILD_NETIFACES "Include Netifaces Library" ON)
 option(BUILD_PYTHONSIX "Include Python Six Library" ON)
+option(BUILD_PYTHON_SETUPTOOLS "Include Python SetupTools Library" ON)
+option(BUILD_PYTHON_PACKAGING "Include Python Packaging Library" ON)
 
 macro(string_option name info default_value)
     if (${name})
@@ -425,6 +427,47 @@ endif()
 # include_dirs
 message(STATUS "---> Python Install: ${python_install}")
 
+if(BUILD_PYTHON_PACKAGING)
+    set(build_python_packaging ${PYTHON_EXECUTABLE} setup.py build)
+    set(install_python_packaging ${PYTHON_EXECUTABLE} setup.py install --verbose)
+    list(APPEND install_python_packaging --install-lib=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR} )
+    list(APPEND install_python_packaging --install-data=${EXTERNALPROJECT_INSTALL_PREFIX}/share )
+    list(APPEND install_python_packaging --install-scripts=${EXTERNALPROJECT_INSTALL_PREFIX}/bin )
+    message(STATUS "---> PythonPackaging Build: ${build_python_packaging}")
+    message(STATUS "---> PythonPackaging Install: ${install_python_packaging}")
+    ExternalProject_Add(PythonPackaging
+        DEPENDS Python
+        GIT_REPOSITORY git://github.com/pypa/packaging.git
+        GIT_TAG 79c84ead5177939a9ac93b3532b4a7c15babaffd
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${build_python_packaging}
+        INSTALL_COMMAND ${install_python_packaging}
+        BUILD_IN_SOURCE 1
+    )
+else()
+    message(STATUS "---> System PythonPackaging will be used")
+    add_custom_target(PythonPackaging)
+endif()
+
+#if(BUILD_PYTHON_SETUPTOOLS)
+#    set(build_python_setuptools ${PYTHON_EXECUTABLE} setup.py build)
+#    set(install_python_setuptools ${PYTHON_EXECUTABLE} setup.py install --verbose)
+#    message(STATUS "---> PythonSetupTools Build: ${build_python_setuptools}")
+#    message(STATUS "---> PythonSetupTools Install: ${install_python_setuptools}")
+#    ExternalProject_Add(PythonSetupTools
+#        DEPENDS Python PythonPackaging
+#        GIT_REPOSITORY git://github.com/pypa/setuptools.git
+#        GIT_TAG 0a32f2290aed6db34a142de0d5c0d607b60c6a05
+#        CONFIGURE_COMMAND ""
+#        BUILD_COMMAND ${build_python_setuptools}
+#        INSTALL_COMMAND ${install_python_setuptools}
+#        BUILD_IN_SOURCE 1
+#    )
+#else()
+#    message(STATUS "---> System PythonSetupTools will be used")
+    add_custom_target(PythonSetupTools)
+#endif()
+
 if(BUILD_PYTHON_UTILS)
     set(build_python_utils ${PYTHON_EXECUTABLE} setup.py build)
     set(install_python_utils ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
@@ -526,16 +569,11 @@ if ( BUILD_CYTHON )
     if(BUILD_OS_WINDOWS)
 #       list(APPEND build_cython --compiler=mingw32)
     endif()
-    set(install_cython ${PYTHON_EXECUTABLE} setup.py install)
-    list(APPEND install_cython --install-lib=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
-    list(APPEND install_cython --install-data=${EXTERNALPROJECT_INSTALL_PREFIX}/share)
-    list(APPEND install_cython --install-scripts=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
-    list(APPEND install_cython --single-version-externally-managed)
-    list(APPEND install_cython --record=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR}/record.txt)
+    set(install_cython ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
     message(STATUS "---> Cython Build: ${build_cython}")
     message(STATUS "---> Cython Install: ${install_cython}")
     ExternalProject_Add(Cython
-        DEPENDS Python Sip PythonAppDirs
+        DEPENDS Python Sip PythonAppDirs PythonSetupTools
         URL https://pypi.python.org/packages/b7/67/7e2a817f9e9c773ee3995c1e15204f5d01c8da71882016cac10342ef031b/Cython-0.25.2.tar.gz
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_cython}
