@@ -425,13 +425,32 @@ endif()
 # include_dirs
 message(STATUS "---> Python Install: ${python_install}")
 
+if(BUILD_PYTHON_UTILS)
+    set(build_python_utils ${PYTHON_EXECUTABLE} setup.py build)
+    set(install_python_utils ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
+    message(STATUS "---> PythonUtils Build: ${build_python_utils}")
+    message(STATUS "---> PythonUtils Install: ${install_python_utils}")
+    ExternalProject_Add(PythonUtils
+        DEPENDS Python
+        GIT_REPOSITORY https://github.com/WoLpH/python-utils.git
+        GIT_TAG origin/master
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${build_python_utils}
+        INSTALL_COMMAND ${install_python_utils}
+        BUILD_IN_SOURCE 1
+    )
+else()
+    message(STATUS "---> System PythonUtils will be used")
+    add_custom_target(PythonUtils)
+endif()
+
 if(BUILD_APPDIRS)
     set(build_python_appdirs ${PYTHON_EXECUTABLE} setup.py build)
     set(install_python_appdirs ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
     message(STATUS "---> PythonAppDirs Build: ${build_python_appdirs}")
     message(STATUS "---> PythonAppDirs Install: ${install_python_appdirs}")
     ExternalProject_Add(PythonAppDirs
-        DEPENDS Python
+        DEPENDS Python PythonUtils
 	GIT_REPOSITORY git://github.com/ActiveState/appdirs.git
         GIT_TAG 859eac40ac7d0b5f3260068c4810d027012f0488
         CONFIGURE_COMMAND ""
@@ -667,25 +686,6 @@ if(BUILD_PYSERIAL)
 else()
     message(STATUS "---> System PySerial will be used")
     add_custom_target(PySerial)
-endif()
-
-if(BUILD_PYTHON_UTILS)
-    set(build_python_utils ${PYTHON_EXECUTABLE} setup.py build)
-    set(install_python_utils ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
-    message(STATUS "---> PythonUtils Build: ${build_python_utils}")
-    message(STATUS "---> PythonUtils Install: ${install_python_utils}")
-    ExternalProject_Add(PythonUtils
-        DEPENDS Python
-        GIT_REPOSITORY https://github.com/WoLpH/python-utils.git
-        GIT_TAG origin/master
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${build_python_utils}
-        INSTALL_COMMAND ${install_python_utils}
-        BUILD_IN_SOURCE 1
-    )
-else()
-    message(STATUS "---> System PythonUtils will be used")
-    add_custom_target(PythonUtils)
 endif()
 
 if(BUILD_NUMPY_STL )
