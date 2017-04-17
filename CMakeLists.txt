@@ -1023,9 +1023,9 @@ elseif(BUILD_OS_LINUX)
     endforeach()
 
     add_custom_command(
-        TARGET build_app PRE_LINK
+        TARGET build_app POST_BUILD 
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/dist
-        COMMENT "---> Cleaning old \"dist\" directory"
+        COMMENT "---> Cleaning old cx_Freeze directory : ${CMAKE_BINARY_DIR}/dist"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
