@@ -1,3 +1,3 @@
 #!/bin/bash
-/usr/share/cura2/cura2
+LD_LIBRARY_PATH=/usr/share/cura2:/usr/share/cura2/lib QT_PLUGIN_PATH=/usr/share/cura2/qt/plugins QML2_IMPORT_PATH=/usr/share/cura2/qml:/usr/share/cura2/qt/qml /usr/share/cura2/cura2
 # LD_LIBRARY_PATH=/opt/cura2/lib PYTHONPATH=/opt/cura2/lib/python3/dist-packages:/opt/cura2/lib/python3/site-packages:/opt/cura2/lib/python3.5/dist-packages:/opt/cura2/lib/python3.5/site-packages QT_PLUGIN_PATH=/opt/cura2/lib/plugins QML2_IMPORT_PATH=/opt/cura2/lib/qml QT_QPA_FONTDIR=/opt/cura2/lib/fonts /opt/cura2/bin/python3 /opt/cura2/bin/cura2 "$@"
