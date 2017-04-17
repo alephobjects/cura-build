@@ -23,6 +23,7 @@ option(BUILD_ZEROCONF "Include python-zeroconf" ON)
 option(BUILD_TYPING "Include python-typing" ON)
 option(BUILD_SAVITAR "Include Savitar Library" ON)
 option(BUILD_APPDIRS "Include AppDirs Library" ON)
+option(BUILD_NETIFACES "Include Netifaces Library" ON)
 
 macro(string_option name info default_value)
     if (${name})
@@ -770,30 +771,22 @@ ExternalProject_Add(Uranium
 # ${EXTRA_PYTHON_DEFINES}
 )
 
-ExternalProject_Add(Cura
-    DEPENDS Uranium CuraEngine Savitar NumpySTL PythonTyping PySerial PythonZeroconf
-    GIT_REPOSITORY ${CURA_URL}
-    GIT_TAG origin/${CURA_TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} -DURANIUM_SCRIPTS_DIR= -DCURA_VERSION=${CURA_VERSION} -DCMAKE_MODULE_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/ 
-#${EXTRA_PYTHON_DEFINES}
-)
-
 ExternalProject_Add(Cura-PostProcessing
-    DEPENDS Cura
+    DEPENDS Python Uranium Savitar
     GIT_REPOSITORY https://github.com/nallath/PostProcessingPlugin
     GIT_TAG origin/master
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
 )
 
 ExternalProject_Add(cura-binary-data
-    DEPENDS Cura
+    DEPENDS Python Uranium Savitar
     GIT_REPOSITORY https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git
     GIT_TAG origin/${TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
 )
 
 ExternalProject_Add(Cura-Doodle3D
-    DEPENDS Cura
+    DEPENDS Python Uranium Savitar
     GIT_REPOSITORY https://github.com/Doodle3D/Doodle3D-cura-plugin
     GIT_TAG origin/master
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
@@ -801,13 +794,21 @@ ExternalProject_Add(Cura-Doodle3D
 
 
 ExternalProject_Add(fdm_materials
-    DEPENDS Cura
+    DEPENDS Python Uranium Savitar
     GIT_REPOSITORY https://github.com/ultimaker/fdm_materials
     GIT_TAG origin/${TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
 )
 
-set(_last_repo fdm_materials) # To make sure ordering for extra repositories is preserved
+ExternalProject_Add(Cura
+    DEPENDS Uranium CuraEngine Savitar NumpySTL PythonTyping PySerial PythonZeroconf Scipy Numpy PythonNetifaces fdm_materials Cura-Doodle3D cura-binary-data Cura-PostProcessing
+    GIT_REPOSITORY ${CURA_URL}
+    GIT_TAG origin/${CURA_TAG_OR_BRANCH}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} -DURANIUM_SCRIPTS_DIR= -DCURA_VERSION=${CURA_VERSION} -DCMAKE_MODULE_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/
+#${EXTRA_PYTHON_DEFINES}
+)
+
+set(_last_repo Cura) # To make sure ordering for extra repositories is preserved
 
 foreach(repo ${EXTRA_REPOSITORIES})
     separate_arguments(items UNIX_COMMAND "${repo}")
