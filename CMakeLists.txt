@@ -425,28 +425,6 @@ endif()
 # include_dirs
 message(STATUS "---> Python Install: ${python_install}")
 
-if ( BUILD_CYTHON )
-# Currently Cython can be build only with Python... but we will see
-    set(build_cython ${PYTHON_EXECUTABLE} setup.py build)
-    if(BUILD_OS_WINDOWS)
-#	list(APPEND build_cython --compiler=mingw32)
-    endif()
-    set(install_cython ${PYTHON_EXECUTABLE} setup.py install ${python_install})
-    message(STATUS "---> Cython Build: ${build_cython}")
-    message(STATUS "---> Cython Install: ${install_cython}")
-    ExternalProject_Add(Cython
-        DEPENDS Python
-        URL https://pypi.python.org/packages/b7/67/7e2a817f9e9c773ee3995c1e15204f5d01c8da71882016cac10342ef031b/Cython-0.25.2.tar.gz
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${build_cython}
-        INSTALL_COMMAND ${install_cython}
-        BUILD_IN_SOURCE 1
-    )
-else()
-    message(STATUS "---> System Cython will be used")
-    add_custom_target(Cython)
-endif()
-
 if(BUILD_APPDIRS)
     set(build_python_appdirs ${PYTHON_EXECUTABLE} setup.py build)
     set(install_python_appdirs ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
@@ -521,6 +499,33 @@ if(BUILD_ZEROCONF)
 else()
     message(STATUS "---> System ZeroConf will be used")
     add_custom_target(PythonZeroconf)
+endif()
+
+if ( BUILD_CYTHON )
+# Currently Cython can be build only with Python... but we will see
+    set(build_cython ${PYTHON_EXECUTABLE} setup.py build)
+    if(BUILD_OS_WINDOWS)
+#       list(APPEND build_cython --compiler=mingw32)
+    endif()
+    set(install_cython ${PYTHON_EXECUTABLE} setup.py install)
+    list(APPEND install_cython --install-lib=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
+    list(APPEND install_cython --install-data=${EXTERNALPROJECT_INSTALL_PREFIX}/share)
+    list(APPEND install_cython --install-scripts=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
+    list(APPEND install_cython --single-version-externally-managed)
+    list(APPEND install_cython --record=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR}/record.txt)
+    message(STATUS "---> Cython Build: ${build_cython}")
+    message(STATUS "---> Cython Install: ${install_cython}")
+    ExternalProject_Add(Cython
+        DEPENDS Python Sip PythonAppDirs
+        URL https://pypi.python.org/packages/b7/67/7e2a817f9e9c773ee3995c1e15204f5d01c8da71882016cac10342ef031b/Cython-0.25.2.tar.gz
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${build_cython}
+        INSTALL_COMMAND ${install_cython}
+        BUILD_IN_SOURCE 1
+    )
+else()
+    message(STATUS "---> System Cython will be used")
+    add_custom_target(Cython)
 endif()
 
 if(BUILD_PYQT)
@@ -1037,20 +1042,24 @@ elseif(BUILD_OS_LINUX)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
+    set(run_cura_version ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/cura_version.py 
+	${CURA_VERSION} ${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/dist)
+    add_custom_command(
+        TARGET build_app POST_BUILD
+        COMMAND ${run_cura_version}
+        COMMENT "---> Generating Version File :${run_cura_version}"
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+    
+    
 #---
     set(package_dir "_CPack_Packages/Linux/${CPACK_GENERATOR}/Cura2-${CURA_VERSION}-Linux/")
     set(CPACK_INSTALL_COMMANDS
+	"${CMAKE_COMMAND} -E remove_directory ${package_dir}"
         "${CMAKE_COMMAND} -E make_directory ${package_dir}/usr/bin"
         "${CMAKE_COMMAND} -E make_directory ${package_dir}/usr/share/applications"
         "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura2 ${package_dir}/usr/bin/"
         "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura2.desktop ${package_dir}/usr/share/applications/"
-    )
-    # Generating version.json
-    list(APPEND CPACK_INSTALL_COMMANDS
-	"${CMAKE_COMMAND} -E make_directory ${package_dir}usr/share/cura2"
-    )
-    list(APPEND CPACK_INSTALL_COMMANDS 
-        "${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/cura_version.py ${CURA_VERSION} ${CMAKE_BINARY_DIR} ${package_dir}usr/share/cura2"
     )
     # Removing files, that are not needed for runtime
     # From bin dir
