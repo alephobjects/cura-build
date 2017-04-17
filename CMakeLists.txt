@@ -871,7 +871,7 @@ elseif(BUILD_OS_WINDOWS)
     # )
 elseif(BUILD_OS_LINUX)
     ExternalProject_Add( cxFreeze
-	DEPENDS Python
+	DEPENDS Python PythonAppDirs
 	URL https://pypi.python.org/packages/d0/6d/9492644452727094543575de9846af5a2b9c764f760e2d414af7c876618c/cx_Freeze-5.0.1.tar.gz
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
