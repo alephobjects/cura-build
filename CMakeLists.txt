@@ -24,6 +24,7 @@ option(BUILD_TYPING "Include python-typing" ON)
 option(BUILD_SAVITAR "Include Savitar Library" ON)
 option(BUILD_APPDIRS "Include AppDirs Library" ON)
 option(BUILD_NETIFACES "Include Netifaces Library" ON)
+option(BUILD_PYTHONSIX "Include Python Six Library" ON)
 
 macro(string_option name info default_value)
     if (${name})
@@ -482,15 +483,27 @@ else()
     message(STATUS "---> System NetIfaces will be used")
     add_custom_target(PythonNetifaces)
 endif()
-    # We should not need it, leaving here just in case
-    #ExternalProject_Add(PythonSix
-    #    DEPENDS Python
-    #    URL https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz
-    #    CONFIGURE_COMMAND ""
-    #    BUILD_COMMAND ${build_python_zeroconf}
-    #    INSTALL_COMMAND ${install_python_zeroconf}
-    #    BUILD_IN_SOURCE 1
-    #)
+
+# We should not need it, leaving here just in case
+# Apparently Six is required for OctoPrint plugin :(
+if(BUILD_PYTHONSIX)
+    set(build_python_six ${PYTHON_EXECUTABLE} setup.py build)
+    set(install_python_six ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
+    message(STATUS "---> PythonSix Build: ${build_python_six}")
+    message(STATUS "---> PythonSix Install: ${install_python_six}")
+    ExternalProject_Add(PythonSix
+        DEPENDS Python
+        URL https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${build_python_six}
+        INSTALL_COMMAND ${install_python_six}
+        BUILD_IN_SOURCE 1
+    )
+else()
+    message(STATUS "---> System PythonSix will be used")
+    add_custom_target(PythonSix)
+endif()
+
 if(BUILD_ZEROCONF)
     set(build_python_zeroconf ${PYTHON_EXECUTABLE} setup.py build)
     set(install_python_zeroconf ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
@@ -801,7 +814,7 @@ ExternalProject_Add(fdm_materials
 )
 
 ExternalProject_Add(Cura
-    DEPENDS Uranium CuraEngine Savitar NumpySTL PythonTyping PySerial PythonZeroconf Scipy Numpy PythonNetifaces fdm_materials Cura-Doodle3D cura-binary-data Cura-PostProcessing
+    DEPENDS Uranium CuraEngine Savitar NumpySTL PythonTyping PySerial PythonZeroconf Scipy Numpy PythonNetifaces fdm_materials Cura-Doodle3D cura-binary-data Cura-PostProcessing PythonSix
     GIT_REPOSITORY ${CURA_URL}
     GIT_TAG origin/${CURA_TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} -DURANIUM_SCRIPTS_DIR= -DCURA_VERSION=${CURA_VERSION} -DCMAKE_MODULE_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/
