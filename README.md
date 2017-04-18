@@ -206,6 +206,11 @@ Dependencies:
 * openblas-devel.x86_64
 * python34-numpy-f2py.x86_64
 
+For Ubuntu 16.04 install zlib1g-dev, libssl-dev, libreadline-dev
+sudo apt-get install zlib1g-dev
+sudo apt-get install libssl-dev
+sudo apt-get install libreadline-dev
+
 To build, make sure these dependencies are installed, then clone this repository and run the following commands from your clone:
 
 ```shell
