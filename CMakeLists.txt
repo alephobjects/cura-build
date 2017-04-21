@@ -252,10 +252,16 @@ if(BUILD_PYTHON)
 		${PYTHON_CONFIGURE_LDFLAGS}
     )
 
+    if (BUILD_OS_OSX)
+      set( python_configure_patch_command COMMAND "sed -ie \'s\|\\#define HAVE_GETENTROPY 1\|/* \\#undef HAVE_GETENTROPY */\|\' pyconfig.h")
+    else()
+      set( python_configure_patch_command)
+    endif()
     ExternalProject_Add(Python
         URL https://www.python.org/ftp/python/${PYTHON_VERSION_STRING}/Python-${PYTHON_VERSION_STRING}.tgz
         PATCH_COMMAND ${python_patch_command}
-        CONFIGURE_COMMAND ${python_configure_command}
+        CONFIGURE_COMMAND ${python_configure_command} ${python_configure_patch_command}
+	
         BUILD_IN_SOURCE 1
     )
     # We want to be able to link to python Libs while running CMAKE
