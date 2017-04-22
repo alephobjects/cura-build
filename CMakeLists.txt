@@ -262,7 +262,7 @@ if(BUILD_PYTHON)
     endif()
 
     if(BUILD_OS_WINDOWS)
-       string(REPLACE "/" "\\" python_configure_command ${python_configure_command})
+       string(REPLACE "/" "\\" python_configure_command "${python_configure_command}")
     endif()
     ExternalProject_Add(Python
         URL https://www.python.org/ftp/python/${PYTHON_VERSION_STRING}/Python-${PYTHON_VERSION_STRING}.tgz
@@ -368,7 +368,7 @@ if(BUILD_QT)
     endif()
 
     if(BUILD_OS_WINDOWS)
-       string(REPLACE "/" "\\" qt_options ${qt_options})
+       string(REPLACE "/" "\\" qt_options "${qt_options}")
     endif()    
     message(STATUS "---> Qt config: ${qt_options}")
     ExternalProject_Add(Qt
@@ -406,7 +406,7 @@ if(BUILD_SIP)
     set(SIP_FOUND True)
 
     if(BUILD_OS_WINDOWS)
-       string(REPLACE "/" "\\" sip_command ${sip_command})
+       string(REPLACE "/" "\\" sip_command "${sip_command}")
     endif()
     message(STATUS "---> SIP command: ${sip_command}")
     ExternalProject_Add(Sip
@@ -428,7 +428,7 @@ endif()
 
 if(BUILD_OS_WINDOWS)
     # Because setuptools is stupid and will interpret "C:/..." as a relative path
-    string(REPLACE "/" "\\" native_prefix ${EXTERNALPROJECT_INSTALL_PREFIX})
+    string(REPLACE "/" "\\" native_prefix "${EXTERNALPROJECT_INSTALL_PREFIX}")
     set(python_install
         --install-lib=${native_prefix}\\lib\\${PYTHON_DIRECTORY}\\site-packages
         --install-data=${native_prefix}\\share
@@ -461,7 +461,7 @@ if(BUILD_PYTHON_PACKAGING)
         list(APPEND install_python_packaging --install-scripts=${EXTERNALPROJECT_INSTALL_PREFIX}/bin )
     endif()
     if(BUILD_OS_WINDOWS)
-       string(REPLACE "/" "\\" install_python_packaging ${install_python_packaging})
+       string(REPLACE "/" "\\" install_python_packaging "${install_python_packaging}")
     endif()
     message(STATUS "---> PythonPackaging Build: ${build_python_packaging}")
     message(STATUS "---> PythonPackaging Install: ${install_python_packaging}")
@@ -502,7 +502,7 @@ if(BUILD_PYTHON_UTILS)
     set(build_python_utils ${PYTHON_EXECUTABLE} setup.py build)
     set(install_python_utils ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
     if(BUILD_OS_WINDOWS)
-       string(REPLACE "/" "\\" install_python_utils ${install_python_utils})
+       string(REPLACE "/" "\\" install_python_utils "${install_python_utils}")
     endif()
     message(STATUS "---> PythonUtils Build: ${build_python_utils}")
     message(STATUS "---> PythonUtils Install: ${install_python_utils}")
@@ -648,7 +648,7 @@ if(BUILD_PYQT)
     #        patch qpy/QtQml/qpyqmlobject.h ${CMAKE_SOURCE_DIR}/qpyqmlobject.h.patch
     #    )
     if(BUILD_OS_WINDOWS)
-       string(REPLACE "/" "\\" pyqt_command ${pyqt_command})
+       string(REPLACE "/" "\\" pyqt_command "${pyqt_command}")
     endif()
     message(STATUS "---> PyQt config: ${pyqt_command}")
     ExternalProject_Add(PyQt
