@@ -253,8 +253,8 @@ if(BUILD_PYTHON)
     )
 
     if (BUILD_OS_OSX)
-      set( python_configure_patch_command COMMAND sed -ie "s/#define HAVE_GETENTROPY 1/\\/* #undef HAVE_GETENTROPY *\\//g" pyconfig.h)
-      list(APPEND python_configure_patch_command COMMAND 
+      set( python_configure_patch_command && sed -ie "s/#define HAVE_GETENTROPY 1/\\/* #undef HAVE_GETENTROPY *\\//g" pyconfig.h)
+      list(APPEND python_configure_patch_command &&
            echo "fixing pyconfig.h with sed -ie 's/#define HAVE_GETENTROPY 1/\\/* #undef HAVE_GETENTROPY *\\//g'")
     else()
       set( python_configure_patch_command)
