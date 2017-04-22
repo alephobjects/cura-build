@@ -404,7 +404,6 @@ if(BUILD_SIP)
     if(BUILD_OS_WINDOWS)
 	list(APPEND sip_command --platform win32-g++)
 	list(APPEND sip_command CFLAGS+="-D_hypot=hypot")
-	list(APPEND sip_command CPPFLAGS+="-D_hypot=hypot")
 	list(APPEND sip_command CXXFLAGS+="-D_hypot=hypot")
     endif()
 
