@@ -80,7 +80,7 @@ if(BUILD_OS_WINDOWS)
     # Checked. "./configure" needs to work
     set(BUILD_PYTHON OFF)
     # Checked: MSYS should be installed (missing grep etc)
-    set(BUILD_OPENBLAS OFF)
+    # set(BUILD_OPENBLAS OFF)
 
     # Disable building of Numpy and Scipy due to dependency on Fortran
     #set(BUILD_NUMPY OFF)
@@ -91,7 +91,7 @@ if(BUILD_OS_WINDOWS)
     #set(BUILD_SAVITAR OFF)
     #set(BUILD_PYTHON_UTILS OFF)
     #set(BUILD_ZEROCONF OFF)
-    set(BUILD_TYPING OFF)
+    #set(BUILD_TYPING OFF)
 
     # There is no reason to build CYTHON because NUMPY, NUMPY_STL and SAVITAR are disabled
     # set(BUILD_CYTHON OFF)
@@ -102,8 +102,9 @@ if(BUILD_OS_WINDOWS)
     #
     # On Win64, in addition MinGW built python extensions fail to load properly so we cannot
     # use it at all.
+    # Building Qt would require configure too
     set(BUILD_QT OFF)
-    set(BUILD_PYQT OFF)
+    # set(BUILD_PYQT OFF)
 
     if(BUILD_OS_WIN64)
         # Sip is required to build the Arcus python bindings, which works fine on Win32
@@ -253,11 +254,15 @@ if(BUILD_PYTHON)
     )
 
     if (BUILD_OS_OSX)
-      set( python_configure_patch_command && sed -ie "s/#define HAVE_GETENTROPY 1/\\/* #undef HAVE_GETENTROPY *\\//g" pyconfig.h)
-      list(APPEND python_configure_patch_command &&
+      set( python_configure_patch_command COMMAND sed -ie "s/#define HAVE_GETENTROPY 1/\\/* #undef HAVE_GETENTROPY *\\//g" pyconfig.h)
+      list(APPEND python_configure_patch_command COMMAND 
            echo "fixing pyconfig.h with sed -ie 's/#define HAVE_GETENTROPY 1/\\/* #undef HAVE_GETENTROPY *\\//g'")
     else()
       set( python_configure_patch_command)
+    endif()
+
+    if(BUILD_OS_WINDOWS)
+       string(REPLACE "/" "\\" python_configure_command ${python_configure_command})
     endif()
     ExternalProject_Add(Python
         URL https://www.python.org/ftp/python/${PYTHON_VERSION_STRING}/Python-${PYTHON_VERSION_STRING}.tgz
@@ -309,14 +314,13 @@ endif()
 
 
 if(BUILD_QT)
-    set(qt_url http://download.qt.io/archive/qt/5.6/5.6.2/single/qt-everywhere-opensource-src-5.6.2.tar.gz)
-    set(qt_md5 1b1b1f929d0cd83680354a0c83d8e945)
-
-    # Qt uses different sources for Windows
     if(BUILD_OS_WINDOWS)
-        set(qt_url http://download.qt.io/archive/qt/5.5/5.5.1/single/qt-everywhere-opensource-src-5.5.1.zip)
-        set(qt_md5 d071cdaa1b8f34fb49f6deac94039c2c)
-    endif()
+       set(qt_url http://download.qt.io/archive/qt/5.6/5.6.2/single/qt-everywhere-opensource-src-5.6.2.zip)
+       set(qt_md5 b684a2f37b1beebd421b3b7d1eca15dc)
+    else()
+       set(qt_url http://download.qt.io/archive/qt/5.6/5.6.2/single/qt-everywhere-opensource-src-5.6.2.tar.gz)
+       set(qt_md5 1b1b1f929d0cd83680354a0c83d8e945)
+   endif()
 
     set(qt_options -release)
 # If one wants to build debuggable library:
@@ -363,6 +367,9 @@ if(BUILD_QT)
 	# list(APPEND qt_options -skip qtx11extras)
     endif()
 
+    if(BUILD_OS_WINDOWS)
+       string(REPLACE "/" "\\" qt_options ${qt_options})
+    endif()    
     message(STATUS "---> Qt config: ${qt_options}")
     ExternalProject_Add(Qt
         URL ${qt_url}
@@ -398,6 +405,9 @@ if(BUILD_SIP)
     set(SIP_INCLUDE_DIR ${EXTERNALPROJECT_INSTALL_PREFIX}/include )
     set(SIP_FOUND True)
 
+    if(BUILD_OS_WINDOWS)
+       string(REPLACE "/" "\\" sip_command ${sip_command})
+    endif()
     message(STATUS "---> SIP command: ${sip_command}")
     ExternalProject_Add(Sip
         DEPENDS Python
@@ -450,6 +460,9 @@ if(BUILD_PYTHON_PACKAGING)
         list(APPEND install_python_packaging --install-data=${EXTERNALPROJECT_INSTALL_PREFIX}/share )
         list(APPEND install_python_packaging --install-scripts=${EXTERNALPROJECT_INSTALL_PREFIX}/bin )
     endif()
+    if(BUILD_OS_WINDOWS)
+       string(REPLACE "/" "\\" install_python_packaging ${install_python_packaging})
+    endif()
     message(STATUS "---> PythonPackaging Build: ${build_python_packaging}")
     message(STATUS "---> PythonPackaging Install: ${install_python_packaging}")
     ExternalProject_Add(PythonPackaging
@@ -488,6 +501,9 @@ endif()
 if(BUILD_PYTHON_UTILS)
     set(build_python_utils ${PYTHON_EXECUTABLE} setup.py build)
     set(install_python_utils ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
+    if(BUILD_OS_WINDOWS)
+       string(REPLACE "/" "\\" install_python_utils ${install_python_utils})
+    endif()
     message(STATUS "---> PythonUtils Build: ${build_python_utils}")
     message(STATUS "---> PythonUtils Install: ${install_python_utils}")
     ExternalProject_Add(PythonUtils
@@ -631,6 +647,9 @@ if(BUILD_PYQT)
     #        patch qpy/QtQml/qpyqmlobject.cpp ${CMAKE_SOURCE_DIR}/qpyqmlobject.cpp.patch && 
     #        patch qpy/QtQml/qpyqmlobject.h ${CMAKE_SOURCE_DIR}/qpyqmlobject.h.patch
     #    )
+    if(BUILD_OS_WINDOWS)
+       string(REPLACE "/" "\\" pyqt_command ${pyqt_command})
+    endif()
     message(STATUS "---> PyQt config: ${pyqt_command}")
     ExternalProject_Add(PyQt
         DEPENDS Python Qt Sip
