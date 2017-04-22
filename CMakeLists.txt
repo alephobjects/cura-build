@@ -103,7 +103,7 @@ if(BUILD_OS_WINDOWS)
     # On Win64, in addition MinGW built python extensions fail to load properly so we cannot
     # use it at all.
     # Building Qt would require configure too
-    set(BUILD_QT OFF)
+    # set(BUILD_QT OFF)
     # set(BUILD_PYQT OFF)
 
     if(BUILD_OS_WIN64)
@@ -320,9 +320,15 @@ if(BUILD_QT)
     else()
        set(qt_url http://download.qt.io/archive/qt/5.6/5.6.2/single/qt-everywhere-opensource-src-5.6.2.tar.gz)
        set(qt_md5 1b1b1f929d0cd83680354a0c83d8e945)
-   endif()
+    endif()
 
-    set(qt_options -release)
+    if(BUILD_OS_WINDOWS)
+       set(qt_options configure.bat )
+    else()
+       set(qt_options ./configure)
+    endif()
+
+    list(APPEND qt_options -release)
 # If one wants to build debuggable library:
 #    list(APPEND qt_options -force-debug-info)
     list(APPEND qt_options -prefix ${EXTERNALPROJECT_INSTALL_PREFIX})
@@ -374,7 +380,7 @@ if(BUILD_QT)
     ExternalProject_Add(Qt
         URL ${qt_url}
         URL_MD5 ${qt_md5}
-        CONFIGURE_COMMAND ./configure ${qt_options}
+        CONFIGURE_COMMAND ${qt_options}
         BUILD_IN_SOURCE 1
     )
 
