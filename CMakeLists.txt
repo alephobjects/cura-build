@@ -640,7 +640,7 @@ if(BUILD_PYQT)
 #	Flags: -DPy_TRACE_DEFS -DMS_WIN32 -D_hypot=hypot
 	list(APPEND pyqt_command QMAKE_CFLAGS+="-D_hypot=hypot -DPy_TRACE_DEFS")
 	list(APPEND pyqt_command QMAKE_CXXFLAGS+="-D_hypot=hypot -DPy_TRACE_DEFS")
-#	list(APPEND pyqt_command QMAKE_LFLAGS+="${LDFLAGS}")
+	list(APPEND pyqt_command QMAKE_LFLAGS+="-LC:\Python35\ -lpython35")
 #	list(APPEND pyqt_command CFLAGS+="-D_hypot=hypot")
 #        list(APPEND pyqt_command CPPFLAGS+="-D_hypot=hypot")
 #        list(APPEND pyqt_command CXXFLAGS+="-D_hypot=hypot")
