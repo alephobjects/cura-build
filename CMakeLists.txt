@@ -403,8 +403,9 @@ if(BUILD_SIP)
 
     if(BUILD_OS_WINDOWS)
 	list(APPEND sip_command --platform win32-g++)
-	list(APPEND sip_command CFLAGS+="-D_hypot=hypot -DPy_TRACE_DEFS")
-	list(APPEND sip_command CXXFLAGS+="-D_hypot=hypot -DPy_TRACE_DEFS")
+	# Apparently Sip doesn't like hypot
+	list(APPEND sip_command CFLAGS+="-DPy_TRACE_DEFS")
+	list(APPEND sip_command CXXFLAGS+="-DPy_TRACE_DEFS")
     endif()
 
     set(SIP_VERSION 0x041301)
