@@ -80,7 +80,7 @@ if(BUILD_OS_WINDOWS)
     # Checked. "./configure" needs to work
     set(BUILD_PYTHON OFF)
     # Checked: MSYS should be installed (missing grep etc)
-    # set(BUILD_OPENBLAS OFF)
+    set(BUILD_OPENBLAS OFF)
 
     # Disable building of Numpy and Scipy due to dependency on Fortran
     #set(BUILD_NUMPY OFF)
