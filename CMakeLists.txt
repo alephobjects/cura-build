@@ -448,7 +448,7 @@ if(BUILD_OS_WINDOWS)
         --install-lib=${native_prefix}\\lib\\${PYTHON_DIRECTORY}\\site-packages
         --install-data=${native_prefix}\\share
         --install-scripts=${native_prefix}\\bin
-	--single-version-externally-managed
+#	--single-version-externally-managed
 	--record=${native_prefix}\\lib\\${PYTHON_DIRECTORY}\\record.txt
     )
 elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
