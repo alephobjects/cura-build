@@ -645,7 +645,7 @@ if(BUILD_PYQT)
 # Flags: -DPy_TRACE_DEFS -DMS_WIN32 -D_hypot=hypot -DPy_TRACE_DEFS
         list(APPEND pyqt_command QMAKE_CFLAGS+="-m32 -fPIC -D_hypot=hypot -std=c++11 -static-libstdc++")
         list(APPEND pyqt_command QMAKE_CXXFLAGS+="-m32 -fPIC -D_hypot=hypot -std=c++11 -static-libstdc++")
-        list(APPEND pyqt_command QMAKE_LFLAGS+=-lpython35)
+        list(APPEND pyqt_command QMAKE_LFLAGS+='-LC:/Python35 -LC:/Python35/libs -lpython35')
 #        list(APPEND pyqt_command CFLAGS+="-D_hypot=hypot")
 #        list(APPEND pyqt_command CPPFLAGS+="-D_hypot=hypot")
 #        list(APPEND pyqt_command CXXFLAGS+="-D_hypot=hypot")
