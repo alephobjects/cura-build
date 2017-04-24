@@ -606,7 +606,7 @@ if ( BUILD_CYTHON )
 # Currently Cython can be build only with Python... but we will see
     set(build_cython ${PYTHON_EXECUTABLE} setup.py build)
     if(BUILD_OS_WINDOWS)
-#       list(APPEND build_cython --compiler=mingw32)
+         list(APPEND build_cython --compiler=mingw32)
     endif()
     set(install_cython ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
     message(STATUS "---> Cython Build: ${build_cython}")
