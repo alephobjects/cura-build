@@ -801,7 +801,11 @@ endif()
 
 if(BUILD_TYPING)
     set(build_typing ${PYTHON_EXECUTABLE} setup.py build)
-    set(install_typing ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed ${python_install} --verbose)
+    if(BUILD_OS_WINDOWS)
+       set(install_typing ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
+    else()
+       set(install_typing ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed ${python_install} --verbose)
+    endif()
     message(STATUS "---> PythonTyping Build: ${build_typing}")
     message(STATUS "---> PythonTyping Install: ${install_typing}")
     ExternalProject_Add(PythonTyping
