@@ -711,9 +711,9 @@ if(BUILD_NUMPY)
     elseif(BUILD_OS_WINDOWS)
         list(APPEND build_numpy --compiler=mingw32  )
 #        list(APPEND build_numpy --no-user-cfg )
-        # Let's try -mno-sse for CFLAGS
-        list(APPEND build_numpy CFLAGS+="-mno-sse")
-        list(APPEND build_numpy CXXFLAGS+="-mno-sse")
+        # Let's try -mno-sse for CFLAGS -msse2
+        list(APPEND build_numpy CFLAGS="-msse2")
+        list(APPEND build_numpy CXXFLAGS="-msse2")
     endif()
 #    set(install_numpy ${PYTHON_EXECUTABLE} setup.py install --prefix ${EXTERNALPROJECT_INSTALL_PREFIX})
     set(install_numpy ${PYTHON_EXECUTABLE} setup.py install --prefix=${EXTERNALPROJECT_INSTALL_PREFIX})
