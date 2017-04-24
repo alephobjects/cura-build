@@ -708,10 +708,10 @@ if(BUILD_NUMPY)
     if(BUILD_OS_LINUX OR BUILD_OS_OSX)
         list(APPEND build_numpy build_ext -j 2 --inplace)
     elseif(BUILD_OS_WINDOWS)
-        list(APPEND build_numpy build_ext)
+        list(APPEND build_numpy build --inplace)
         list(APPEND build_numpy --compiler=mingw32  )
 	list(APPEND build_numpy --fcompiler=gnu95 )
-        list(APPEND build_numpy --no-user-cfg )
+#        list(APPEND build_numpy --no-user-cfg )
         # Let's try -mno-sse for CFLAGS -msse2
 # Apparently CFLAGS are not accepted via setup.py
 #        list(APPEND build_numpy CFLAGS="-msse2")
