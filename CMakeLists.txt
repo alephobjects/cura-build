@@ -179,13 +179,13 @@ if(BUILD_PYTHON)
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_CURRENT_SOURCE_DIR}\\bin\\patch.exe
+                ${CMAKE_SOURCE_DIR}\\bin\\patch.exe
                 ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe
 #        BUILD_IN_SOURCE 1
         )
     set(python_patch_command ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe -p0
-        -i ${CMAKE_CURRENT_SOURCE_DIR}\\cmake\\patches-win32\\01-dynload_win.patch 
-        -d ${CMAKE_SOURCE_DIR}\\Python-3.5.2 )
+        -i ${CMAKE_SOURCE_DIR}\\cmake\\patches-win32\\01-dynload_win.patch 
+        -d ${CMAKE_SOURCE_DIR}\\..\\Python-3.5.2 )
     else()
         set(python_patch_command)
         add_custom_target(WinPatch)
