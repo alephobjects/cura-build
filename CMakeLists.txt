@@ -258,6 +258,7 @@ if(BUILD_PYTHON)
       )
 
       # Download python itself and place it into the right spot
+            file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/inst/${PYTHON_SITE_PACKAGES_DIR})
             set(_download_link "http://www.python.org/ftp/python/${PYTHON_VERSION_STRING}/Python-${PYTHON_VERSION_STRING}.tgz")
             get_filename_component(_filename ${_download_link} NAME)
             if (BUILD_OS_WINDOWS)
@@ -275,14 +276,15 @@ if(BUILD_PYTHON)
                    SHOW_PROGRESS
                 )
             endif()
-            message(STATUS "Extracting ${_archive_filepath}")
             if (BUILD_OS_WINDOWS)
+                message(STATUS "Extracting ${_archive_filepath} to  ${CMAKE_BINARY_DIR}\\Python-prefix\\src" )
                 execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz ${_archive_filepath}
-                    ${CMAKE_BINARY_DIR}\\Python-prefix\\src
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}\\Python-prefix\\src
                     RESULT_VARIABLE rv)
             else()
+                message(STATUS "Extracting ${_archive_filepath} to  ${CMAKE_BINARY_DIR}/Python-prefix/src" )
                 execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz ${_archive_filepath}
-                    ${CMAKE_BINARY_DIR}/Python-prefix/src
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/Python-prefix/src
                     RESULT_VARIABLE rv)
             endif()
             if(NOT rv EQUAL 0)
