@@ -171,6 +171,11 @@ message(STATUS "Building Cura ${CURA_VERSION}")
 
 if(BUILD_PYTHON)
     # We'll need a patch command
+
+    set (winpatch_source_path ${CMAKE_BINARY_DIR}\\WinPatch-prefix\\src\\WinPatch\\bin)
+    string(REPLACE "/" "\\" winpatch_source_path "${winpatch_source_path}")
+    set (winpatch_destination_path ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin)
+    string(REPLACE "/" "\\" winpatch_destination_path "${winpatch_destination_path}")
     if (BUILD_OS_WINDOWS)
         ExternalProject_Add(WinPatch
 #        DEPENDS
@@ -179,13 +184,13 @@ if(BUILD_PYTHON)
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_SOURCE_DIR}\\WinPatch-prefix\\src\\WinPatch\\bin\\patch.exe
-                ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe
+                ${winpatch_source_path}\\patch.exe
+                ${winpatch_destination_path}\\patch.exe
 #        BUILD_IN_SOURCE 1
         )
-    set(python_patch_command ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe -p0
-        -i ${CMAKE_SOURCE_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\01-dynload_win.patch 
-        -d ${CMAKE_SOURCE_DIR}\\Python-prefix\\src\\Python-3.5.2 )
+    set(python_patch_command ${winpatch_destination_path}\\patch.exe -p0
+        -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\01-dynload_win.patch 
+        -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-3.5.2 )
     else()
         set(python_patch_command)
         add_custom_target(WinPatch)
