@@ -216,25 +216,55 @@ if(BUILD_PYTHON)
 
     if (BUILD_OS_WINDOWS)
         string(REPLACE "/" "\\" CMAKE_BINARY_DIR "${CMAKE_BINARY_DIR}")
-        set (winpatch_source_path ${CMAKE_BINARY_DIR}\\WinPatch-prefix\\src\\WinPatch\\bin)
-        set (winpatch_destination_path ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin)
+        set (pythonpatch_source_path ${CMAKE_BINARY_DIR}\\PythonPatch-prefix\\src\\PythonPatch\\bin)
+        set (pythonpatch_destination_path ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin)
 
-        set(python_patch_command ${winpatch_destination_path}\\patch.exe -p0
+        set(pythonpatch_build_command ${pythonpatch_destination_path}\\patch.exe -t -p0
             -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\01-dynload_win.patch 
             -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
-        list(APPEND python_patch_command COMMAND ${winpatch_destination_path}\\patch.exe -p0
+        list(APPEND pythonpatch_build_command COMMAND ${pythonpatch_destination_path}\\patch.exe -t -p0
             -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\02-signalmodule.patch
             -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
-        list(APPEND python_patch_command COMMAND ${winpatch_destination_path}\\patch.exe -p0
+        list(APPEND pythonpatch_build_command COMMAND ${pythonpatch_destination_path}\\patch.exe -t -p0
             -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\03-mingw32.patch
             -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
-             
 
+        set (pythonpatch_configure_command ${CMAKE_COMMAND} -E copy 
+            ${pythonpatch_source_path}\\patch.exe
+            ${pythonpatch_destination_path}\\patch.exe )
 
-        # Download python itself and place it into the right spot
+        ExternalProject_Add(PythonPatch
+#            OUTPUT ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe
+            URL https://downloads.sourceforge.net/project/gnuwin32/patch/2.5.9-7/patch-2.5.9-7-bin.zip
+            CONFIGURE_COMMAND ${pythonpatch_configure_command}
+            BUILD_COMMAND ${pythonpatch_build_command}
+            INSTALL_COMMAND ""
+            BUILD_IN_SOURCE 1
+        )
+    else()
+        add_custom_target(PythonPatch)
+    endif()         
+
+    if(BUILD_OS_WINDOWS OR BUILD_OS_LINUX )
+      # For windows we'll try to build using CMake for python
+      ExternalProject_Add(Python
+          DEPENDS PythonPatch
+          GIT_REPOSITORY git://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
+          GIT_TAG 8459a8b49bd66d12a47547a8be3fab4379d2b9aa
+#          CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON
+          CONFIGURE_COMMAND ${CMAKE_COMMAND} <SOURCE_DIR> -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON COMMAND ${python_patch_command}
+#          BUILD_COMMAND  ${MAKE_EXECUTABLE}
+#          INSTALL_COMMAND ${MAKE_EXECUTABLE} install
+      )
+
+      # Download python itself and place it into the right spot
             set(_download_link "http://www.python.org/ftp/python/${PYTHON_VERSION_STRING}/Python-${PYTHON_VERSION_STRING}.tgz")
             get_filename_component(_filename ${_download_link} NAME)
-            set(_archive_filepath ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\${_filename})
+            if (BUILD_OS_WINDOWS)
+                set(_archive_filepath ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\${_filename})
+            else()
+                set(_archive_filepath ${CMAKE_BINARY_DIR}/Python-prefix/src/${_filename})
+            endif()
             if(EXISTS "${_archive_filepath}")
                 message(STATUS "${_archive_filepath} already downloaded")
             else()
@@ -246,40 +276,18 @@ if(BUILD_PYTHON)
                 )
             endif()
             message(STATUS "Extracting ${_archive_filepath}")
-            execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz ${_archive_filepath}
-                ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\
-                RESULT_VARIABLE rv)
+            if (BUILD_OS_WINDOWS)
+                execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz ${_archive_filepath}
+                    ${CMAKE_BINARY_DIR}\\Python-prefix\\src
+                    RESULT_VARIABLE rv)
+            else()
+                execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz ${_archive_filepath}
+                    ${CMAKE_BINARY_DIR}/Python-prefix/src
+                    RESULT_VARIABLE rv)
+            endif()
             if(NOT rv EQUAL 0)
                 message(FATAL_ERROR "error: extraction of '${_filename}' failed")
             endif()
-
-
-        ExternalProject_Add(WinPatch
-        OUTPUT ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe
-        URL https://downloads.sourceforge.net/project/gnuwin32/patch/2.5.9-7/patch-2.5.9-7-bin.zip
-        CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy
-                ${winpatch_source_path}\\patch.exe
-                ${winpatch_destination_path}\\patch.exe
-        BUILD_COMMAND ${python_patch_command}
-        INSTALL_COMMAND ""
-        BUILD_IN_SOURCE 1
-        )
-    else()
-        set(python_patch_command echo "Patching Python...")
-        add_custom_target(WinPatch)
-    endif()
-
-    if(BUILD_OS_WINDOWS OR BUILD_OS_LINUX )
-      # For windows we'll try to build using CMake for python
-      ExternalProject_Add(Python
-          DEPENDS WinPatch
-          GIT_REPOSITORY git://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
-          GIT_TAG 8459a8b49bd66d12a47547a8be3fab4379d2b9aa
-#          CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON
-          CONFIGURE_COMMAND ${CMAKE_COMMAND} <SOURCE_DIR> -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON COMMAND ${python_patch_command}
-#          BUILD_COMMAND  ${MAKE_EXECUTABLE}
-#          INSTALL_COMMAND ${MAKE_EXECUTABLE} install
-      )
 
     else() # elseif(BUILD_OS_OSX OR BUILD_OS_LINUX)
       set( python_configure_command ./configure )
