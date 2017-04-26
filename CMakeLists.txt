@@ -475,7 +475,8 @@ message(STATUS "---> Python Install: ${python_install}")
 
 if(BUILD_PYTHON_PACKAGING)
     set(build_python_packaging ${PYTHON_EXECUTABLE} setup.py build)
-    set(install_python_packaging ${PYTHON_EXECUTABLE} setup.py install --verbose ${python_install} --single-version-externally-managed)
+    # --single-version-externally-managed
+    set(install_python_packaging ${PYTHON_EXECUTABLE} setup.py install --verbose ${python_install})
     if(BUILD_OS_WINDOWS)
        string(REPLACE "/" "\\" install_python_packaging "${install_python_packaging}")
     endif()
