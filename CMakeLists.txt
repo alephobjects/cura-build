@@ -167,6 +167,13 @@ if(NOT "${CURA_EXTRA_VERSION}" STREQUAL "")
     set(CURA_VERSION "${CURA_VERSION}-${CURA_EXTRA_VERSION}")
 endif()
 
+if(BUILD_OS_WINDOWS)
+    set(MAKE_EXECUTABLE mingw32-make)
+elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
+    set(MAKE_EXECUTABLE make)
+endif()
+message(STATUS "---> Make executable: ${MAKE_EXECUTABLE}")
+
 message(STATUS "Building Cura ${CURA_VERSION}")
 
 if(BUILD_PYTHON)
@@ -239,15 +246,12 @@ if(BUILD_PYTHON)
           GIT_REPOSITORY git://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
           GIT_TAG 8459a8b49bd66d12a47547a8be3fab4379d2b9aa
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON
-#          PATCH_COMMAND ${python_patch_command}
+          UPDATE_COMMAND ""
+          CONFIGURE_COMMAND "${python_patch_command}"
+          BUILD_COMMAND ${MAKE_EXECUTABLE}
+          INSTALL_COMMAND ${MAKE_EXECUTABLE} install
       )
 
-      # We want to apply patches right after Running CMAKE
-      ExternalProject_Add(PythonApplyPatch
-          DEPENDS Python
-          PATCH_COMMAND ${python_patch_command}
-      )
-    # -DCMAKE_CXX_FLAGS=${savitar_cxx_flags} -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR}
     else() # elseif(BUILD_OS_OSX OR BUILD_OS_LINUX)
       set( python_configure_command ./configure )
       if (BUILD_OS_OSX)
@@ -297,13 +301,6 @@ message(STATUS "---> Python executable: ${PYTHON_EXECUTABLE}")
 message(STATUS "---> Python libraries: ${PYTHON_LIBRARIES}")
 message(STATUS "---> Python includes: ${PYTHON_INCLUDE_DIRS}")
 message(STATUS "---> Python libraries version: ${PYTHONLIBS_VERSION_STRING}")
-
-if(BUILD_OS_WINDOWS)
-    set(MAKE_EXECUTABLE mingw32-make)
-elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
-    set(MAKE_EXECUTABLE make)
-endif()
-message(STATUS "---> Make executable: ${MAKE_EXECUTABLE}")
 
 if(BUILD_OS_WINDOWS)
     set(PYTHON_DIRECTORY "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
@@ -521,7 +518,8 @@ endif()
 
 if(BUILD_PYPARSING)
     set(build_pyparsing ${PYTHON_EXECUTABLE} setup.py build)
-    set(install_pyparsing ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose --single-version-externally-managed)
+    # --single-version-externally-managed
+    set(install_pyparsing ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose )
     message(STATUS "---> PyParsing Build: ${build_pyparsing}")
     message(STATUS "---> PyParsing Install: ${install_pyparsing}")
     ExternalProject_Add(PyParsing
