@@ -177,33 +177,6 @@ message(STATUS "---> Make executable: ${MAKE_EXECUTABLE}")
 message(STATUS "Building Cura ${CURA_VERSION}")
 
 if(BUILD_PYTHON)
-    # We'll need a patch command
-
-    set (winpatch_source_path ${CMAKE_BINARY_DIR}\\WinPatch-prefix\\src\\WinPatch\\bin)
-    string(REPLACE "/" "\\" winpatch_source_path "${winpatch_source_path}")
-    set (winpatch_destination_path ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin)
-    string(REPLACE "/" "\\" winpatch_destination_path "${winpatch_destination_path}")
-    if (BUILD_OS_WINDOWS)
-        ExternalProject_Add(WinPatch
-#        DEPENDS
-        OUTPUT ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe
-        URL https://downloads.sourceforge.net/project/gnuwin32/patch/2.5.9-7/patch-2.5.9-7-bin.zip
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ""
-        INSTALL_COMMAND ${CMAKE_COMMAND} -E copy
-                ${winpatch_source_path}\\patch.exe
-                ${winpatch_destination_path}\\patch.exe
-#        BUILD_IN_SOURCE 1
-        )
-        # command at the end is mandatory
-        set(python_patch_command ${winpatch_destination_path}\\patch.exe -p0
-            -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\01-dynload_win.patch 
-            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-3.5.2 )
-    else()
-        set(python_patch_command echo "Patching Python...")
-        add_custom_target(WinPatch)
-    endif()
-
     if(BUILD_OS_OSX)
         set(PYTHON_CONFIGURE_CFLAGS "CFLAGS=-I/usr/local/opt/openssl/include")
         set(PYTHON_CONFIGURE_LDFLAGS "LDFLAGS=-L/usr/local/opt/openssl/lib")
@@ -240,15 +213,65 @@ if(BUILD_PYTHON)
            -DPython_ADDITIONAL_VERSIONS=${Python_ADDITIONAL_VERSIONS}
     )
 
+
+    if (BUILD_OS_WINDOWS)
+        set (winpatch_source_path ${CMAKE_BINARY_DIR}\\WinPatch-prefix\\src\\WinPatch\\bin)
+        string(REPLACE "/" "\\" winpatch_source_path "${winpatch_source_path}")
+        set (winpatch_destination_path ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin)
+        string(REPLACE "/" "\\" winpatch_destination_path "${winpatch_destination_path}")
+
+        set(python_patch_command ${winpatch_destination_path}\\patch.exe -p0
+            -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\01-dynload_win.patch 
+            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-3.5.2 )
+
+
+        # Download python itself and place it into the right spot
+            set(_download_link "http://www.python.org/ftp/python/3.5.2/Python-3.5.2.tgz")
+            get_filename_component(_filename ${_download_link} NAME)
+            set(_archive_filepath ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\${_filename})
+            if(EXISTS "${_archive_filepath}")
+                message(STATUS "${_filename} already downloaded")
+            else()
+                message(STATUS "Downloading ${_download_link}")
+                file(
+                   DOWNLOAD ${_download_link} ${_archive_filepath}
+#                   EXPECTED_MD5 ${_download_${PY_VERSION}_md5}
+                   SHOW_PROGRESS
+                )
+            endif()
+            message(STATUS "Extracting ${_filename}")
+            execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz ${_archive_filepath}
+                ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\
+                RESULT_VARIABLE rv)
+            if(NOT rv EQUAL 0)
+                message(FATAL_ERROR "error: extraction of '${_filename}' failed")
+            endif()
+
+
+        ExternalProject_Add(WinPatch
+        OUTPUT ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe
+        URL https://downloads.sourceforge.net/project/gnuwin32/patch/2.5.9-7/patch-2.5.9-7-bin.zip
+        CONFIGURE_COMMAND ${CMAKE_COMMAND} -E copy
+                ${winpatch_source_path}\\patch.exe
+                ${winpatch_destination_path}\\patch.exe
+        BUILD_COMMAND ${python_patch_command}
+        INSTALL_COMMAND ""
+        BUILD_IN_SOURCE 1
+        )
+    else()
+        set(python_patch_command echo "Patching Python...")
+        add_custom_target(WinPatch)
+    endif()
+
     if(BUILD_OS_WINDOWS OR BUILD_OS_LINUX )
       # For windows we'll try to build using CMake for python
       ExternalProject_Add(Python
           DEPENDS WinPatch
           GIT_REPOSITORY git://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
           GIT_TAG 8459a8b49bd66d12a47547a8be3fab4379d2b9aa
-          CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON
-#          CONFIGURE_COMMAND ${python_patch_command}
-          BUILD_COMMAND ${python_patch_command} COMMAND ${MAKE_EXECUTABLE}
+#          CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON
+          CONFIGURE_COMMAND ${CMAKE_COMMAND} <SOURCE_DIR> -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON COMMAND ${python_patch_command}
+#          BUILD_COMMAND  ${MAKE_EXECUTABLE}
 #          INSTALL_COMMAND ${MAKE_EXECUTABLE} install
       )
 
