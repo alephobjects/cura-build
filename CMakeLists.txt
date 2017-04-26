@@ -177,7 +177,7 @@ if(BUILD_PYTHON)
         OUTPUT ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe
         URL https://downloads.sourceforge.net/project/gnuwin32/patch/2.5.9-7/patch-2.5.9-7-bin.zip
         CONFIGURE_COMMAND ""
-#        BUILD_COMMAND ""
+        BUILD_COMMAND ""
         INSTALL_COMMAND ${CMAKE_COMMAND} -E copy
                 ${CMAKE_CURRENT_SOURCE_DIR}\\bin\\patch.exe
                 ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe
