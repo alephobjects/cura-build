@@ -179,13 +179,13 @@ if(BUILD_PYTHON)
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ""
         INSTALL_COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_SOURCE_DIR}\\bin\\patch.exe
+                ${CMAKE_SOURCE_DIR}\\WinPatch-prefix\\src\\WinPatch\\bin\\patch.exe
                 ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe
 #        BUILD_IN_SOURCE 1
         )
     set(python_patch_command ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe -p0
-        -i ${CMAKE_SOURCE_DIR}\\cmake\\patches-win32\\01-dynload_win.patch 
-        -d ${CMAKE_SOURCE_DIR}\\..\\Python-3.5.2 )
+        -i ${CMAKE_SOURCE_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\01-dynload_win.patch 
+        -d ${CMAKE_SOURCE_DIR}\\Python-prefix\\src\\Python-3.5.2 )
     else()
         set(python_patch_command)
         add_custom_target(WinPatch)
@@ -528,7 +528,8 @@ endif()
 
 if(BUILD_APPDIRS)
     set(build_python_appdirs ${PYTHON_EXECUTABLE} setup.py build)
-    set(install_python_appdirs ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose --single-version-externally-managed)
+    # --single-version-externally-managed
+    set(install_python_appdirs ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
     message(STATUS "---> PythonAppDirs Build: ${build_python_appdirs}")
     message(STATUS "---> PythonAppDirs Install: ${install_python_appdirs}")
     ExternalProject_Add(PythonAppDirs
