@@ -170,12 +170,31 @@ endif()
 message(STATUS "Building Cura ${CURA_VERSION}")
 
 if(BUILD_PYTHON)
-    if(BUILD_OS_OSX)
+    # We'll need a patch command
+    if (BUILD_OS_WINDOWS)
+        ExternalProject_Add(WinPatch
+#        DEPENDS
+        OUTPUT ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe
+        URL https://downloads.sourceforge.net/project/gnuwin32/patch/2.5.9-7/patch-2.5.9-7-bin.zip
+        CONFIGURE_COMMAND ""
+#        BUILD_COMMAND ""
+        INSTALL_COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_CURRENT_SOURCE_DIR}\\bin\\patch.exe
+                ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe
+#        BUILD_IN_SOURCE 1
+        )
+    set(python_patch_command ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe -p0
+        -i ${CMAKE_CURRENT_SOURCE_DIR}\\cmake\\patches-win32\\01-dynload_win.patch 
+        -d ${CMAKE_SOURCE_DIR}\\Python-3.5.2 )
+    else()
         set(python_patch_command)
+        add_custom_target(WinPatch)
+    endif()
+
+    if(BUILD_OS_OSX)
         set(PYTHON_CONFIGURE_CFLAGS "CFLAGS=-I/usr/local/opt/openssl/include")
         set(PYTHON_CONFIGURE_LDFLAGS "LDFLAGS=-L/usr/local/opt/openssl/lib")
     else()
-        set(python_patch_command)
         set(PYTHON_CONFIGURE_CFLAGS)
         set(PYTHON_CONFIGURE_LDFLAGS)
     endif()
@@ -211,9 +230,11 @@ if(BUILD_PYTHON)
     if(BUILD_OS_WINDOWS OR BUILD_OS_LINUX )
       # For windows we'll try to build using CMake for python
       ExternalProject_Add(Python
+          DEPENDS WinPatch
           GIT_REPOSITORY git://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
           GIT_TAG 8459a8b49bd66d12a47547a8be3fab4379d2b9aa
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON
+          PATCH_COMMAND ${python_patch_command}
       )
     # -DCMAKE_CXX_FLAGS=${savitar_cxx_flags} -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR}
     else() # elseif(BUILD_OS_OSX OR BUILD_OS_LINUX)
@@ -709,7 +730,7 @@ if(BUILD_PYTHON_NOSE)
     message(STATUS "---> PythonNose Build: ${build_python_nose}")
     message(STATUS "---> PythonNose Install: ${install_python_nose}")
     ExternalProject_Add(PythonNose
-        DEPENDS Python
+        DEPENDS Python PythonSetupTools
         GIT_REPOSITORY git://github.com/nose-devs/nose.git
         GIT_TAG 7c26ad1e6b7d308cafa328ad34736d34028c122a
         CONFIGURE_COMMAND ""
