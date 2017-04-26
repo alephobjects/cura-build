@@ -195,9 +195,10 @@ if(BUILD_PYTHON)
                 ${winpatch_destination_path}\\patch.exe
 #        BUILD_IN_SOURCE 1
         )
-    set(python_patch_command ${winpatch_destination_path}\\patch.exe -p0
-        -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\01-dynload_win.patch 
-        -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-3.5.2 )
+        # command at the end is mandatory
+        set(python_patch_command ${winpatch_destination_path}\\patch.exe -p0
+            -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\01-dynload_win.patch 
+            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-3.5.2 COMMAND )
     else()
         set(python_patch_command)
         add_custom_target(WinPatch)
@@ -246,7 +247,7 @@ if(BUILD_PYTHON)
           GIT_REPOSITORY git://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
           GIT_TAG 8459a8b49bd66d12a47547a8be3fab4379d2b9aa
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON
-          BUILD_COMMAND ${python_patch_command} COMMAND  ${MAKE_EXECUTABLE}
+          BUILD_COMMAND ${python_patch_command} ${MAKE_EXECUTABLE}
           INSTALL_COMMAND ${MAKE_EXECUTABLE} install
       )
 
