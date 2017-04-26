@@ -215,31 +215,37 @@ if(BUILD_PYTHON)
 
 
     if (BUILD_OS_WINDOWS)
+        string(REPLACE "/" "\\" CMAKE_BINARY_DIR "${CMAKE_BINARY_DIR}")
         set (winpatch_source_path ${CMAKE_BINARY_DIR}\\WinPatch-prefix\\src\\WinPatch\\bin)
-        string(REPLACE "/" "\\" winpatch_source_path "${winpatch_source_path}")
         set (winpatch_destination_path ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin)
-        string(REPLACE "/" "\\" winpatch_destination_path "${winpatch_destination_path}")
 
         set(python_patch_command ${winpatch_destination_path}\\patch.exe -p0
             -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\01-dynload_win.patch 
-            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-3.5.2 )
+            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
+        list(APPEND python_patch_command COMMAND ${winpatch_destination_path}\\patch.exe -p0
+            -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\02-signalmodule.patch
+            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
+        list(APPEND python_patch_command COMMAND ${winpatch_destination_path}\\patch.exe -p0
+            -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\03-mingw32.patch
+            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
+             
 
 
         # Download python itself and place it into the right spot
-            set(_download_link "http://www.python.org/ftp/python/3.5.2/Python-3.5.2.tgz")
+            set(_download_link "http://www.python.org/ftp/python/${PYTHON_VERSION_STRING}/Python-${PYTHON_VERSION_STRING}.tgz")
             get_filename_component(_filename ${_download_link} NAME)
             set(_archive_filepath ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\${_filename})
             if(EXISTS "${_archive_filepath}")
-                message(STATUS "${_filename} already downloaded")
+                message(STATUS "${_archive_filepath} already downloaded")
             else()
-                message(STATUS "Downloading ${_download_link}")
+                message(STATUS "Downloading ${_archive_filepath}")
                 file(
                    DOWNLOAD ${_download_link} ${_archive_filepath}
 #                   EXPECTED_MD5 ${_download_${PY_VERSION}_md5}
                    SHOW_PROGRESS
                 )
             endif()
-            message(STATUS "Extracting ${_filename}")
+            message(STATUS "Extracting ${_archive_filepath}")
             execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz ${_archive_filepath}
                 ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\
                 RESULT_VARIABLE rv)
