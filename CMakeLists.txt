@@ -500,7 +500,8 @@ endif()
 # Apparently Six is required for OctoPrint plugin :(
 if(BUILD_PYTHONSIX)
     set(build_python_six ${PYTHON_EXECUTABLE} setup.py build)
-    set(install_python_six ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose --single-version-externally-managed)
+    # --single-version-externally-managed
+    set(install_python_six ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
     message(STATUS "---> PythonSix Build: ${build_python_six}")
     message(STATUS "---> PythonSix Install: ${install_python_six}")
     ExternalProject_Add(PythonSix
