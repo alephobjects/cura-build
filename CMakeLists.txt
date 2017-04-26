@@ -239,6 +239,12 @@ if(BUILD_PYTHON)
           GIT_REPOSITORY git://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
           GIT_TAG 8459a8b49bd66d12a47547a8be3fab4379d2b9aa
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON
+#          PATCH_COMMAND ${python_patch_command}
+      )
+
+      # We want to apply patches right after Running CMAKE
+      ExternalProject_Add(PythonApplyPatch
+          DEPENDS Python
           PATCH_COMMAND ${python_patch_command}
       )
     # -DCMAKE_CXX_FLAGS=${savitar_cxx_flags} -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR}
