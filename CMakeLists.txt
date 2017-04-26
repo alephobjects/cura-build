@@ -198,9 +198,9 @@ if(BUILD_PYTHON)
         # command at the end is mandatory
         set(python_patch_command ${winpatch_destination_path}\\patch.exe -p0
             -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\01-dynload_win.patch 
-            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-3.5.2 COMMAND )
+            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-3.5.2 )
     else()
-        set(python_patch_command)
+        set(python_patch_command echo "Patching Python...")
         add_custom_target(WinPatch)
     endif()
 
@@ -247,8 +247,9 @@ if(BUILD_PYTHON)
           GIT_REPOSITORY git://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
           GIT_TAG 8459a8b49bd66d12a47547a8be3fab4379d2b9aa
           CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON
-          BUILD_COMMAND ${python_patch_command} ${MAKE_EXECUTABLE}
-          INSTALL_COMMAND ${MAKE_EXECUTABLE} install
+          CONFIGURE_COMMAND ${python_patch_command}
+#          BUILD_COMMAND ${python_patch_command} ${MAKE_EXECUTABLE}
+#          INSTALL_COMMAND ${MAKE_EXECUTABLE} install
       )
 
     else() # elseif(BUILD_OS_OSX OR BUILD_OS_LINUX)
