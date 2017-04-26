@@ -252,7 +252,7 @@ if(BUILD_PYTHON)
           GIT_REPOSITORY git://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
           GIT_TAG 8459a8b49bd66d12a47547a8be3fab4379d2b9aa
 #          CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON
-          CONFIGURE_COMMAND ${CMAKE_COMMAND} <SOURCE_DIR> -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON COMMAND ${python_patch_command}
+          CONFIGURE_COMMAND ${CMAKE_COMMAND} <SOURCE_DIR> -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON -DENABLE_SSL=OFF
 #          BUILD_COMMAND  ${MAKE_EXECUTABLE}
 #          INSTALL_COMMAND ${MAKE_EXECUTABLE} install
       )
@@ -320,7 +320,7 @@ if(BUILD_PYTHON)
       endif()
       ExternalProject_Add(Python
           URL https://www.python.org/ftp/python/${PYTHON_VERSION_STRING}/Python-${PYTHON_VERSION_STRING}.tgz
-          PATCH_COMMAND ${python_patch_command}
+#          PATCH_COMMAND ${python_patch_command}
           CONFIGURE_COMMAND ${python_configure_command} ${python_configure_patch_command}
 	
           BUILD_IN_SOURCE 1
