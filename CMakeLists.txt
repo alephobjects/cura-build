@@ -241,7 +241,9 @@ if(BUILD_PYTHON)
             INSTALL_COMMAND ""
             BUILD_IN_SOURCE 1
         )
-        list(APPEND pythonpatch_build_command COMMAND)   
+        list(APPEND pythonpatch_build_command COMMAND)
+        # It appears all of the patches are for 2.7
+        set (pythonpatch_build_command)
     else()
         set (pythonpatch_build_command)
         add_custom_target(PythonPatch)
@@ -254,7 +256,7 @@ if(BUILD_PYTHON)
           GIT_REPOSITORY git://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
           GIT_TAG 8459a8b49bd66d12a47547a8be3fab4379d2b9aa
 #          CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON
-          CONFIGURE_COMMAND ${pythonpatch_build_command} ${CMAKE_COMMAND} <SOURCE_DIR> -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON -DENABLE_SSL=OFF
+          CONFIGURE_COMMAND ${pythonpatch_build_command} ${CMAKE_COMMAND} <SOURCE_DIR> -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON
 #          BUILD_COMMAND  ${MAKE_EXECUTABLE}
 #          INSTALL_COMMAND ${MAKE_EXECUTABLE} install
       )
