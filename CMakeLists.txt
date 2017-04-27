@@ -169,6 +169,8 @@ endif()
 
 if(BUILD_OS_WINDOWS)
     set(MAKE_EXECUTABLE mingw32-make)
+    set(CMAKE_C_COMPILER gcc)
+    set(CMAKE_CXX_COMPILER g++)
 elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
     set(MAKE_EXECUTABLE make)
 endif()
