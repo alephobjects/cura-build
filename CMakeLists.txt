@@ -260,12 +260,18 @@ if(BUILD_PYTHON)
       # We'll need to find OpenSSL
       find_package(OpenSSL)
       # For windows we'll try to build using CMake for python
+      set(python_configure_command ${pythonpatch_build_command})
+      list(APPEND python_configure_command ${CMAKE_COMMAND} <SOURCE_DIR> -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} )
+      list(APPEND python_configure_command -DBUILD_LIBPYTHON_SHARED=ON)
+      if (BUILD_OS_WINDOWS)
+        list(APPEND python_configure_command -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++)
+      else()
+      endif()
       ExternalProject_Add(Python
           DEPENDS PythonPatch
           GIT_REPOSITORY git://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
           GIT_TAG 8459a8b49bd66d12a47547a8be3fab4379d2b9aa
-#          CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON
-          CONFIGURE_COMMAND ${pythonpatch_build_command} ${CMAKE_COMMAND} <SOURCE_DIR> -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_LIBPYTHON_SHARED=ON
+          CONFIGURE_COMMAND ${python_configure_command}
           BUILD_COMMAND  ${MAKE_EXECUTABLE}
           INSTALL_COMMAND ${MAKE_EXECUTABLE} install
       )
