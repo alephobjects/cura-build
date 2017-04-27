@@ -224,13 +224,13 @@ if(BUILD_PYTHON)
         set (pythonpatch_source_path ${CMAKE_BINARY_DIR}\\PythonPatch-prefix\\src\\PythonPatch\\bin)
         set (pythonpatch_destination_path ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin)
 
-        set(pythonpatch_build_command ${pythonpatch_destination_path}\\patch.exe -t -p0
+        set(pythonpatch_build_command ${pythonpatch_destination_path}\\patch.exe -t -p1
             -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\05-libffi-latest.patch
             -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
-#        list(APPEND pythonpatch_build_command COMMAND ${pythonpatch_destination_path}\\patch.exe -t -p0
+#        list(APPEND pythonpatch_build_command COMMAND ${pythonpatch_destination_path}\\patch.exe -t -p1
 #            -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\02-signalmodule.patch
 #            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
-#        list(APPEND pythonpatch_build_command COMMAND ${pythonpatch_destination_path}\\patch.exe -t -p0
+#        list(APPEND pythonpatch_build_command COMMAND ${pythonpatch_destination_path}\\patch.exe -t -p1
 #            -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\03-mingw32.patch
 #            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
 
