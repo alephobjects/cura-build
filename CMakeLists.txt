@@ -268,8 +268,8 @@ if(BUILD_PYTHON)
       endif()
       ExternalProject_Add(Python
           DEPENDS PythonPatch
-          GIT_REPOSITORY git://github.com/python-cmake-buildsystem/python-cmake-buildsystem.git
-          GIT_TAG 8459a8b49bd66d12a47547a8be3fab4379d2b9aa
+          GIT_REPOSITORY https://code.alephobjects.com/source/python-cmake-buildsystem.git
+          GIT_TAG origin/master
           CONFIGURE_COMMAND ${python_configure_command}
           BUILD_COMMAND  ${MAKE_EXECUTABLE}
           INSTALL_COMMAND ${MAKE_EXECUTABLE} install
