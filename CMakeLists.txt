@@ -186,7 +186,9 @@ if(BUILD_PYTHON)
     endif()
     set(PYTHON_VERSION_MAJOR 3)
     set(PYTHON_VERSION_MINOR 5)
-    if(BUILD_OS_WINDOWS OR BUILD_OS_LINUX )
+    #if(BUILD_OS_WINDOWS OR BUILD_OS_LINUX )
+    # For now let's leave only WINDOWS with 3.5.2
+    if(BUILD_OS_WINDOWS)
        set(PYTHON_VERSION_PATCH 2)
     else()
        set(PYTHON_VERSION_PATCH 3)
@@ -196,7 +198,8 @@ if(BUILD_PYTHON)
     set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
     set(PYTHONINTERP_FOUND True)
 
-    if(BUILD_OS_WINDOWS OR BUILD_OS_LINUX )
+    # if(BUILD_OS_WINDOWS OR BUILD_OS_LINUX )
+    if(BUILD_OS_WINDOWS)
        set(PYTHON_LIBRARY ${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}m.so)
     else()
        set(PYTHON_LIBRARY ${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}.so)
@@ -249,7 +252,9 @@ if(BUILD_PYTHON)
         add_custom_target(PythonPatch)
     endif()         
 
-    if(BUILD_OS_WINDOWS OR BUILD_OS_LINUX )
+    # if(BUILD_OS_WINDOWS OR BUILD_OS_LINUX )
+    # For now let's switch WIN to CMAKE Python only
+    if(BUILD_OS_WINDOWS) 
       # For windows we'll try to build using CMake for python
       ExternalProject_Add(Python
           DEPENDS PythonPatch
