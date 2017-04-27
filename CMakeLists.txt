@@ -267,7 +267,6 @@ if(BUILD_PYTHON)
       list(APPEND python_configure_command -G ${CMAKE_GENERATOR})
       if (BUILD_OS_WINDOWS)
         list(APPEND python_configure_command -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++)
-        list(APPEND python_configure_command -DSIZEOF_WCHAR_T=2)
       else()
       endif()
       ExternalProject_Add(Python
