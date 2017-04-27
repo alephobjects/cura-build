@@ -897,7 +897,7 @@ if(BUILD_SCIPY)
     message(STATUS "---> SciPy build: ${build_scipy}")
     message(STATUS "---> SciPy install: ${install_scipy}")
     ExternalProject_Add(Scipy
-        DEPENDS Python PythonUtils Numpy 
+        DEPENDS Python PythonUtils Numpy PythonSix
         # URL http://downloads.sourceforge.net/project/scipy/scipy/0.16.1/scipy-0.16.1.tar.gz
 	GIT_REPOSITORY git://github.com/scipy/scipy.git
 	GIT_TAG 46cbf563f5010b27017324ca66e1daffb6d21c47
