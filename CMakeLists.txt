@@ -339,6 +339,10 @@ if(BUILD_PYTHON)
         set( python_configure_patch_command COMMAND sed -ie "s/#define HAVE_GETENTROPY 1/\\/* #undef HAVE_GETENTROPY *\\//g" pyconfig.h)
         list(APPEND python_configure_patch_command COMMAND 
            echo "fixing pyconfig.h with sed -ie 's/#define HAVE_GETENTROPY 1/\\/* #undef HAVE_GETENTROPY *\\//g'")
+        set( python_configure_patch_command COMMAND sed -ie "s/#define HAVE_CLOCK_GETTIME 1/\\/* #undef HAVE_CLOCK_GETTIME *\\//g" pyconfig.h)
+        list(APPEND python_configure_patch_command COMMAND
+           echo "fixing pyconfig.h with sed -ie 's/#define HAVE_CLOCK_GETTIME 1/\\/* #undef HAVE_CLOCK_GETTIME *\\//g'")
+
       else()
         set( python_configure_patch_command)
       endif()
