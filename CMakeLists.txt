@@ -225,14 +225,14 @@ if(BUILD_PYTHON)
         set (pythonpatch_destination_path ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin)
 
         set(pythonpatch_build_command ${pythonpatch_destination_path}\\patch.exe -t -p0
-            -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\01-dynload_win.patch 
+            -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\05-libffi-latest.patch
             -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
-        list(APPEND pythonpatch_build_command COMMAND ${pythonpatch_destination_path}\\patch.exe -t -p0
-            -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\02-signalmodule.patch
-            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
-        list(APPEND pythonpatch_build_command COMMAND ${pythonpatch_destination_path}\\patch.exe -t -p0
-            -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\03-mingw32.patch
-            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
+#        list(APPEND pythonpatch_build_command COMMAND ${pythonpatch_destination_path}\\patch.exe -t -p0
+#            -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\02-signalmodule.patch
+#            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
+#        list(APPEND pythonpatch_build_command COMMAND ${pythonpatch_destination_path}\\patch.exe -t -p0
+#            -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\03-mingw32.patch
+#            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
 
         set (pythonpatch_configure_command ${CMAKE_COMMAND} -E copy 
             ${pythonpatch_source_path}\\patch.exe
@@ -247,8 +247,6 @@ if(BUILD_PYTHON)
             BUILD_IN_SOURCE 1
         )
         list(APPEND pythonpatch_build_command COMMAND)
-        # It appears all of the patches are for 2.7
-        set (pythonpatch_build_command)
     else()
         set (pythonpatch_build_command)
         add_custom_target(PythonPatch)
