@@ -171,6 +171,8 @@ if(BUILD_OS_WINDOWS)
     set(MAKE_EXECUTABLE mingw32-make)
     set(CMAKE_C_COMPILER gcc)
     set(CMAKE_CXX_COMPILER g++)
+    # Some of the cmake files expect this to be lower-case for some reason ???
+    string( TOLOWER "${CMAKE_SYSTEM_PROCESSOR}" CMAKE_SYSTEM_PROCESSOR )
     message(STATUS "---> System Processor: ${CMAKE_SYSTEM_PROCESSOR}")
 elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
     set(MAKE_EXECUTABLE make)
