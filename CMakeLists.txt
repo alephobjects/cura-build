@@ -234,6 +234,9 @@ if(BUILD_PYTHON)
             -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\02-PY3-posixmodule.patch
             -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
         list(APPEND pythonpatch_build_command COMMAND ${pythonpatch_destination_path}\\patch.exe -t -p1
+            -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\03-PY3-getpathp.patch
+            -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
+        list(APPEND pythonpatch_build_command COMMAND ${pythonpatch_destination_path}\\patch.exe -t -p1
             -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\05-PY3-libffi-latest.patch
             -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
 
