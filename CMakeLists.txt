@@ -273,6 +273,7 @@ if(BUILD_PYTHON)
       list(APPEND python_configure_command -G ${CMAKE_GENERATOR})
       if (BUILD_OS_WINDOWS)
         list(APPEND python_configure_command -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++)
+        list(APPEND python_configure_command -DBUILD_EXTENSIONS_AS_BUILTIN=ON)
       else()
       endif()
       ExternalProject_Add(Python
@@ -341,10 +342,11 @@ if(BUILD_PYTHON)
 		${PYTHON_CONFIGURE_LDFLAGS}
       )
       if (BUILD_OS_OSX)
-        set( python_configure_patch_command COMMAND sed -ie "s/#define HAVE_GETENTROPY 1/\\/* #undef HAVE_GETENTROPY *\\//g" pyconfig.h)
+        set( python_configure_patch_command COMMAND sed -ie 
+           "s/#define HAVE_GETENTROPY 1/\\/* #undef HAVE_GETENTROPY *\\//g" pyconfig.h)
         list(APPEND python_configure_patch_command COMMAND 
            echo "fixing pyconfig.h with sed -ie 's/#define HAVE_GETENTROPY 1/\\/* #undef HAVE_GETENTROPY *\\//g'")
-        list(APPEND  python_configure_patch_command COMMAND sed -ie 
+        list(APPEND python_configure_patch_command COMMAND sed -ie 
            "s/#define HAVE_CLOCK_GETTIME 1/\\/* #undef HAVE_CLOCK_GETTIME *\\//g" pyconfig.h)
         list(APPEND python_configure_patch_command COMMAND
            echo "fixing pyconfig.h with sed -ie 's/#define HAVE_CLOCK_GETTIME 1/\\/* #undef HAVE_CLOCK_GETTIME *\\//g'")
