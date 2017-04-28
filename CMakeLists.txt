@@ -273,7 +273,8 @@ if(BUILD_PYTHON)
       list(APPEND python_configure_command -G ${CMAKE_GENERATOR})
       if (BUILD_OS_WINDOWS)
         list(APPEND python_configure_command -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++)
-        list(APPEND python_configure_command -DBUILD_EXTENSIONS_AS_BUILTIN=ON)
+        # Don't build extensions as built-in
+        # list(APPEND python_configure_command -DBUILD_EXTENSIONS_AS_BUILTIN=ON)
       else()
       endif()
       ExternalProject_Add(Python
