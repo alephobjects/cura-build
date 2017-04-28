@@ -275,6 +275,7 @@ if(BUILD_PYTHON)
         list(APPEND python_configure_command -DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++)
         # Don't build extensions as built-in
         # list(APPEND python_configure_command -DBUILD_EXTENSIONS_AS_BUILTIN=ON)
+        list(APPEND python_configure_command -DENABLE_xxlimited=OFF )
       else()
       endif()
       ExternalProject_Add(Python
