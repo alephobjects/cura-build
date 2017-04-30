@@ -276,6 +276,8 @@ if(BUILD_PYTHON)
         # Don't build extensions as built-in
         # list(APPEND python_configure_command -DBUILD_EXTENSIONS_AS_BUILTIN=ON)
         list(APPEND python_configure_command -DENABLE_XXLIMITED=OFF )
+        list(APPEND python_configure_command -DENABLE_CTYPES=OFF )
+        list(APPEND python_configure_command -DENABLE_CTYPES_TEST=OFF )
       else()
       endif()
       ExternalProject_Add(Python
