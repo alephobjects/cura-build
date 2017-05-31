@@ -47,6 +47,6 @@ src_test() {
 }
 
 src_install() {
-	enable_cmake-utils_src_install
+	cmake-utils_src_install
 	python_optimize "${D}usr/$(get_libdir)"
 }
