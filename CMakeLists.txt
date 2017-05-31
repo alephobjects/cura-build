@@ -147,13 +147,13 @@ unset(CURA_MINOR_VERSION CACHE)
 if(DEFINED ENV{CURA_MINOR_VERSION})
     set(CURA_MINOR_VERSION $ENV{CURA_MINOR_VERSION} CACHE STRING "Cura Minor Version" FORCE)
 else()
-    set(CURA_MINOR_VERSION "5" CACHE STRING "Cura Minor Version")
+    set(CURA_MINOR_VERSION "6" CACHE STRING "Cura Minor Version")
 endif()
 unset(CURA_PATCH_VERSION CACHE)
 if(DEFINED ENV{CURA_PATCH_VERSION})
     set(CURA_PATCH_VERSION $ENV{CURA_PATCH_VERSION} CACHE STRING "Cura Patch Version" FORCE)
 else()
-    set(CURA_PATCH_VERSION "9" CACHE STRING "Cura Patch Version")
+    set(CURA_PATCH_VERSION "1" CACHE STRING "Cura Patch Version")
 endif()
 unset(CURA_EXTRA_VERSION CACHE)
 if(DEFINED ENV{CURA_EXTRA_VERSION})
@@ -551,29 +551,6 @@ endif()
 # include_dirs
 message(STATUS "---> Python Install: ${python_install}")
 
-if(BUILD_PYTHON_PACKAGING)
-    set(build_python_packaging ${PYTHON_EXECUTABLE} setup.py build)
-    # --single-version-externally-managed
-    set(install_python_packaging ${PYTHON_EXECUTABLE} setup.py install --verbose ${python_install})
-    if(BUILD_OS_WINDOWS)
-       string(REPLACE "/" "\\" install_python_packaging "${install_python_packaging}")
-    endif()
-    message(STATUS "---> PythonPackaging Build: ${build_python_packaging}")
-    message(STATUS "---> PythonPackaging Install: ${install_python_packaging}")
-    ExternalProject_Add(PythonPackaging
-        DEPENDS Python
-        GIT_REPOSITORY git://github.com/pypa/packaging.git
-        GIT_TAG 79c84ead5177939a9ac93b3532b4a7c15babaffd
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${build_python_packaging}
-        INSTALL_COMMAND ${install_python_packaging}
-        BUILD_IN_SOURCE 1
-    )
-else()
-    message(STATUS "---> System PythonPackaging will be used")
-    add_custom_target(PythonPackaging)
-endif()
-
 # We should not need it, leaving here just in case
 # Apparently Six is required for OctoPrint plugin :(
 if(BUILD_PYTHONSIX)
@@ -612,6 +589,29 @@ if(BUILD_PYPARSING)
 else()
     message(STATUS "---> System PyParsing will be used")
     add_custom_target(PyParsing)
+endif()
+
+if(BUILD_PYTHON_PACKAGING)
+    set(build_python_packaging ${PYTHON_EXECUTABLE} setup.py build)
+    # --single-version-externally-managed
+    set(install_python_packaging ${PYTHON_EXECUTABLE} setup.py install --verbose ${python_install})
+    if(BUILD_OS_WINDOWS)
+       string(REPLACE "/" "\\" install_python_packaging "${install_python_packaging}")
+    endif()
+    message(STATUS "---> PythonPackaging Build: ${build_python_packaging}")
+    message(STATUS "---> PythonPackaging Install: ${install_python_packaging}")
+    ExternalProject_Add(PythonPackaging
+        DEPENDS Python PythonSix PyParsing
+        GIT_REPOSITORY git://github.com/pypa/packaging.git
+        GIT_TAG 79c84ead5177939a9ac93b3532b4a7c15babaffd
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${build_python_packaging}
+        INSTALL_COMMAND ${install_python_packaging}
+        BUILD_IN_SOURCE 1
+    )
+else()
+    message(STATUS "---> System PythonPackaging will be used")
+    add_custom_target(PythonPackaging)
 endif()
 
 if(BUILD_APPDIRS)
