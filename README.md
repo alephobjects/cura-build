@@ -237,3 +237,190 @@ cmake -DMINIMUM_PYTHON_VERSION=3.4.0 ..
 make
 make package
 ```
+
+## Docker
+
+Docker files and build scripts for Cura2 builds.
+
+
+Building DEB packages
+---------------------
+
+To build DEB package you need to run ```keitaro/alephobjects:stretch``` docker container. (For Ubuntu Xenial LTS use ```keitaro/alephobjects:xenial```)
+You can build the packages by running the following command:
+
+```
+docker run -e UNIT=<unit-name> -v <host-out-directory>:/out keitaro/alephobjects:stretch
+```
+
+Where:
+ * ```unit-name``` is the name of the library you want to build. Possible values are: *libarcus*, *libsavitar*, *pythonuranium*, *curaengine*, *cura2*, *all*. This would build a
+ DEB package for Arcus, Savitar, Uranium, Cura Engine and Cura2 respectively. If no UNIT is given, by default would build all packages.
+ * ```host-out-directory``` is the path to a directory where the generated .deb packages will be generated. This parameter is required - you must specify a host directory where the
+ packages will be copied over after building in the container. If you want to generate in you working directory just pass ```$(pwd)``` as parameter.
+
+For instructions on how to build a specific package see bellow.
+
+Tweaking the builds
+===================
+
+You can tweak multiple parameters in the build by setting (overriding) ENV variables in the docker container.
+These are the available ENV variables that control the builds:
+
+
+**General**
+
+ * UNIT (default "All") - which unit to build.  Possible values are: *libarcus*, *libsavitar*, *pythonuranium*, *curaengine*, *cura2*, *all*. This would build a
+ DEB package for Arcus, Savitar, Uranium, Cura Engine and Cura2 respectively. If no UNIT is given, by default would build all packages.
+ * DIST (default "stretch") - the target distro for which to build the packages. Possible values are *stretch* (for Debian stretch), *zesty* (for Ubuntu Zesty) and *xenial*(for Ubuntu Xenial LTS).
+
+
+**Arcus env variables**
+
+* ARCUS_PKG_VERSION (default is the version id CPackConfig.cmake) - arcus debian package version.
+* ARCUS_GIT_REVISION (default "master") - arcus revision to checkout when building from repository.
+* ARCUS_GIT_REPO (default "https://code.alephobjects.com/source/arcus.git") - arcus Git repository URL.
+
+
+**Savitar env variables**
+
+* SAVITAR_PKG_VERSION (default is the version id CPackConfig.cmake) - savitar debian package version.
+* SAVITAR_GIT_REVISION (default "master") - savitar revision to checkout when building from repository.
+* SAVITAR_GIT_REPO (default "https://code.alephobjects.com/source/savitar.git") - savitar Git repository URL.
+
+
+**Uranium env variables**
+
+* URANIUM_PKG_VERSION=""
+* URANIUM_GIT_REVISION="master"
+* URANIUM_GIT_REPO="https://code.alephobjects.com/diffusion/U/uranium.git"
+
+
+**Cura Engine env variables**
+
+* CURAENGINE_PKG_VERSION (default is the version id CPackConfig.cmake) - curaengine debian package version.
+* CURAENGINE_GIT_REVISION (default "master") - curaengine revision to checkout when building from repository.
+* CURAENGINE_GIT_REPO (default "https://code.alephobjects.com/diffusion/CTE/cura-engine.git") - curaengine Git repository URL.
+
+
+**Cura2 env variables**
+
+* CURA2_PKG_VERSION (default is the version id CPackConfig.cmake) - cura2 debian package version.
+* CURA2_GIT_REVISION (default "master") - cura2 revision to checkout when building from repository.
+* CURA2_GIT_REPO (default "https://code.alephobjects.com/source/Cura2.git") - cura2 Git repository URL.
+
+
+**Dependencies versions management**
+
+* CURA2_DEPS_MINIMUM_ARCUS_VERSION (defaults to ARCUS_PKG_VERSION) - arcus dependency version.
+* CURA2_DEPS_MINIMUM_SAVITAR_VERSION (defaults to SAVITAR_PKG_VERSION) - savitar dependency version.
+* CURA2_DEPS_MINIMUM_URANIUM_VERSION (defaults to URANIUM_PKG_VERSION) - uranium dependency version.
+* CURA2_DEPS_MINIMUM_CURAENGINE_VERSION (defaults to CURAENGINE_PKG_VERSION) - curaengine dependency version.
+
+
+**Python Deps version**
+
+* CURA2_PYTHON_DEPS_PKG_VERSION (default "0.1.0") - cura2-python-deps debian package version.
+* MINIMUM_CURA2_PYTHON_DEPS_PKG_VERSION (default "0.1.0") - cura2-python-deps dependency version.
+
+
+Examples
+========
+
+
+**Build all for stretch from local directory**
+
+First make sure you have checked out the source code for all packages (arcus, savitar, uranium, cura-engine, Cura2) in a directory of the host - for example: /home/user/build .
+Lets say we want the built packages in /tmp/debian-stretch.
+```
+docker run -ti -e UNIT=all -e DIST=stretch -v /home/user/build:/Cura2build/build -v /tmp/debian-stretch:/out keitaro/alephobjects:stretch
+```
+After the build is complete, you'll get the packages in /tmp/debian-stretch:
+```
+$ ls /tmp/debian-stretch
+arcus-15.05.91_amd64.deb  Cura2-2.5.10-Linux.deb  CuraEngine-15.05.90_amd64.deb  savitar-15.05.91_amd64.deb  uranium-15.05.93-Linux.deb
+```
+
+
+**Building for Ubuntu Xenial**
+
+This build generates more packages (also builds the required packages that are not available out of the box on Ubuntu Xenial LTS).
+To build for xenial, you must use the **xenial** tag of the docker container.
+
+Assuming similar setup as the previous example:
+
+```
+docker run -ti -e UNIT=all -e DIST=xenial -v /home/user/build:/Cura2build/build -v /tmp/ubuntu-xenial:/out keitaro/alephobjects:xenial
+```
+
+Then we'll get the following packages in /tmp/ubuntu-xenial:
+```
+$ ls /tmp/ubuntu-xenial
+arcus-15.05.91_amd64.deb  Cura2-2.5.10-Linux.deb  cura2-python-deps-0.1.0.deb  CuraEngine-15.05.90_amd64.deb  protobuf-3.3.0.deb  savitar-15.05.91_amd64.deb  uranium-15.05.93-Linux.deb
+```
+
+Building Arcus
+=============
+
+To build Arcus run the following command:
+
+```
+docker run -e UNIT=libarcus -e -v $(pwd):/out keitaro/alephobjects:stretch
+```
+
+The build will generate a DEB package in your current directory.
+
+Building Savitar
+=============
+
+To build Savitar run the following command:
+
+```
+docker run -e UNIT=libsavitar -v $(pwd):/out keitaro/alephobjects:stretch
+```
+
+The build will generate a DEB package in your current directory.
+
+Building Uranium
+=============
+
+To build Uranium run the following command:
+
+```
+docker run -e UNIT=pythonuranium -v $(pwd):/out keitaro/alephobjects:stretch
+```
+
+The build will generate a DEB package in your current directory.
+
+Building Cura2Engine
+=============
+
+To build Cura2Engine run the following command:
+
+```
+docker run -e UNIT=curaengine -v $(pwd):/out keitaro/alephobjects:stretch
+```
+
+The build will generate a DEB package in your current directory.
+
+Building Cura2
+=============
+
+To build Cura2 run the following command:
+
+```
+docker run -e UNIT=cura2 -v $(pwd):/out keitaro/alephobjects:stretch
+```
+
+The build will generate a DEB package in your current directory.
+
+Building local code
+=============
+
+To build local code for specific package run the following command:
+
+```
+docker run -e UNIT=(libarcus|libsavitar|pythonuranium|curaengine|cura2) -v $(pwd):/out -v $(pwd):/Cura2build/build keitaro/alephobjects:stretch
+```
+
+In your current directory you must have cloned the package that you want to build.
