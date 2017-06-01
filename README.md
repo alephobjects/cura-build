@@ -240,6 +240,33 @@ make package
 
 ## Docker
 
+Build the docker images
+----------------------
+
+To build the docker images go to the docker file and use the following command:
+
+
+**To build for Debian Stretch:**
+
+```
+cd docker && \
+docker build -t <your-tag> -f images/debian/stretch/Dockerfile .
+```
+
+**To build for Ubuntu Zesty:**
+
+```
+cd docker && \
+docker build -t <your-tag> -f images/ubuntu/zesty/Dockerfile .
+```
+
+**To build for Ubuntu Xenial:**
+
+```
+cd docker && \
+docker build -t <your-tag> -f images/ubuntu/xenial/Dockerfile .
+```
+
 Docker files and build scripts for Cura2 builds.
 
 

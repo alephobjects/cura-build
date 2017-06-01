@@ -1,0 +1,8 @@
+Package: cura2-python3.5-deps
+Architecture: all
+Maintainer: Alephobjects
+Depends: python3 (>=3.5)
+Priority: required
+Version: PYTHON_DEPS_PKG_VERSION
+Description: Cura2 Python3.5 Dependencies for Xenial
+ This package contains Cura2 dependencies for Python3.5 such as PyQt5 (version 5.8)

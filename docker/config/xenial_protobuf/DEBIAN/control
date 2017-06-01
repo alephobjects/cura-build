@@ -1,0 +1,9 @@
+Package: python3-protobuf
+Architecture: all
+Maintainer: Alephobjects
+Depends: python3 (>=3.5)
+Priority: required
+Version: 3.3.0
+Description: Cura2 python3-protobuf for Xenial
+ This package contains python3-protobuf (version 3.3.0), libprotobuf13
+
