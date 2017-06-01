@@ -273,7 +273,7 @@ Docker files and build scripts for Cura2 builds.
 Building DEB packages
 ---------------------
 
-To build DEB package you need to run ```keitaro/alephobjects:stretch``` docker container. (For Ubuntu Xenial LTS use ```keitaro/alephobjects:xenial```)
+To build DEB package you need to run `keitaro/alephobjects:stretch` docker container. (For Ubuntu Xenial LTS use `keitaro/alephobjects:xenial`)
 You can build the packages by running the following command:
 
 ```
@@ -281,10 +281,10 @@ docker run -e UNIT=<unit-name> -v <host-out-directory>:/out keitaro/alephobjects
 ```
 
 Where:
- * ```unit-name``` is the name of the library you want to build. Possible values are: *libarcus*, *libsavitar*, *pythonuranium*, *curaengine*, *cura2*, *all*. This would build a
+ * `unit-name` is the name of the library you want to build. Possible values are: *libarcus*, *libsavitar*, *pythonuranium*, *curaengine*, *cura2*, *all*. This would build a
  DEB package for Arcus, Savitar, Uranium, Cura Engine and Cura2 respectively. If no UNIT is given, by default would build all packages.
- * ```host-out-directory``` is the path to a directory where the generated .deb packages will be generated. This parameter is required - you must specify a host directory where the
- packages will be copied over after building in the container. If you want to generate in you working directory just pass ```$(pwd)``` as parameter.
+ * `host-out-directory` is the path to a directory where the generated .deb packages will be generated. This parameter is required - you must specify a host directory where the
+ packages will be copied over after building in the container. If you want to generate in you working directory just pass `$(pwd)` as parameter.
 
 For instructions on how to build a specific package see bellow.
 
