@@ -1,7 +1,10 @@
 function build_fdm_materials () {
+  revision=$FDM_GIT_REVISION
+
   cd /Cura2build/ultimaker
-  git clone https://github.com/Ultimaker/fdm_materials.git
+  git clone $FDM_GIT_REPO fdm_materials
   cd fdm_materials/
+  git checkout -f $revision
   mkdir build && cd build
   cmake -DCMAKE_INSTALL_PREFIX=/Cura2build/ultimaker/build/ultimaker-1.0.0/usr ..
   make
@@ -9,9 +12,12 @@ function build_fdm_materials () {
 }
 
 function build_cbd () {
+  revision=$CBD_GIT_REVISION
+
   cd /Cura2build/ultimaker
-  git clone https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git
+  git clone $CBD_GIT_REPO cura-binary-data
   cd cura-binary-data/
+  git checkout -f $revision
   mkdir build && cd build
   cmake -DCMAKE_INSTALL_PREFIX=/Cura2build/ultimaker/build/ultimaker-1.0.0/usr ..
   make

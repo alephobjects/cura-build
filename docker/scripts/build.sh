@@ -61,6 +61,9 @@ case $UNIT in
 
     build_ultimaker
   ;;
+  "utlimaker")
+    build_ultimaker
+  ;;
   *)
   echo "Build all..."
     build_libarcus "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION"
