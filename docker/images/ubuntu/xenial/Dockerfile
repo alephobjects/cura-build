@@ -126,7 +126,8 @@ RUN mkdir -p "/Cura2build/build" && \
     mkdir -p /Cura2build/config/xenial_protobuf/DEBIAN && \
     mkdir -p /Cura2build/protobuf && \
     mkdir -p /Cura2build/scripts && \
-    mkdir -p /Cura2build/config/cura-engine
+    mkdir -p /Cura2build/config/cura-engine && \
+    mkdir -p /Cura2build/ultimaker
 
 COPY scripts ./scripts
 COPY config ./config

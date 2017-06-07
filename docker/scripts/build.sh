@@ -11,6 +11,7 @@ source scripts/build_libsavitar.sh
 source scripts/build_pythonuranium.sh
 source scripts/build_curaengine.sh
 source scripts/build_cura2.sh
+source scripts/build_ultimaker.sh
 
 if [[ "$DIST" == "xenial" ]]; then
   source scripts/build_protobuf.sh
@@ -57,21 +58,25 @@ case $UNIT in
       build_curaengine "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION"
       build_cura2 "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION" "debian-stretch"
     fi
+
+    build_ultimaker
   ;;
   *)
   echo "Build all..."
     build_libarcus "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION"
     build_libsavitar "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION"
 
-  if [[ "$DIST" == "xenial" ]]; then
-    build_protobuf
-    build_pythonuranium "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION" "ubuntu-xenial"
-    build_curaengine "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION"
-    build_cura2_xenial "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION" "ubuntu-xenial"
-  else
-    build_pythonuranium "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION" "debian-stretch"
-    build_curaengine "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION"
-    build_cura2 "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION" "debian-stretch"
-  fi
+    if [[ "$DIST" == "xenial" ]]; then
+      build_protobuf
+      build_pythonuranium "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION" "ubuntu-xenial"
+      build_curaengine "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION"
+      build_cura2_xenial "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION" "ubuntu-xenial"
+    else
+      build_pythonuranium "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION" "debian-stretch"
+      build_curaengine "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION"
+      build_cura2 "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION" "debian-stretch"
+    fi
+
+    build_ultimaker
   ;;
 esac

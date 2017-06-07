@@ -1,0 +1,7 @@
+Package: ultimaker
+Architecture: all
+Maintainer: Alephobjects
+Priority: required
+Version: 1.0.0
+Description: Cura2 ultimaker package
+ This package contains ultimaker materials and firmware
