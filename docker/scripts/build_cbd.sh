@@ -1,6 +1,12 @@
 function build_cbd(){
   revision=$CBD_GIT_REVISION
 
+  CMAKE_ARGS=""
+
+  if [ ! -z "$CBD_BUILD_MARLIN" ]; then
+    CMAKE_ARGS="$CMAKE_ARGS -DBUILD_MARLIN_FIRMWARES=$CBD_BUILD_MARLIN"
+  fi
+
   cd /Cura2build
   if [ ! -d "build/cura-binary-data" ]; then
     git clone $CBD_GIT_REPO cura-binary-data
@@ -10,19 +16,12 @@ function build_cbd(){
     cd build/cura-binary-data
   fi
 
-  # build Marlin firmware
-  echo "Building Marlin firmware"
 
-  ./build-marlin-firmwares.sh
-
-  echo "Marlin firmware build"
   if [ ! -d build ]; then
     mkdir build
   fi
   cd build
-
-  cmake ..
-
+  cmake $CMAKE_ARGS ..
   make package
   cp *.deb /out/
 }

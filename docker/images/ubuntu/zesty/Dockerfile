@@ -36,6 +36,7 @@ ENV CURA2_GIT_REPO="https://code.alephobjects.com/source/Cura2.git"
 ENV CBD_PKG_VERSION=""
 ENV CBD_GIT_REVISION="master"
 ENV CBD_GIT_REPO="https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git"
+ENV CBD_BUILD_MARLIN="ON"
 
 ENV CURA2_DEPS_MINIMUM_ARCUS_VERSION="${ARCUS_PKG_VERSION}"
 ENV CURA2_DEPS_MINIMUM_SAVITAR_VERSION="${SAVITAR_PKG_VERSION}"
@@ -47,12 +48,12 @@ ENV CURA2_PYTHON_DEPS_PKG_VERSION="0.1.0"
 ENV MINIMUM_CURA2_PYTHON_DEPS_PKG_VERSION="0.1.0"
 
 RUN apt-get -qq update && apt-get install -y \
-            gcc-avr \
             avr-libc \
             build-essential \
             cmake \
             curl \
             debmake \
+            gcc-avr \
             gfortran \
             git \
             protobuf-compiler \
