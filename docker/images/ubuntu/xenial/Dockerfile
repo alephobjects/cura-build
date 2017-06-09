@@ -36,6 +36,7 @@ ENV CURA2_GIT_REPO="https://code.alephobjects.com/source/Cura2.git"
 ENV CBD_PKG_VERSION=""
 ENV CBD_GIT_REVISION="master"
 ENV CBD_GIT_REPO="https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git"
+ENV CBD_BUILD_MARLIN="ON"
 
 # FDM materials env variables
 ENV FDM_PKG_VERSION=""
@@ -52,6 +53,7 @@ ENV CURA2_PYTHON_DEPS_PKG_VERSION="0.1.0"
 ENV MINIMUM_CURA2_PYTHON_DEPS_PKG_VERSION="0.1.0"
 
 RUN apt-get -qq update && apt-get install -y \
+            avr-libc \
             autoconf \
             automake \
             build-essential \
@@ -59,6 +61,7 @@ RUN apt-get -qq update && apt-get install -y \
             curl \
             debmake \
             g++ \
+            gcc-avr \
             gfortran \
             git \
             libgl1-mesa-dev \
