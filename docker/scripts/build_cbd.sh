@@ -7,6 +7,18 @@ function build_cbd(){
     CMAKE_ARGS="$CMAKE_ARGS -DBUILD_MARLIN_FIRMWARES=$CBD_BUILD_MARLIN"
   fi
 
+  if [ ! -z "$CBD_URANIUM" ]; then
+    CMAKE_ARGS="$CMAKE_ARGS -DPACK_URANIUM=$CBD_URANIUM"
+  fi
+
+  if [ ! -z "$CBD_CURA_I18N" ]; then
+    CMAKE_ARGS="$CMAKE_ARGS -DPACK_CURA_I18N=$CBD_CURA_I18N"
+  fi
+
+  if [ ! -z "$CBD_PACK_EXCLUDE_ULTIMAKER" ]; then
+    CMAKE_ARGS="$CMAKE_ARGS -DPACK_EXCLUDE_ULTIMAKER=$CBD_PACK_EXCLUDE_ULTIMAKER"
+  fi
+
   cd /Cura2build
   if [ ! -d "build/cura-binary-data" ]; then
     git clone $CBD_GIT_REPO cura-binary-data
@@ -21,6 +33,7 @@ function build_cbd(){
     mkdir build
   fi
   cd build
+  echo $CMAKE_ARGS
   cmake $CMAKE_ARGS ..
   make package
   cp *.deb /out/
