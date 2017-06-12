@@ -16,6 +16,7 @@ option(BUILD_PYQT "Include PyQt" ON)
 option(BUILD_OPENBLAS "Include OpenBLAS" ON)
 option(BUILD_NUMPY "Include Numpy" ON)
 option(BUILD_SCIPY "Include Scipy" ON)
+option(BUILD_SCIPY_LITE "Include Scipy Lite" OFF)
 option(BUILD_PYSERIAL "Include PySerial" ON)
 option(BUILD_NUMPY_STL "Include Numpy-STL" ON)
 option(BUILD_PYTHON_UTILS "Include Python-Utils" ON)
@@ -887,6 +888,10 @@ else()
     add_custom_target(Numpy)
 endif()
 
+if (BUILD_SCIPY AND BUILD_SCIPY_LITE)
+    message(FATAL_ERROR "Can't build SciPy and SciPyLite at the same time")
+endif()
+
 if(BUILD_SCIPY)
     set(envvar_scipy)
     set(build_scipy ${PYTHON_EXECUTABLE} setup.py build_ext)
@@ -922,9 +927,40 @@ if(BUILD_SCIPY)
         INSTALL_COMMAND ${envvar_scipy} ${install_scipy}
 	BUILD_IN_SOURCE 1
     )
-else()
+elseif(NOT BUILD_SCIPY_LITE)
     message(STATUS "---> System SciPy will be used")
     add_custom_target(Scipy)
+endif()
+
+if (BUILD_SCIPY_LITE)
+    # PyHULL is needed then
+    set(build_pyhull ${PYTHON_EXECUTABLE} setup.py build)
+    set(install_pyhull ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose --single-version-externally-managed)
+    message(STATUS "---> PyHull Build: ${build_pyhull}")
+    message(STATUS "---> PyHull Install: ${install_pyhull}")
+    ExternalProject_Add(PyHull
+        DEPENDS Python
+        URL https://github.com/materialsvirtuallab/pyhull/archive/v1.5.0.tar.gz
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${build_pyhull}
+        INSTALL_COMMAND ${install_pyhull}
+        BUILD_IN_SOURCE 1
+    )
+
+    # And SciPyLite
+    set(build_scipy_lite ${PYTHON_EXECUTABLE} setup.py build)
+    set(install_scipy_lite ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose --single-version-externally-managed)
+    message(STATUS "---> SciPyLite Build: ${build_scipy_lite}")
+    message(STATUS "---> SciPyLite Install: ${install_scipy_lite}")
+    ExternalProject_Add(Scipy
+        DEPENDS Python PythonUtils Numpy PythonSix PyHull
+        GIT_REPOSITORY https://code.alephobjects.com/source/CuraSciPyLite.git
+        GIT_TAG origin/master
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${build_scipy_lite}
+        INSTALL_COMMAND ${install_scipy_lite}
+        BUILD_IN_SOURCE 1
+    )
 endif()
 
 if(BUILD_PYSERIAL)
