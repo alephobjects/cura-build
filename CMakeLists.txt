@@ -595,7 +595,8 @@ endif()
 if(BUILD_PYTHON_PACKAGING)
     set(build_python_packaging ${PYTHON_EXECUTABLE} setup.py build)
     # --single-version-externally-managed
-    set(install_python_packaging ${PYTHON_EXECUTABLE} setup.py install --verbose ${python_install})
+    set(install_python_packaging ${PYTHON_EXECUTABLE} setup.py setopt --command=easy_install --option=zip-ok --set-value=False)
+    list(APPEND install_python_packaging COMMAND ${PYTHON_EXECUTABLE} setup.py install --verbose ${python_install})
     if(BUILD_OS_WINDOWS)
        string(REPLACE "/" "\\" install_python_packaging "${install_python_packaging}")
     endif()
@@ -918,7 +919,7 @@ if(BUILD_SCIPY)
     message(STATUS "---> SciPy build: ${build_scipy}")
     message(STATUS "---> SciPy install: ${install_scipy}")
     ExternalProject_Add(Scipy
-        DEPENDS Python PythonUtils Numpy PythonSix
+        DEPENDS Python PythonUtils Numpy PythonSix PythonPackaging
         # URL http://downloads.sourceforge.net/project/scipy/scipy/0.16.1/scipy-0.16.1.tar.gz
 	GIT_REPOSITORY git://github.com/scipy/scipy.git
 	GIT_TAG 46cbf563f5010b27017324ca66e1daffb6d21c47
