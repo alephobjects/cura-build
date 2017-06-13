@@ -167,6 +167,7 @@ print("Copying CuraEngine")
 shutil.copy("@EXTERNALPROJECT_INSTALL_PREFIX@/bin/CuraEngine.exe", "dist/CuraEngine.exe")
 shutil.copy("@compiler_dir@/libstdc++-6.dll", "dist/libstdc++-6.dll")
 shutil.copy("@compiler_dir@/libwinpthread-1.dll", "dist/libwinpthread-1.dll")
+shutil.copy("@compiler_dir@/libgomp-1.dll", "dist/libgomp-1.dll")
 
 # Statically linking instead.  This try block does not encompass all the variety of mingw configurations and is brittle.
 
