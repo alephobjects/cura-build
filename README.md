@@ -341,7 +341,7 @@ These are the available ENV variables that control the builds:
 * ENV CBD_BUILD_MARLIN (Default "ON") - whether to build and package Marlin firmware files
 * ENV CBD_CURA_I18N (Default "ON") - pack internationalization files
 * ENV CBD_URANIUM (Default "ON") - pack uranium internationalization files
-* ENV CBD_PACK_EXCLUDE_ULTIMAKER (Default "ON") - exclude Ultimaker provided binary firmware files from the build
+* ENV CBD_PACK_FIRMWARE (Default "all", available values are "all", "lulzbot", "ultimaker") - pack specific firmware. By default it will pack all firmware. If you pass "ultimaker" it will pack only the firmware provided by Ultimaker. If passed "lulzbot" it will pack the firmware that is not provided by Ultimaker.
 
 **Dependencies versions management**
 
