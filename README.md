@@ -171,7 +171,7 @@ Install OpenGL dev libs:
 sudo apt-get install mesa-common-dev
 sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev
 
-sudo apt-get install gfortran python3 python3-dev python3-pyqt5 python3-pyqt5.qtopengl python3-pyqt5.qtquick python3-pyqt5.qtsvg python3-numpy python3-serial python3-opengl python3-setuptools qml-module-qtquick2 qml-module-qtquick-window2 qml-module-qtquick-layouts qml-module-qtquick-dialogs qml-module-qtquick-controls gfortran pkg-config libxcb1-dev libx11-dev 
+sudo apt-get install gfortran python3 python3-dev python3-pyqt5 python3-pyqt5.qtopengl python3-pyqt5.qtquick python3-pyqt5.qtsvg python3-numpy python3-serial python3-opengl python3-setuptools qml-module-qtquick2 qml-module-qtquick-window2 qml-module-qtquick-layouts qml-module-qtquick-dialogs qml-module-qtquick-controls gfortran pkg-config libxcb1-dev libx11-dev
 x11proto-gl-dev x11proto-composite-dev x11proto-core-dev x11proto-damage-dev x11proto-dri2-dev x11proto-fixes-dev x11proto-gl-dev x11proto-input-dev x11proto-kb-dev x11proto-randr-dev x11proto-record-dev x11proto-render-dev x11proto-xext-dev x11proto-xf86vidmode-dev x11proto-xinerama-dev
 
 git clone https://code.alephobjects.com/source/Cura2build.git
@@ -281,8 +281,8 @@ docker run -e UNIT=<unit-name> -v <host-out-directory>:/out keitaro/alephobjects
 ```
 
 Where:
- * `unit-name` is the name of the library you want to build. Possible values are: *libarcus*, *libsavitar*, *pythonuranium*, *curaengine*, *cura2*, *all*. This would build a
- DEB package for Arcus, Savitar, Uranium, Cura Engine and Cura2 respectively. If no UNIT is given, by default would build all packages.
+ * `unit-name` is the name of the library you want to build. Possible values are: *libarcus*, *libsavitar*, *pythonuranium*, *curaengine*, *cura2*, *cbd*, *all*. This would build a
+ DEB package for Arcus, Savitar, Uranium, Cura Engine, Cura Binary Data and Cura2 respectively. If no UNIT is given, by default would build all packages.
  * `host-out-directory` is the path to a directory where the generated .deb packages will be generated. This parameter is required - you must specify a host directory where the
  packages will be copied over after building in the container. If you want to generate in you working directory just pass `$(pwd)` as parameter.
 
@@ -336,10 +336,20 @@ These are the available ENV variables that control the builds:
 * CURA2_GIT_REVISION (default "master") - cura2 revision to checkout when building from repository.
 * CURA2_GIT_REPO (default "https://code.alephobjects.com/source/Cura2.git") - cura2 Git repository URL.
 
+
 **FDM Material env variables**
 
 * FDM_GIT_REVISION="master"
 * FDM_GIT_REPO="https://github.com/Ultimaker/fdm_materials.git"
+
+
+**Cura Binary Data variables**
+
+* ENV CBD_BUILD_MARLIN (Default "ON") - whether to build and package Marlin firmware files
+* ENV CBD_CURA_I18N (Default "ON") - pack internationalization files
+* ENV CBD_URANIUM (Default "ON") - pack uranium internationalization files
+* ENV CBD_PACK_FIRMWARE (Default "all", available values are "all", "lulzbot", "ultimaker") - pack specific firmware. By default it will pack all firmware. If you pass "ultimaker" it will pack only the firmware provided by Ultimaker. If passed "lulzbot" it will pack the firmware that is not provided by Ultimaker.
+
 
 **Dependencies versions management**
 
@@ -445,6 +455,7 @@ docker run -e UNIT=cura2 -v $(pwd):/out keitaro/alephobjects:stretch
 
 The build will generate a DEB package in your current directory.
 
+
 Building Ultimaker
 =============
 
@@ -454,6 +465,17 @@ To build Ultimaker run the following command:
 
 ```
 docker run -e UNIT=ultimaker -v $(pwd):/out keitaro/alephobjects:stretch
+```
+The build will generate a DEB package in your current directory.
+
+
+Building Cura Binary Data
+=========================
+
+To build Cura2 run the following command:
+
+```
+docker run -e UNIT=cbd -v $(pwd):/out keitaro/alephobjects:stretch
 ```
 
 The build will generate a DEB package in your current directory.

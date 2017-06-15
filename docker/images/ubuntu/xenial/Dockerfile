@@ -35,7 +35,7 @@ ENV CURA2_GIT_REPO="https://code.alephobjects.com/source/Cura2.git"
 # Cura Binary Data env variables
 ENV CBD_PKG_VERSION=""
 ENV CBD_GIT_REVISION="master"
-ENV CBD_GIT_REPO="https://vlado_keitaro:vladoohr123@bitbucket.org/keitaroinc/cura-binary-data.git"
+ENV CBD_GIT_REPO="https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git"
 ENV CBD_BUILD_MARLIN="ON"
 ENV CBD_CURA_I18N="ON"
 ENV CBD_URANIUM="ON"

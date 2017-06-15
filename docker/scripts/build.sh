@@ -12,12 +12,13 @@ source scripts/build_pythonuranium.sh
 source scripts/build_curaengine.sh
 source scripts/build_cura2.sh
 source scripts/build_ultimaker.sh
+source scripts/build_cbd.sh
 
 if [[ "$DIST" == "xenial" ]]; then
   source scripts/build_protobuf.sh
 fi
 
-echo "Building for: $DIST" 
+echo "Building for: $DIST"
 
 case $UNIT in
   "libarcus")
@@ -63,6 +64,9 @@ case $UNIT in
   ;;
   "ultimaker")
     build_ultimaker
+  ;;
+  "cbd")
+    build_cbd "$OUT_DIR"
   ;;
   *)
   echo "Build all..."
