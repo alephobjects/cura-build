@@ -85,5 +85,6 @@ case $UNIT in
     fi
 
     build_ultimaker
+    build_cbd "$OUT_DIR"
   ;;
 esac
