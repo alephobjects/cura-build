@@ -59,8 +59,6 @@ case $UNIT in
       build_curaengine "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION"
       build_cura2 "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION" "debian-stretch"
     fi
-
-    build_ultimaker
   ;;
   "ultimaker")
     build_ultimaker
