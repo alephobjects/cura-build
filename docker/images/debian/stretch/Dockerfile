@@ -37,8 +37,8 @@ ENV CBD_PKG_VERSION=""
 ENV CBD_GIT_REVISION="master"
 ENV CBD_GIT_REPO="https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git"
 ENV CBD_BUILD_MARLIN="ON"
-ENV CBD_CURA_I18N="ON"
-ENV CBD_URANIUM="ON"
+ENV CBD_CURA_I18N="OFF"
+ENV CBD_URANIUM="OFF"
 ENV CBD_PACK_FIRMWARE="lulzbot"
 
 # FDM materials env variables

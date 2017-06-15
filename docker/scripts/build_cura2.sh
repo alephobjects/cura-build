@@ -47,7 +47,7 @@ function build_cura2 () {
   cd /Cura2build
 
   if [ ! -d "build/Cura2" ]; then
-    git clone "$CURA2_GIT_REPO"
+    git clone "$CURA2_GIT_REPO" Cura2
     cd Cura2
     git checkout -f $revision
     #patch_cura2 "/Cura2build/config/cura2/Cura2.patch"
