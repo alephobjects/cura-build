@@ -37,9 +37,11 @@ ENV CBD_PKG_VERSION=""
 ENV CBD_GIT_REVISION="master"
 ENV CBD_GIT_REPO="https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git"
 ENV CBD_BUILD_MARLIN="ON"
+ENV CBD_CURA_I18N="ON"
+ENV CBD_URANIUM="ON"
+ENV CBD_PACK_FIRMWARE="all"
 
 # FDM materials env variables
-ENV FDM_PKG_VERSION=""
 ENV FDM_GIT_REVISION="master"
 ENV FDM_GIT_REPO="https://github.com/Ultimaker/fdm_materials.git"
 
@@ -120,7 +122,7 @@ RUN mkdir -p "/Cura2build/build" && \
     mkdir -p /Cura2build/config/cura2 && \
     mkdir -p /Cura2build/config/xenial_python_deps/DEBIAN && \
     mkdir -p /Cura2build/scripts && \
-    mkdir -p /Cura2build/config/cura-engine
+    mkdir -p /Cura2build/config/cura-engine && \
     mkdir -p /Cura2build/ultimaker
 
 COPY scripts ./scripts

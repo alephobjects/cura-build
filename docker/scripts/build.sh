@@ -61,7 +61,7 @@ case $UNIT in
 
     build_ultimaker
   ;;
-  "utlimaker")
+  "ultimaker")
     build_ultimaker
   ;;
   *)

@@ -336,6 +336,10 @@ These are the available ENV variables that control the builds:
 * CURA2_GIT_REVISION (default "master") - cura2 revision to checkout when building from repository.
 * CURA2_GIT_REPO (default "https://code.alephobjects.com/source/Cura2.git") - cura2 Git repository URL.
 
+**FDM Material env variables**
+
+* FDM_GIT_REVISION="master"
+* FDM_GIT_REPO="https://github.com/Ultimaker/fdm_materials.git"
 
 **Dependencies versions management**
 
@@ -437,6 +441,19 @@ To build Cura2 run the following command:
 
 ```
 docker run -e UNIT=cura2 -v $(pwd):/out keitaro/alephobjects:stretch
+```
+
+The build will generate a DEB package in your current directory.
+
+Building Ultimaker
+=============
+
+Ultimaker contains FDM Material and Ultimaker firmware packages
+
+To build Ultimaker run the following command:
+
+```
+docker run -e UNIT=ultimaker -v $(pwd):/out keitaro/alephobjects:stretch
 ```
 
 The build will generate a DEB package in your current directory.

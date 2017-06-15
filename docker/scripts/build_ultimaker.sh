@@ -14,10 +14,13 @@ function build_fdm_materials () {
 function build_cbd () {
   revision=$CBD_GIT_REVISION
 
-  CMAKE_ARGS="-DCMAKE_INSTALL_PREFIX=/Cura2build/ultimaker/build/ultimaker-1.0.0/usr"
+  CMAKE_ARGS+="-DCMAKE_INSTALL_PREFIX=/Cura2build/ultimaker/build/ultimaker-1.0.0/usr"
+  CMAKE_ARGS+=" -DPACK_URANIUM=OFF"
+  CMAKE_ARGS+=" -DPACK_CURA_I18N=OFF"
+  CMAKE_ARGS+=" -DPACK_FIRMWARE=ultimaker"
 
   if [ ! -z "$CBD_BUILD_MARLIN" ]; then
-    CMAKE_ARGS="$CMAKE_ARGS -DBUILD_MARLIN_FIRMWARES=$CBD_BUILD_MARLIN"
+    CMAKE_ARGS+=" -DBUILD_MARLIN_FIRMWARES=$CBD_BUILD_MARLIN"
   fi
 
   cd /Cura2build
@@ -31,7 +34,12 @@ function build_cbd () {
     cd build/cura-binary-data
   fi
 
-  mkdir build && cd build
+
+  if [ ! -d build ]; then
+    mkdir build
+  fi
+  cd build
+
   cmake $CMAKE_ARGS ..
   make
   make install
@@ -41,15 +49,7 @@ function build_ultimaker() {
   build_fdm_materials
   build_cbd
   
-  # remove lulzbot firmware
-  cd ../..
-  find /Cura2build/ultimaker/build/ultimaker-1.0.0/usr \
-       -regextype posix-extended -regex '.*(TAZ|Mini-Single).*\.hex'| xargs rm
-
-  # remove translation files     
-  rm -rf \
-    /Cura2build/ultimaker/build/ultimaker-1.0.0/usr/share/uranium \
-    /Cura2build/ultimaker/build/ultimaker-1.0.0/usr/share/cura/resources/i18n
+  cd /Cura2build/ultimaker
 
   # create debian package
   mkdir -p build/ultimaker-1.0.0/DEBIAN

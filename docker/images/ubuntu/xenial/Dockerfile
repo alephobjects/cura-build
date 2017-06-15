@@ -35,11 +35,13 @@ ENV CURA2_GIT_REPO="https://code.alephobjects.com/source/Cura2.git"
 # Cura Binary Data env variables
 ENV CBD_PKG_VERSION=""
 ENV CBD_GIT_REVISION="master"
-ENV CBD_GIT_REPO="https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git"
+ENV CBD_GIT_REPO="https://vlado_keitaro:vladoohr123@bitbucket.org/keitaroinc/cura-binary-data.git"
 ENV CBD_BUILD_MARLIN="ON"
+ENV CBD_CURA_I18N="ON"
+ENV CBD_URANIUM="ON"
+ENV CBD_PACK_FIRMWARE="all"
 
 # FDM materials env variables
-ENV FDM_PKG_VERSION=""
 ENV FDM_GIT_REVISION="master"
 ENV FDM_GIT_REPO="https://github.com/Ultimaker/fdm_materials.git"
 
@@ -53,9 +55,9 @@ ENV CURA2_PYTHON_DEPS_PKG_VERSION="0.1.0"
 ENV MINIMUM_CURA2_PYTHON_DEPS_PKG_VERSION="0.1.0"
 
 RUN apt-get -qq update && apt-get install -y \
-            avr-libc \
             autoconf \
             automake \
+            avr-libc \
             build-essential \
             cmake \
             curl \
