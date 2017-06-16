@@ -80,40 +80,20 @@ endif()
 
 # Explicitly disable unsupported options
 if(BUILD_OS_WINDOWS)
-    # Checked. "./configure" needs to work
-    # set(BUILD_PYTHON OFF)
-    # Checked: MSYS should be installed (missing grep etc)
-    # One would like to see if the CMAKE build works for it
+    set(BUILD_PYTHON OFF)
+    set(BUILD_QT OFF)
+    set(BUILD_PYQT OFF)
     set(BUILD_OPENBLAS OFF)
-
-    # Disable building of Numpy and Scipy due to dependency on Fortran
-    #set(BUILD_NUMPY OFF)
-    #set(BUILD_SCIPY OFF)
-    # 
-    # Disable everything that depends on NumPy or SciPy
-    #set(BUILD_NUMPY_STL OFF)
-    #set(BUILD_SAVITAR OFF)
-    #set(BUILD_PYTHON_UTILS OFF)
-    #set(BUILD_ZEROCONF OFF)
-    #set(BUILD_TYPING OFF)
-
-    # There is no reason to build CYTHON because NUMPY, NUMPY_STL and SAVITAR are disabled
-    # set(BUILD_CYTHON OFF)
-
-    # On Win32, MinGW built Qt ignores environment variable changes made when running the
-    # application. Since we need that to disable the threaded renderer, we need to use an
-    # MSVC built Qt/PyQt for now.
-    #
-    # On Win64, in addition MinGW built python extensions fail to load properly so we cannot
-    # use it at all.
-    # Building Qt would require configure too
-    # set(BUILD_QT OFF)
-    # set(BUILD_PYQT OFF)
+    set(BUILD_NUMPY OFF)
+    set(BUILD_SCIPY OFF)
+    set(BUILD_CYTHON OFF)
 
     if(BUILD_OS_WIN64)
         # Sip is required to build the Arcus python bindings, which works fine on Win32
         # but fails on Win64. So we need an externally built SIP and Arcus bindings on Win64.
         set(BUILD_SIP OFF)
+    else()
+        set(PYTHONPATH "${CMAKE_CURRENT_BINARY_DIR}/inst/lib/python3.5/site-packages")
     endif()
 elseif(BUILD_OS_LINUX)
     # set(BUILD_PYTHON OFF)
@@ -732,8 +712,10 @@ if ( BUILD_CYTHON )
         BUILD_IN_SOURCE 1
     )
 else()
-    message(STATUS "---> System Cython will be used")
-    add_custom_target(Cython)
+    add_custom_target(Cython
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} Cython
+        COMMENT "Installing Cython"
+    )
 endif()
 
 if(BUILD_PYQT)
@@ -786,8 +768,10 @@ if(BUILD_PYQT)
         BUILD_IN_SOURCE 1
     )
 else()
-    message(STATUS "---> System PyQt will be used")
-    add_custom_target(PyQt)
+    add_custom_target(PyQt
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} PyQt5==5.7.1
+        COMMENT "Installing PyQt5"
+    )
 endif()
 
 
@@ -885,8 +869,11 @@ if(BUILD_NUMPY)
         BUILD_IN_SOURCE 1
     )
 else()
-    message(STATUS "---> System NumPy will be used")
-    add_custom_target(Numpy)
+    add_custom_target(Numpy
+        DEPENDS Cython
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} http://software.ultimaker.com/cura-binary-dependencies/numpy-1.11.3+mkl-cp35-cp35m-win32.whl
+        COMMENT "Installing NumPy"
+    )
 endif()
 
 if (BUILD_SCIPY AND BUILD_SCIPY_LITE)
@@ -929,8 +916,10 @@ if(BUILD_SCIPY)
 	BUILD_IN_SOURCE 1
     )
 elseif(NOT BUILD_SCIPY_LITE)
-    message(STATUS "---> System SciPy will be used")
-    add_custom_target(Scipy)
+    add_custom_target(Scipy
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} http://software.ultimaker.com/cura-binary-dependencies/scipy-0.19.0-cp35-cp35m-win32.whl
+        COMMENT "Installing SciPy"
+    )
 endif()
 
 if (BUILD_SCIPY_LITE)
@@ -1254,7 +1243,8 @@ if(BUILD_OS_OSX)
 elseif(BUILD_OS_WINDOWS)
     set(CPACK_GENERATOR "NSIS")
 
-    get_filename_component(compiler_dir ${CMAKE_CXX_COMPILER} DIRECTORY)
+    find_program(compiler ${CMAKE_CXX_COMPILER})
+    get_filename_component(compiler_dir ${compiler} DIRECTORY)
     configure_file(setup_win32.py.in setup_win32.py @ONLY)
 
     add_custom_target(build_exe ALL)
@@ -1280,6 +1270,11 @@ elseif(BUILD_OS_WINDOWS)
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/dist
         COMMENT "Cleaning old dist/ directory"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+    add_custom_command(
+        TARGET build_exe POST_BUILD
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} cx_Freeze
+        COMMENT "Installing cx_Freeze"
     )
     add_custom_command(
         TARGET build_exe POST_BUILD
