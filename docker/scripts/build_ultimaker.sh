@@ -11,7 +11,7 @@ function build_fdm_materials () {
   make install
 }
 
-function build_cbd () {
+function build_ultimaker_cbd () {
   revision=$CBD_GIT_REVISION
 
   CMAKE_ARGS+="-DCMAKE_INSTALL_PREFIX=/Cura2build/ultimaker/build/ultimaker-1.0.0/usr"
@@ -25,15 +25,15 @@ function build_cbd () {
 
   cd /Cura2build
 
-  if [ ! -d "build/cura-binary-data" ]; then
-    cd ultimaker
+  if [ -d "build/cura-binary-data" ]; then
+    cd build/cura-binary-data
+  elif [ -d cura-binary-data ]; then
+    cd cura-binary-data
+  else
     git clone $CBD_GIT_REPO cura-binary-data
     cd cura-binary-data/
     git checkout -f $revision
-  else
-    cd build/cura-binary-data
   fi
-
 
   if [ ! -d build ]; then
     mkdir build
@@ -47,7 +47,7 @@ function build_cbd () {
 
 function build_ultimaker() {
   build_fdm_materials
-  build_cbd
+  build_ultimaker_cbd
   
   cd /Cura2build/ultimaker
 

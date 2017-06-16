@@ -4,10 +4,13 @@ import os.path
 from cx_Freeze import setup, Executable, hooks
 
 def load_scipy(finder, module):
-    finder.IncludePackage("scipy._lib")
-    finder.IncludePackage("scipy.misc")
-    finder.IncludePackage("scipy.sparse.csgraph._validation")
-    finder.IncludePackage("scipy.sparse._csparsetools")
+    try:
+        finder.IncludePackage("scipy._lib")
+        finder.IncludePackage("scipy.misc")
+        finder.IncludePackage("scipy.sparse.csgraph._validation")
+        finder.IncludePackage("scipy.sparse._csparsetools")
+    except Exception as e:
+        print("setup_linux.py.in: Error in load_scipy: ", e)
 
 hooks.load_scipy = load_scipy
 
@@ -47,7 +50,7 @@ build_options = {
         "appdirs",
     ],
     "include_files": [
-        ("@EXTERNALPROJECT_INSTALL_PREFIX@/bin/CuraEngine", 				""),	
+        ("@EXTERNALPROJECT_INSTALL_PREFIX@/bin/CuraEngine", 				""),
         ("@EXTERNALPROJECT_INSTALL_PREFIX@/lib/cura", 					"plugins"),
         ("@EXTERNALPROJECT_INSTALL_PREFIX@/lib/uranium", 				"plugins"),
         ("@EXTERNALPROJECT_INSTALL_PREFIX@/lib/python3/dist-packages/UM/Qt/qml/UM", 	"qml/UM"),
