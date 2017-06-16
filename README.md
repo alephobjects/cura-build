@@ -73,16 +73,10 @@ On Windows, the following dependencies are needed for building:
 * **Zeroconf** (https://pypi.python.org/pypi/zeroconf)
   * Zeroconf is installed when running mingw32-make. There is no need to install it manually.
   * Again the easiest way to install is via `pip3 install zeroconf`.
-* **Microsoft Visual Studio 2015 (community edition)**:
+* **Visual C++ 2015 Build Tools (http://landinghub.visualstudio.com/visual-cpp-build-tools)**:
   Go to "custom installation" and choose:
-    * Programming languages:
-      * Visual c++ (all)
-      * Python Tools for Visual Studio (Nov 2015)
-    * Windows & Web Development:
-      * Universal Windows App Development Tools:
-        * Tools 1.2
-        * Windows 10 SDK 10.0.10586
-        * Windows 10 SDK 10.0.10240
+    * Select features:
+      * Windows 10 SDK 10.0.10.240
 * **NSIS 3** (http://nsis.sourceforge.net/Main_Page)
   * This application is neeeded to create the installer.
   * You'll need to add the path to your NSIS folder to your system path. (You don't need to add NSIS/bin)
