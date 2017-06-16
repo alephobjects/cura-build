@@ -353,7 +353,6 @@ else()
    find_package(PythonInterp ${MINIMUM_PYTHON_VERSION} REQUIRED)
    find_package(PythonLibs REQUIRED)
    add_custom_target(Python) # In order to satisfy dependencies
-   ADD_DEPENDENCIES(Python EnvVars)
    set(EXTRA_PYTHON_DEFINES)
 endif()
 message(STATUS "---> Python executable: ${PYTHON_EXECUTABLE}")
@@ -542,7 +541,7 @@ if(BUILD_PYTHONSIX)
     message(STATUS "---> PythonSix Build: ${build_python_six}")
     message(STATUS "---> PythonSix Install: ${install_python_six}")
     ExternalProject_Add(PythonSix
-        DEPENDS Python PythonSix
+        DEPENDS Python
         URL https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_python_six}
