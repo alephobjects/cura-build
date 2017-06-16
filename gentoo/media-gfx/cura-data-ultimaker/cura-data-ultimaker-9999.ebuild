@@ -12,8 +12,10 @@ SLOT="0"
 KEYWORDS="~amd64 ~x86"
 IUSE=""
 
-RDEPEND="media-gfx/cura"
-DEPEND=""
+RDEPEND=""
+DEPEND="cross-avr/gcc
+				cross-avr/binutils
+				cross-avr/avr-libc"
 
 src_configure() {
 	local mycmakeargs=(
