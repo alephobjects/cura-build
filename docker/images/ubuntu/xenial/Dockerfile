@@ -5,7 +5,7 @@ ENV UNIT="All"
 ENV GIT_REVISION="master"
 ENV DIST_DIR="."
 ENV DEB_VERSION=""
-ENV DIST="stretch"
+ENV DIST="xenial"
 
 # Arcus env variables
 ENV ARCUS_PKG_VERSION=""
