@@ -21,9 +21,17 @@ function build_cbd(){
 
   cd /Cura2build
   if [ ! -d "build/cura-binary-data" ]; then
-    git clone $CBD_GIT_REPO cura-binary-data
-    cd cura-binary-data
-    git checkout -f $revision
+    if [ ! -d "cura-binary-data" ]; then
+      git clone $CBD_GIT_REPO cura-binary-data
+      cd cura-binary-data
+    else
+      if [ -d "cura-binary-data" ]; then
+        cd cura-binary-data
+        if [ -d "cura-binary-data/.git" ]; then
+          git checkout -f $revision
+        fi
+      fi
+    fi
   else
     cd build/cura-binary-data
   fi

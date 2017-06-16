@@ -86,8 +86,8 @@ function build_cura2_python_deps(){
   sed -i "s/PYTHON_DEPS_PKG_VERSION/${version}/" "$PKG_DIR/DEBIAN/control"
 
   pip3 install \
-            PyQt5 \
-            sip \
+            PyQt5==5.8.2 \
+            sip==4.19.2 \
             pyserial \
             typing \
             zeroconf \
