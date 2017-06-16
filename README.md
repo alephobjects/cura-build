@@ -37,34 +37,41 @@ On Windows, the following dependencies are needed for building:
   * The `git` command should be available on your `%PATH%`. Make sure that the `cmd` directory in the git for windows installation directory is on the `%PATH%` and *not* its `bin` directory, otherwise mingw32 will complain about `sh.exe` being on the path.
 * **CMake** (http://www.cmake.org/)
   * Once CMake is installed make sure it is available on your `%PATH%`. Check this by running `cmake --version` in the Windows console.
-* **MinGW-W64** >= 4.9.04 (https://wiki.qt.io/MinGW-64-bit)
+* **MinGW-W64** = 5.3.0 (https://wiki.qt.io/MinGW-64-bit)
   * Once installed, its `bin` directory should be available on your `%PATH%`. Test this by running `mingw32-make --version` in the Windows console.
   * MinGW can be installed on different ways, but these were tested (without guarentees):
     * MinGW w64 installer (32-/64bit): Install the correct target architecture and make sure you choose:
-      * Version := 4.9.3
+      * Version := 5.3.0
       * Architecture := i686 (here for 32bit)
       * Threads := posix
       * Exception := dwarf
       * Build revision := 1
-    * Qt5 Installer (32bit only): You can install "MinGW 4.9.2" using their "Maintenance Tool" as a component from the category "Tools"
-    * When looking for other resources, make sure you download the posix flavour of MinGW. It is the only version, which is C++11 compatible (for more info take a look at the Qt docs).
-* **Python** >= 3.5.2 (http://python.org/)
+* **Python** >= 3.5.2 (https://www.python.org/downloads/windows/)
+  * Download Python 3.5.2 - Windows x86 web-based installer
+  * Once installed, `root` directory of the installation should be available on your `%PATH%`. 
   * This project supports Python 3.5.1 except for a bug in cx_Freeze.  Use Python 3.5.2 if possible.
   * You will need the latest version of pip `python -m pip install -U pip`
 * **cx_Freeze**
+  * cx_Freeze is installed when running mingw32-make. There is no need to install it manually.
   * `pip install cx_Freeze`
   * As of 1-26-2017 the latest version of cx_Freeze (5.0.1) does not support Python 3.5.1 without a patch: https://bitbucket.org/anthony_tuininga/cx_freeze/issues/225/cxfreeze-module-dis-has-no-attribute
 * **NumPy** (http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy)
+  * NumPy is installed when running mingw32-make. There is no need to install it manually.
   * __NOTE__: make sure to get the NON-MKL version!
   * __NOTE__: CJ: It looks like this needs MKL, the above link only provides MKL versions, and Ultimaker Cura uses MKL.
 * **SciPy** (http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy)
+  * SciPy is installed when running mingw32-make. There is no need to install it manually.
 * **PySerial** from https://pypi.python.org/pypi/pyserial/3.2.1
+  * PySerial is installed when running mingw32-make. There is no need to install it manually.
   * It can be installed via `pip3 install pyserial`
 * **Py2Exe** (https://pypi.python.org/pypi/py2exe/0.9.2.0/#downloads)
+  * Py2Exe is installed when running mingw32-make. There is no need to install it manually.
   * The easiest way to install this is to run the command `pip install py2exe`. The executable `build_exe.exe` should now be in your `<python dir>/Scripts` directory. You may have to add `<python dir>/Scripts` to you `%PATH%`.
 * **Numpy-STL** (https://pypi.python.org/pypi/numpy-stl)
+  * Numpy-STL is installed when running mingw32-make. There is no need to install it manually.
   * Also the easiest way to install is via `pip3 install numpy-stl`.
 * **Zeroconf** (https://pypi.python.org/pypi/zeroconf)
+  * Zeroconf is installed when running mingw32-make. There is no need to install it manually.
   * Again the easiest way to install is via `pip3 install zeroconf`.
 * **Microsoft Visual Studio 2015 (community edition)**:
   Go to "custom installation" and choose:
@@ -80,24 +87,20 @@ On Windows, the following dependencies are needed for building:
   * This application is neeeded to create the installer.
   * You'll need to add the path to your NSIS folder to your system path. (You don't need to add NSIS/bin)
   * Be sure to include the Language files in the installation.
-* **PyQt 5.4**
-  * The pip PyQT 5.6 package is missing the needed qml files. PyQT 5.7.1 is the latest pip package as of this writing
+* **PyQt 5.7.1**
+  * PyQt is installed when running mingw32-make. There is no need to install it manually.
+  * The pip PyQT 5.6 package is missing the needed qml files. PyQT 5.7.1 works.PyQT 5.8.2 is the latest pip package as of this writing
   * and future PyQt pip packages are not guaranteed to work with this project.
   * `pip install pyqt5==5.7.1`
 * **SIP**
   * SIP is installed when pip installing PyQT5, the below line is just included for reference.
   * `pip install SIP`
 
-Here's all of the remote pip packages in a single line.  (Run this after installing the manually downloaded scipy and numpy packages)
-```
-pip install pyqt5==5.7.1 py2exe cx_Freeze zeroconf numpy-stl
-```
-
 Make sure these dependencies are available from your path.
 
 Additionally, for 32-bit builds:
 
-* Perl (http://www.activestate.com/activeperl, Required to build Qt)
+* Perl (http://www.activestate.com/activeperl, Required to build Qt). 
 * Create in the user directory a file named pydistutils.cfg with the following contents:
   * CJ: Not sure what the point of noting the compiler to be mingw32 is when much of the binaries are being compiled by msbuild.  This step may not be needed.
 ```shell
@@ -109,7 +112,8 @@ compiler=mingw32
 REM 32-bit
 mkdir build-32
 cd build-32
-cmake -G "MinGW Makefiles" -DBUILD_PYSERIAL=0 ..
+..\env_win32.bat
+cmake -G "MinGW Makefiles" ..
 mingw32-make package
 ```
 

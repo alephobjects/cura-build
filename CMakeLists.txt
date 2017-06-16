@@ -92,6 +92,8 @@ if(BUILD_OS_WINDOWS)
         # Sip is required to build the Arcus python bindings, which works fine on Win32
         # but fails on Win64. So we need an externally built SIP and Arcus bindings on Win64.
         set(BUILD_SIP OFF)
+    else()
+        set(PYTHONPATH "${CMAKE_CURRENT_BINARY_DIR}/inst/lib/python3.5/site-packages")
     endif()
 elseif(BUILD_OS_LINUX)
     # set(BUILD_PYTHON OFF)
@@ -351,6 +353,7 @@ else()
    find_package(PythonInterp ${MINIMUM_PYTHON_VERSION} REQUIRED)
    find_package(PythonLibs REQUIRED)
    add_custom_target(Python) # In order to satisfy dependencies
+   ADD_DEPENDENCIES(Python EnvVars)
    set(EXTRA_PYTHON_DEFINES)
 endif()
 message(STATUS "---> Python executable: ${PYTHON_EXECUTABLE}")
@@ -539,7 +542,7 @@ if(BUILD_PYTHONSIX)
     message(STATUS "---> PythonSix Build: ${build_python_six}")
     message(STATUS "---> PythonSix Install: ${install_python_six}")
     ExternalProject_Add(PythonSix
-        DEPENDS Python
+        DEPENDS Python PythonSix
         URL https://pypi.python.org/packages/b3/b2/238e2590826bfdd113244a40d9d3eb26918bd798fc187e2360a8367068db/six-1.10.0.tar.gz
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_python_six}
@@ -711,7 +714,7 @@ if ( BUILD_CYTHON )
     )
 else()
     add_custom_target(Cython
-        COMMAND ${PYTHON_EXECUTABLE} -m pip install Cython
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} Cython
         COMMENT "Installing Cython"
     )
 endif()
@@ -767,7 +770,7 @@ if(BUILD_PYQT)
     )
 else()
     add_custom_target(PyQt
-        COMMAND ${PYTHON_EXECUTABLE} -m pip install PyQt5==5.7.1
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} PyQt5==5.7.1
         COMMENT "Installing PyQt5"
     )
 endif()
@@ -869,7 +872,7 @@ if(BUILD_NUMPY)
 else()
     add_custom_target(Numpy
         DEPENDS Cython
-        COMMAND ${PYTHON_EXECUTABLE} -m pip install http://software.ultimaker.com/cura-binary-dependencies/numpy-1.11.3+mkl-cp35-cp35m-win32.whl
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} http://software.ultimaker.com/cura-binary-dependencies/numpy-1.11.3+mkl-cp35-cp35m-win32.whl
         COMMENT "Installing NumPy"
     )
 endif()
@@ -915,7 +918,7 @@ if(BUILD_SCIPY)
     )
 elseif(NOT BUILD_SCIPY_LITE)
     add_custom_target(Scipy
-        COMMAND ${PYTHON_EXECUTABLE} -m pip install http://software.ultimaker.com/cura-binary-dependencies/scipy-0.19.0-cp35-cp35m-win32.whl
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} http://software.ultimaker.com/cura-binary-dependencies/scipy-0.19.0-cp35-cp35m-win32.whl
         COMMENT "Installing SciPy"
     )
 endif()
@@ -1271,7 +1274,7 @@ elseif(BUILD_OS_WINDOWS)
     )
     add_custom_command(
         TARGET build_exe POST_BUILD
-        COMMAND ${PYTHON_EXECUTABLE} -m pip install cx_Freeze
+        COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} cx_Freeze
         COMMENT "Installing cx_Freeze"
     )
     add_custom_command(
