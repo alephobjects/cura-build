@@ -31,7 +31,7 @@ To debug Cura.app, you need the Console open (```open -a Console```) to see stdo
 
 ## Windows
 
-On Windows, the following dependencies are needed for building:
+On Windows, the following dependencies are needed for building( not all for 32-bit builds ):
 
 * **git for windows** (https://git-for-windows.github.io/)
   * The `git` command should be available on your `%PATH%`. Make sure that the `cmd` directory in the git for windows installation directory is on the `%PATH%` and *not* its `bin` directory, otherwise mingw32 will complain about `sh.exe` being on the path.
@@ -52,33 +52,19 @@ On Windows, the following dependencies are needed for building:
   * This project supports Python 3.5.1 except for a bug in cx_Freeze.  Use Python 3.5.2 if possible.
   * You will need the latest version of pip `python -m pip install -U pip`
 * **cx_Freeze**
-  * It will be installed when mingw32-make is run.
-  * There is no need to install it manually.
   * `pip install cx_Freeze`
   * As of 1-26-2017 the latest version of cx_Freeze (5.0.1) does not support Python 3.5.1 without a patch: https://bitbucket.org/anthony_tuininga/cx_freeze/issues/225/cxfreeze-module-dis-has-no-attribute
 * **NumPy** (http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy)
-  * It will be installed when mingw32-make is run.
-  * There is no need to install it manually.
   * __NOTE__: make sure to get the NON-MKL version!
   * __NOTE__: CJ: It looks like this needs MKL, the above link only provides MKL versions, and Ultimaker Cura uses MKL.
 * **SciPy** (http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy)
-  * It will be installed when mingw32-make is run.
-  * There is no need to install it manually.
 * **PySerial** from https://pypi.python.org/pypi/pyserial/3.2.1
-  * It will be installed when mingw32-make is run.
-  * There is no need to install it manually.
   * It can be installed via `pip3 install pyserial`
 * **Py2Exe** (https://pypi.python.org/pypi/py2exe/0.9.2.0/#downloads)
-  * It will be installed when mingw32-make is run.
-  * There is no need to install it manually.
   * The easiest way to install this is to run the command `pip install py2exe`. The executable `build_exe.exe` should now be in your `<python dir>/Scripts` directory. You may have to add `<python dir>/Scripts` to you `%PATH%`.
 * **Numpy-STL** (https://pypi.python.org/pypi/numpy-stl)
-  * It will be installed when mingw32-make is run.
-  * There is no need to install it manually.
   * Also the easiest way to install is via `pip3 install numpy-stl`.
 * **Zeroconf** (https://pypi.python.org/pypi/zeroconf)
-  * It will be installed when mingw32-make is run.
-  * There is no need to install it manually.
   * Again the easiest way to install is via `pip3 install zeroconf`.
 * **Visual C++ 2015 Build Tools (http://landinghub.visualstudio.com/visual-cpp-build-tools)**:
   Go to "custom installation" and choose:
@@ -89,8 +75,6 @@ On Windows, the following dependencies are needed for building:
   * You'll need to add the path to your NSIS folder to your system path. (You don't need to add NSIS/bin)
   * Be sure to include the Language files in the installation.
 * **PyQt 5.7.1**
-  * It will be installed when mingw32-make is run.
-  * There is no need to install it manually.
   * The pip PyQT 5.6 package is missing the needed qml files. PyQT 5.7.1 works. PyQT 5.8.2 is the latest pip package as of this writing
   * and future PyQt pip packages are not guaranteed to work with this project.
   * `pip install pyqt5==5.7.1`
@@ -98,7 +82,17 @@ On Windows, the following dependencies are needed for building:
   * SIP is installed when pip installing PyQT5, the below line is just included for reference.
   * `pip install SIP`
 
+Here's all of the remote pip packages in a single line.  (Run this after installing the manually downloaded scipy and numpy packages)
+```
+pip install pyqt5==5.7.1 py2exe cx_Freeze zeroconf numpy-stl
+```
+
 Make sure these dependencies are available from your path.
+
+For 32-bit builds:
+
+* There is no need to install the following packages: cx_Freeze, NumPy, SciPy, PySerial, Py2Exe, Numpy-STL, Zeroconf, PyQt and SIP.
+* They will be installed when mingw32-make is run.
 
 ```shell
 REM 32-bit

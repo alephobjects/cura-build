@@ -712,10 +712,15 @@ if ( BUILD_CYTHON )
         BUILD_IN_SOURCE 1
     )
 else()
-    add_custom_target(Cython
-        COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} Cython
-        COMMENT "Installing Cython"
-    )
+    if(BUILD_OS_WIN32)
+        add_custom_target(Cython
+            COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} Cython
+            COMMENT "Installing Cython"
+        )
+    else()
+        message(STATUS "---> System Cython will be used")
+        add_custom_target(Cython)
+    endif()
 endif()
 
 if(BUILD_PYQT)
@@ -768,10 +773,15 @@ if(BUILD_PYQT)
         BUILD_IN_SOURCE 1
     )
 else()
-    add_custom_target(PyQt
-        COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} PyQt5==5.7.1
-        COMMENT "Installing PyQt5"
-    )
+    if(BUILD_OS_WIN32)
+        add_custom_target(PyQt
+            COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} PyQt5==5.7.1
+            COMMENT "Installing PyQt5"
+        )
+    else()
+        message(STATUS "---> System PyQt will be used")
+        add_custom_target(PyQt)
+    endif()
 endif()
 
 
@@ -869,11 +879,16 @@ if(BUILD_NUMPY)
         BUILD_IN_SOURCE 1
     )
 else()
-    add_custom_target(Numpy
-        DEPENDS Cython
-        COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} http://software.ultimaker.com/cura-binary-dependencies/numpy-1.11.3+mkl-cp35-cp35m-win32.whl
-        COMMENT "Installing NumPy"
-    )
+    if(BUILD_OS_WIN32)
+        add_custom_target(Numpy
+            DEPENDS Cython
+            COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} http://software.ultimaker.com/cura-binary-dependencies/numpy-1.11.3+mkl-cp35-cp35m-win32.whl
+            COMMENT "Installing NumPy"
+        )
+    else()
+        message(STATUS "---> System NumPy will be used")
+        add_custom_target(Numpy)
+    endif()
 endif()
 
 if (BUILD_SCIPY AND BUILD_SCIPY_LITE)
@@ -916,10 +931,15 @@ if(BUILD_SCIPY)
 	BUILD_IN_SOURCE 1
     )
 elseif(NOT BUILD_SCIPY_LITE)
-    add_custom_target(Scipy
-        COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} http://software.ultimaker.com/cura-binary-dependencies/scipy-0.19.0-cp35-cp35m-win32.whl
-        COMMENT "Installing SciPy"
-    )
+    if(BUILD_OS_WIN32)
+        add_custom_target(Scipy
+            COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} http://software.ultimaker.com/cura-binary-dependencies/scipy-0.19.0-cp35-cp35m-win32.whl
+            COMMENT "Installing SciPy"
+        )
+    else()
+        message(STATUS "---> System SciPy will be used")
+        add_custom_target(Scipy)
+    endif()
 endif()
 
 if (BUILD_SCIPY_LITE)
@@ -1271,11 +1291,15 @@ elseif(BUILD_OS_WINDOWS)
         COMMENT "Cleaning old dist/ directory"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
-    add_custom_command(
-        TARGET build_exe POST_BUILD
-        COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} cx_Freeze
-        COMMENT "Installing cx_Freeze"
-    )
+
+    if(BUILD_OS_WIN32)
+        add_custom_command(
+            TARGET build_exe POST_BUILD
+            COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} cx_Freeze
+            COMMENT "Installing cx_Freeze"
+        )
+    endif()
+
     add_custom_command(
         TARGET build_exe POST_BUILD
         COMMAND ${PYTHON_EXECUTABLE} setup_win32.py build
