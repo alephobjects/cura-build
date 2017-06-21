@@ -13,6 +13,7 @@ source scripts/build_curaengine.sh
 source scripts/build_cura2.sh
 source scripts/build_ultimaker.sh
 source scripts/build_cbd.sh
+source scripts/build_postprocessing_plugin.sh
 
 if [[ "$DIST" == "xenial" ]]; then
   source scripts/build_protobuf.sh
@@ -66,6 +67,9 @@ case $UNIT in
   "cbd")
     build_cbd "$OUT_DIR"
   ;;
+  "postprocessing_plugin")
+  build_postprocessing_plugin
+  ;;
   *)
   echo "Build all..."
     build_libarcus "$GIT_REVISION" "$OUT_DIR" "$DEB_VERSION"
@@ -84,5 +88,6 @@ case $UNIT in
 
     build_ultimaker
     build_cbd "$OUT_DIR"
+    build_postprocessing_plugin
   ;;
 esac
