@@ -16,7 +16,8 @@ brew link openssl --force
 ```
 5. Because Fortran is necessary: *brew install gcc* (Fortran used to be a separate installation but not anymore.  Building gcc can take over 6 hours depending on your computer.)
 6. You may need to run the following to build Qt:
-```cd /Applications/Xcode.app/Contents/Developer/usr/bin/
+```
+cd /Applications/Xcode.app/Contents/Developer/usr/bin/
 sudo ln -s xcodebuild xcrun
 ```
 7. Run these commands from the Cura2Build directory:
