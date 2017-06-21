@@ -48,7 +48,7 @@ On Windows, the following dependencies are needed for building:
       * Build revision := 1
 * **Python** >= 3.5.2 (https://www.python.org/downloads/windows/)
   * Download Python 3.5.2 - Windows x86 web-based installer
-  * Once installed, `root` directory of the installation should be available on your `%PATH%`. 
+  * Once installed, `root` directory of the installation should be available on your `%PATH%`.
   * This project supports Python 3.5.1 except for a bug in cx_Freeze.  Use Python 3.5.2 if possible.
   * You will need the latest version of pip `python -m pip install -U pip`
 * **cx_Freeze**
@@ -94,7 +94,7 @@ Make sure these dependencies are available from your path.
 
 Additionally, for 32-bit builds:
 
-* Perl (http://www.activestate.com/activeperl, Required to build Qt). 
+* Perl (http://www.activestate.com/activeperl, Required to build Qt).
 * Create in the user directory a file named pydistutils.cfg with the following contents:
   * CJ: Not sure what the point of noting the compiler to be mingw32 is when much of the binaries are being compiled by msbuild.  This step may not be needed.
 ```shell
@@ -279,8 +279,8 @@ docker run -e UNIT=<unit-name> -v <host-out-directory>:/out keitaro/alephobjects
 ```
 
 Where:
- * `unit-name` is the name of the library you want to build. Possible values are: *libarcus*, *libsavitar*, *pythonuranium*, *curaengine*, *cura2*, *cbd*, *all*. This would build a
- DEB package for Arcus, Savitar, Uranium, Cura Engine, Cura Binary Data and Cura2 respectively. If no UNIT is given, by default would build all packages.
+ * `unit-name` is the name of the library you want to build. Possible values are: *libarcus*, *libsavitar*, *pythonuranium*, *curaengine*, *cura2*, *cbd*, *postprocessing_plugin*, *doodle3d_plugin* *all*. This would build a
+ DEB package for Arcus, Savitar, Uranium, Cura Engine, Cura Binary Data, Cura2, Cura2 PostProcessing Plugin and Doodle3D Cura Plugin respectively. If no UNIT is given, by default would build all packages.
  * `host-out-directory` is the path to a directory where the generated .deb packages will be generated. This parameter is required - you must specify a host directory where the
  packages will be copied over after building in the container. If you want to generate in you working directory just pass `$(pwd)` as parameter.
 
@@ -347,6 +347,20 @@ These are the available ENV variables that control the builds:
 * ENV CBD_CURA_I18N (Default "ON") - pack internationalization files
 * ENV CBD_URANIUM (Default "ON") - pack uranium internationalization files
 * ENV CBD_PACK_FIRMWARE (Default "all", available values are "all", "lulzbot", "ultimaker") - pack specific firmware. By default it will pack all firmware. If you pass "ultimaker" it will pack only the firmware provided by Ultimaker. If passed "lulzbot" it will pack the firmware that is not provided by Ultimaker.
+
+
+**Cura2 PostProcessing Plugin variables**
+
+ * CURA2_POSTPROCESSING_GIT_REPO (Default https://code.alephobjects.com/source/Cura2-PostProcessing.git) - Cura2 PostProcessing plugin git repository URL.
+ * CURA2_POSTPROCESSING_GIT_REVISION (Default master) - which git revision to build
+ * CURA2_POSTPROCESSING_VERSION - debian package version
+
+
+**Doodle3D Cura plugin variables**
+
+ * CURA2_DOODLE3D_GIT_REPO (Default https://github.com/Doodle3D/Doodle3D-cura-plugin.git) - Doodle3D git repository URL.
+ * CURA2_DOODLE3D_GIT_REVISION (Default master) - which git revision to build.
+ * CURA2_DOODLE3D_VERSION - debian package version
 
 
 **Dependencies versions management**
@@ -470,13 +484,37 @@ The build will generate a DEB package in your current directory.
 Building Cura Binary Data
 =========================
 
-To build Cura2 run the following command:
+To build Cura2 Binary Data run the following command:
 
 ```
 docker run -e UNIT=cbd -v $(pwd):/out keitaro/alephobjects:stretch
 ```
 
 The build will generate a DEB package in your current directory.
+
+
+Building Cura2 PostProcessing plugin
+=========================
+
+To build Cura2 PostProcessing plugin run the following command:
+
+```
+docker run -e UNIT=postprocessing_plugin -v $(pwd):/out keitaro/alephobjects:stretch
+```
+
+The build will generate a DEB package in your current directory.
+
+Building Doodle3D Cura plugin
+=========================
+
+To build Cura2 Doodle3D Cura plugin run the following command:
+
+```
+docker run -e UNIT=doodle3d_plugin -v $(pwd):/out keitaro/alephobjects:stretch
+```
+
+The build will generate a DEB package in your current directory.
+
 
 Building local code
 =============
