@@ -80,19 +80,18 @@ endif()
 
 # Explicitly disable unsupported options
 if(BUILD_OS_WINDOWS)
-    set(BUILD_PYTHON OFF)
-    set(BUILD_QT OFF)
-    set(BUILD_PYQT OFF)
-    set(BUILD_OPENBLAS OFF)
-    set(BUILD_NUMPY OFF)
-    set(BUILD_SCIPY OFF)
-    set(BUILD_CYTHON OFF)
-
     if(BUILD_OS_WIN64)
         # Sip is required to build the Arcus python bindings, which works fine on Win32
         # but fails on Win64. So we need an externally built SIP and Arcus bindings on Win64.
         set(BUILD_SIP OFF)
     else()
+        set(BUILD_PYTHON OFF)
+        set(BUILD_QT OFF)
+        set(BUILD_PYQT OFF)
+        set(BUILD_OPENBLAS OFF)
+        set(BUILD_NUMPY OFF)
+        set(BUILD_SCIPY OFF)
+        set(BUILD_CYTHON OFF)
         set(PYTHONPATH "${CMAKE_CURRENT_BINARY_DIR}/inst/lib/python3.5/site-packages")
     endif()
 elseif(BUILD_OS_LINUX)
