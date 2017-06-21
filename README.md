@@ -46,44 +46,52 @@ On Windows, the following dependencies are needed for building:
       * Threads := posix
       * Exception := dwarf
       * Build revision := 1
-* **Python** >= 3.5.2 (https://www.python.org/downloads/windows/)
+* **Python** = 3.5.2 (https://www.python.org/downloads/windows/)
   * Download Python 3.5.2 - Windows x86 web-based installer
   * Once installed, `root` directory of the installation should be available on your `%PATH%`. 
   * This project supports Python 3.5.1 except for a bug in cx_Freeze.  Use Python 3.5.2 if possible.
   * You will need the latest version of pip `python -m pip install -U pip`
 * **cx_Freeze**
-  * cx_Freeze is installed when running mingw32-make. There is no need to install it manually.
+  * It will be installed when mingw32-make is run.
+  * There is no need to install it manually.
   * `pip install cx_Freeze`
   * As of 1-26-2017 the latest version of cx_Freeze (5.0.1) does not support Python 3.5.1 without a patch: https://bitbucket.org/anthony_tuininga/cx_freeze/issues/225/cxfreeze-module-dis-has-no-attribute
 * **NumPy** (http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy)
-  * NumPy is installed when running mingw32-make. There is no need to install it manually.
+  * It will be installed when mingw32-make is run.
+  * There is no need to install it manually.
   * __NOTE__: make sure to get the NON-MKL version!
   * __NOTE__: CJ: It looks like this needs MKL, the above link only provides MKL versions, and Ultimaker Cura uses MKL.
 * **SciPy** (http://www.lfd.uci.edu/~gohlke/pythonlibs/#scipy)
-  * SciPy is installed when running mingw32-make. There is no need to install it manually.
+  * It will be installed when mingw32-make is run.
+  * There is no need to install it manually.
 * **PySerial** from https://pypi.python.org/pypi/pyserial/3.2.1
-  * PySerial is installed when running mingw32-make. There is no need to install it manually.
+  * It will be installed when mingw32-make is run.
+  * There is no need to install it manually.
   * It can be installed via `pip3 install pyserial`
 * **Py2Exe** (https://pypi.python.org/pypi/py2exe/0.9.2.0/#downloads)
-  * Py2Exe is installed when running mingw32-make. There is no need to install it manually.
+  * It will be installed when mingw32-make is run.
+  * There is no need to install it manually.
   * The easiest way to install this is to run the command `pip install py2exe`. The executable `build_exe.exe` should now be in your `<python dir>/Scripts` directory. You may have to add `<python dir>/Scripts` to you `%PATH%`.
 * **Numpy-STL** (https://pypi.python.org/pypi/numpy-stl)
-  * Numpy-STL is installed when running mingw32-make. There is no need to install it manually.
+  * It will be installed when mingw32-make is run.
+  * There is no need to install it manually.
   * Also the easiest way to install is via `pip3 install numpy-stl`.
 * **Zeroconf** (https://pypi.python.org/pypi/zeroconf)
-  * Zeroconf is installed when running mingw32-make. There is no need to install it manually.
+  * It will be installed when mingw32-make is run.
+  * There is no need to install it manually.
   * Again the easiest way to install is via `pip3 install zeroconf`.
 * **Visual C++ 2015 Build Tools (http://landinghub.visualstudio.com/visual-cpp-build-tools)**:
   Go to "custom installation" and choose:
     * Select features:
       * Windows 10 SDK 10.0.10.240
-* **NSIS 3** (http://nsis.sourceforge.net/Main_Page)
+* **NSIS 3.01** (http://nsis.sourceforge.net/Main_Page)
   * This application is neeeded to create the installer.
   * You'll need to add the path to your NSIS folder to your system path. (You don't need to add NSIS/bin)
   * Be sure to include the Language files in the installation.
 * **PyQt 5.7.1**
-  * PyQt is installed when running mingw32-make. There is no need to install it manually.
-  * The pip PyQT 5.6 package is missing the needed qml files. PyQT 5.7.1 works.PyQT 5.8.2 is the latest pip package as of this writing
+  * It will be installed when mingw32-make is run.
+  * There is no need to install it manually.
+  * The pip PyQT 5.6 package is missing the needed qml files. PyQT 5.7.1 works. PyQT 5.8.2 is the latest pip package as of this writing
   * and future PyQt pip packages are not guaranteed to work with this project.
   * `pip install pyqt5==5.7.1`
 * **SIP**
@@ -91,16 +99,6 @@ On Windows, the following dependencies are needed for building:
   * `pip install SIP`
 
 Make sure these dependencies are available from your path.
-
-Additionally, for 32-bit builds:
-
-* Perl (http://www.activestate.com/activeperl, Required to build Qt). 
-* Create in the user directory a file named pydistutils.cfg with the following contents:
-  * CJ: Not sure what the point of noting the compiler to be mingw32 is when much of the binaries are being compiled by msbuild.  This step may not be needed.
-```shell
-[build]
-compiler=mingw32
-```
 
 ```shell
 REM 32-bit
