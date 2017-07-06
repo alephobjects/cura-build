@@ -30,6 +30,7 @@ option(BUILD_PYTHON_SETUPTOOLS "Include Python SetupTools Library" ON)
 option(BUILD_PYTHON_PACKAGING "Include Python Packaging Library" ON)
 option(BUILD_PYPARSING "Include Python Parsing Library" ON)
 option(BUILD_PYTHON_NOSE "Include Python NOSE Library" ON)
+option(BUILD_MARLIN_FIRMWARES "Build Firmware for 3Dprinters as a part of Cura2 build" OFF)
 
 macro(string_option name info default_value)
     if (${name})
@@ -1107,7 +1108,7 @@ ExternalProject_Add(cura-binary-data
     DEPENDS Python Uranium Savitar
     GIT_REPOSITORY https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git
     GIT_TAG origin/${TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DBUILD_MARLIN_FIRMWARES=${BUILD_MARLIN_FIRMWARES} -DPACK_FIRMWARE="all"
 )
 
 ExternalProject_Add(Cura-Doodle3D
