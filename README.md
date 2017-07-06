@@ -38,7 +38,7 @@ On Windows, the following dependencies are needed for building( not all for 32-b
   * The `git` command should be available on your `%PATH%`. Make sure that the `cmd` directory in the git for windows installation directory is on the `%PATH%` and *not* its `bin` directory, otherwise mingw32 will complain about `sh.exe` being on the path.
 * **CMake** (http://www.cmake.org/)
   * Once CMake is installed make sure it is available on your `%PATH%`. Check this by running `cmake --version` in the Windows console.
-* **MinGW-W64** = 5.3.0 (https://wiki.qt.io/MinGW-64-bit)
+* **MinGW-W64** = 5.3.0 (https://sourceforge.net/projects/mingw-w64/)
   * Once installed, its `bin` directory should be available on your `%PATH%`. Test this by running `mingw32-make --version` in the Windows console.
   * MinGW can be installed on different ways, but these were tested (without guarentees):
     * MinGW w64 installer (32-/64bit): Install the correct target architecture and make sure you choose:
@@ -46,7 +46,7 @@ On Windows, the following dependencies are needed for building( not all for 32-b
       * Architecture := i686 (here for 32bit)
       * Threads := posix
       * Exception := dwarf
-      * Build revision := 1
+      * Build revision := 0
 * **Python** = 3.5.2 (https://www.python.org/downloads/windows/)
   * Download Python 3.5.2 - Windows x86 web-based installer
   * Once installed, `root` directory of the installation should be available on your `%PATH%`.

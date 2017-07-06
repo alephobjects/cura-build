@@ -1068,6 +1068,10 @@ else()
   add_custom_target(Savitar)
 endif()
 
+if(BUILD_OS_WIN32)
+	set(EXTRA_CBD_ARGS -DBUILD_MARLIN_FIRMWARES=OFF)
+	list(APPEND EXTRA_CBD_ARGS -DPACK_FIRMWARE=copy)
+endif()
 
 if(BUILD_OS_WIN64)
     # Due to problems building Python modules on Win64 we currently need to disable building Arcus.
@@ -1104,10 +1108,10 @@ ExternalProject_Add(Cura-PostProcessing
 )
 
 ExternalProject_Add(cura-binary-data
-    DEPENDS Python Uranium Savitar
-    GIT_REPOSITORY https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git
-    GIT_TAG origin/${TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
+	DEPENDS Python Uranium Savitar
+	GIT_REPOSITORY https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git
+	GIT_TAG origin/${TAG_OR_BRANCH}
+	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} ${EXTRA_CBD_ARGS}
 )
 
 ExternalProject_Add(Cura-Doodle3D
