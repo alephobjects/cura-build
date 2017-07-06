@@ -30,6 +30,7 @@ option(BUILD_PYTHON_SETUPTOOLS "Include Python SetupTools Library" ON)
 option(BUILD_PYTHON_PACKAGING "Include Python Packaging Library" ON)
 option(BUILD_PYPARSING "Include Python Parsing Library" ON)
 option(BUILD_PYTHON_NOSE "Include Python NOSE Library" ON)
+option(BUILD_MARLIN_FIRMWARES "Build Firmware for 3Dprinters as a part of Cura2 build" OFF)
 
 macro(string_option name info default_value)
     if (${name})
@@ -1114,14 +1115,6 @@ ExternalProject_Add(cura-binary-data
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} ${EXTRA_CBD_ARGS}
 )
 
-ExternalProject_Add(Cura-Doodle3D
-    DEPENDS Python Uranium Savitar
-    GIT_REPOSITORY https://github.com/Doodle3D/Doodle3D-cura-plugin
-    GIT_TAG origin/master
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
-)
-
-
 ExternalProject_Add(fdm_materials
     DEPENDS Python Uranium Savitar
     GIT_REPOSITORY https://github.com/ultimaker/fdm_materials
@@ -1130,7 +1123,7 @@ ExternalProject_Add(fdm_materials
 )
 
 ExternalProject_Add(Cura
-    DEPENDS Uranium CuraEngine Savitar NumpySTL PythonTyping PySerial PythonZeroconf Scipy Numpy PythonNetifaces fdm_materials Cura-Doodle3D cura-binary-data Cura-PostProcessing PythonSix
+    DEPENDS Uranium CuraEngine Savitar NumpySTL PythonTyping PySerial PythonZeroconf Scipy Numpy PythonNetifaces fdm_materials cura-binary-data Cura-PostProcessing PythonSix
     GIT_REPOSITORY ${CURA_URL}
     GIT_TAG origin/${CURA_TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} -DURANIUM_SCRIPTS_DIR= -DCURA_VERSION=${CURA_VERSION} -DCMAKE_MODULE_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/

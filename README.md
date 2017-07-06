@@ -273,8 +273,8 @@ docker run -e UNIT=<unit-name> -v <host-out-directory>:/out keitaro/alephobjects
 ```
 
 Where:
- * `unit-name` is the name of the library you want to build. Possible values are: *libarcus*, *libsavitar*, *pythonuranium*, *curaengine*, *cura2*, *cbd*, *postprocessing_plugin*, *doodle3d_plugin* *all*. This would build a
- DEB package for Arcus, Savitar, Uranium, Cura Engine, Cura Binary Data, Cura2, Cura2 PostProcessing Plugin and Doodle3D Cura Plugin respectively. If no UNIT is given, by default would build all packages.
+ * `unit-name` is the name of the library you want to build. Possible values are: *libarcus*, *libsavitar*, *pythonuranium*, *curaengine*, *cura2*, *cbd*, *postprocessing_plugin*, *all*. This would build a
+ DEB package for Arcus, Savitar, Uranium, Cura Engine, Cura Binary Data, Cura2 and Cura2 PostProcessing Plugin respectively. If no UNIT is given, by default would build all packages.
  * `host-out-directory` is the path to a directory where the generated .deb packages will be generated. This parameter is required - you must specify a host directory where the
  packages will be copied over after building in the container. If you want to generate in you working directory just pass `$(pwd)` as parameter.
 
@@ -348,13 +348,6 @@ These are the available ENV variables that control the builds:
  * CURA2_POSTPROCESSING_GIT_REPO (Default https://code.alephobjects.com/source/Cura2-PostProcessing.git) - Cura2 PostProcessing plugin git repository URL.
  * CURA2_POSTPROCESSING_GIT_REVISION (Default master) - which git revision to build
  * CURA2_POSTPROCESSING_VERSION - debian package version
-
-
-**Doodle3D Cura plugin variables**
-
- * CURA2_DOODLE3D_GIT_REPO (Default https://github.com/Doodle3D/Doodle3D-cura-plugin.git) - Doodle3D git repository URL.
- * CURA2_DOODLE3D_GIT_REVISION (Default master) - which git revision to build.
- * CURA2_DOODLE3D_VERSION - debian package version
 
 
 **Dependencies versions management**
@@ -494,17 +487,6 @@ To build Cura2 PostProcessing plugin run the following command:
 
 ```
 docker run -e UNIT=postprocessing_plugin -v $(pwd):/out keitaro/alephobjects:stretch
-```
-
-The build will generate a DEB package in your current directory.
-
-Building Doodle3D Cura plugin
-=========================
-
-To build Cura2 Doodle3D Cura plugin run the following command:
-
-```
-docker run -e UNIT=doodle3d_plugin -v $(pwd):/out keitaro/alephobjects:stretch
 ```
 
 The build will generate a DEB package in your current directory.
