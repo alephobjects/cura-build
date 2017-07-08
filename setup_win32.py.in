@@ -13,6 +13,7 @@ import re
 import shutil
 import site
 import Arcus
+import Savitar
 import scipy
 import numpy
 import numpy.core
@@ -67,11 +68,13 @@ includes = [
     "PyQt5._QOpenGLFunctions_2_0",
     "serial",
     "Arcus",
+    "Savitar",
     "xml.etree",
     "xml.etree.ElementTree",
     "cura",
     "cura.OneAtATimeIterator",
     "zeroconf",
+    "stl",
     "numpy.core._methods",
     "numpy.lib.format"
 ]
