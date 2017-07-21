@@ -140,7 +140,8 @@ unset(CURA_EXTRA_VERSION CACHE)
 if(DEFINED ENV{CURA_EXTRA_VERSION})
     set(CURA_EXTRA_VERSION $ENV{CURA_EXTRA_VERSION} CACHE STRING "Cura Extra Version Information" FORCE)
 else()
-    set(CURA_EXTRA_VERSION "${CURA_TAG_OR_BRANCH}" CACHE STRING "Cura Extra Version Information")
+#    set(CURA_EXTRA_VERSION "${CURA_TAG_OR_BRANCH}" CACHE STRING "Cura Extra Version Information")
+    set(CURA_EXTRA_VERSION "" CACHE STRING "Cura Extra Version Information")
 endif()
 
 set(CURA_VERSION "${CURA_MAJOR_VERSION}.${CURA_MINOR_VERSION}.${CURA_PATCH_VERSION}")
@@ -1001,7 +1002,8 @@ if(BUILD_NUMPY_STL )
 #        URL https://github.com/WoLpH/numpy-stl/archive/v1.9.0.tar.gz
 #        URL_MD5 cda2531edecff4468a4bbe78c6a2833b
         GIT_REPOSITORY https://github.com/WoLpH/numpy-stl.git
-        GIT_TAG origin/master
+#        GIT_TAG origin/master
+	GIT_TAG 64190e4b4e88a95d38849636f5aad4e0da25af08
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_numpystl}
         INSTALL_COMMAND ${install_numpystl}
