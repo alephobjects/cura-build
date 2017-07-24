@@ -15,10 +15,11 @@ def get_curabuild_commit_hash(cmake_binary_dir):
 def generate(cura_version, cmake_binary_dir, target_dir):
     data = {
         "cura_version": cura_version,
-	"cura": get_commit_hash("Cura", cmake_binary_dir),
+        "cura": get_commit_hash("Cura", cmake_binary_dir),
         "uranium": get_commit_hash("Uranium", cmake_binary_dir),
         "engine": get_commit_hash("CuraEngine", cmake_binary_dir),
         "libarcus": get_commit_hash("Arcus", cmake_binary_dir),
+        "libsavitar": get_commit_hash("Savitar", cmake_binary_dir),
         "binarydata":get_commit_hash("cura-binary-data", cmake_binary_dir),
 	"build": get_curabuild_commit_hash(cmake_binary_dir)
     }
