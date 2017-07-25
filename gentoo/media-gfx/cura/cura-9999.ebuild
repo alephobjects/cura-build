@@ -6,7 +6,7 @@ inherit cmake-utils git-r3 fdo-mime gnome2-utils python-single-r1
 DESCRIPTION="A 3D model slicing application for 3D printing"
 HOMEPAGE="https://code.alephobjects.com/source/Cura2/"
 EGIT_REPO_URI="https://code.alephobjects.com/source/Cura2.git"
-EGIT_BRANCH="devel"
+EGIT_BRANCH="master"
 
 LICENSE="AGPL-3+"
 SLOT="0"

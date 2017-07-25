@@ -6,7 +6,7 @@ inherit cmake-utils git-r3 python-single-r1
 DESCRIPTION="A Python framework for building 3D printing related applications"
 HOMEPAGE="https://code.alephobjects.com/diffusion/U/"
 EGIT_REPO_URI="https://code.alephobjects.com/diffusion/U/uranium.git"
-EGIT_BRANCH="devel"
+EGIT_BRANCH="master"
 KEYWORDS="~amd64 ~x86"
 
 LICENSE="AGPL-3+"
