@@ -536,10 +536,10 @@ message(STATUS "---> Python Install: ${python_install}")
 # We should not need it, leaving here just in case
 # Apparently Six is required for OctoPrint plugin :(
 if(BUILD_PYTHONSIX)
-    set(build_python_six ${PYTHON_EXECUTABLE} setup.py build)
+    set(build_python_six ${PYTHON_EXECUTABLE} setup.py sdist)
     # --single-version-externally-managed
     set(install_python_six ${PYTHON_EXECUTABLE} setup.py setopt --command=easy_install --option=zip-ok --set-value=False)
-    list(APPEND install_python_six COMMAND ${PYTHON_EXECUTABLE} setup.py install --verbose ${python_install})
+    list(APPEND install_python_six COMMAND ${PYTHON_EXECUTABLE} setup.py install --verbose ${python_install} --single-version-externally-managed)
     message(STATUS "---> PythonSix Build: ${build_python_six}")
     message(STATUS "---> PythonSix Install: ${install_python_six}")
     ExternalProject_Add(PythonSix
