@@ -96,15 +96,9 @@ if(BUILD_OS_WINDOWS)
         set(PYTHONPATH "${CMAKE_CURRENT_BINARY_DIR}/inst/lib/python3.5/site-packages")
     endif()
 elseif(BUILD_OS_LINUX)
-    # set(BUILD_PYTHON OFF)
 	set(BUILD_TYPING OFF)
 elseif(BUILD_OS_OSX)
-    # set(BUILD_PYTHON OFF)
 	set(BUILD_TYPING OFF)
-# Turning NumPy/SciPy off for now
-#    set(BUILD_NUMPY OFF)
-#    set(BUILD_SCIPY OFF)
-#    set(BUILD_NUMPY_STL OFF)
 endif()
 
 set(TAG_OR_BRANCH "master" CACHE STRING "The name of the tag or branch to build")
@@ -140,7 +134,6 @@ unset(CURA_EXTRA_VERSION CACHE)
 if(DEFINED ENV{CURA_EXTRA_VERSION})
     set(CURA_EXTRA_VERSION $ENV{CURA_EXTRA_VERSION} CACHE STRING "Cura Extra Version Information" FORCE)
 else()
-#    set(CURA_EXTRA_VERSION "${CURA_TAG_OR_BRANCH}" CACHE STRING "Cura Extra Version Information")
     set(CURA_EXTRA_VERSION "" CACHE STRING "Cura Extra Version Information")
 endif()
 
@@ -173,7 +166,6 @@ if(BUILD_PYTHON)
     endif()
     set(PYTHON_VERSION_MAJOR 3)
     set(PYTHON_VERSION_MINOR 5)
-    #if(BUILD_OS_WINDOWS OR BUILD_OS_LINUX )
     # For now let's leave only WINDOWS with 3.5.2
     if(BUILD_OS_WINDOWS)
        set(PYTHON_VERSION_PATCH 2)
@@ -185,7 +177,6 @@ if(BUILD_PYTHON)
     set(Python_ADDITIONAL_VERSIONS ${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR})
     set(PYTHONINTERP_FOUND True)
 
-    # if(BUILD_OS_WINDOWS OR BUILD_OS_LINUX )
     if(BUILD_OS_WINDOWS)
        set(PYTHON_LIBRARY ${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libpython${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}m.so)
     else()
@@ -230,7 +221,6 @@ if(BUILD_PYTHON)
             ${pythonpatch_destination_path}\\patch.exe )
 
         ExternalProject_Add(PythonPatch
-#            OUTPUT ${EXTERNALPROJECT_INSTALL_PREFIX}\\bin\\patch.exe
             URL https://downloads.sourceforge.net/project/gnuwin32/patch/2.5.9-7/patch-2.5.9-7-bin.zip
             CONFIGURE_COMMAND ${pythonpatch_configure_command}
             BUILD_COMMAND ""
@@ -243,7 +233,6 @@ if(BUILD_PYTHON)
         add_custom_target(PythonPatch)
     endif()         
 
-    # if(BUILD_OS_WINDOWS OR BUILD_OS_LINUX )
     # For now let's switch WIN to CMAKE Python only
     if(BUILD_OS_WINDOWS) 
       # We'll need to find OpenSSL
@@ -415,7 +404,6 @@ if(BUILD_QT)
     list(APPEND qt_options -no-cups -no-sql-db2 -no-sql-ibase -no-sql-mysql)
     list(APPEND qt_options -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2)
     list(APPEND qt_options -no-sql-tds -no-openssl -qt-pcre)
-#    list(APPEND qt_options -dbus-linked)
     if(BUILD_OS_LINUX OR BUILD_OS_OSX) 
         list(APPEND qt_options -no-eglfs)
     endif()
@@ -424,13 +412,8 @@ if(BUILD_QT)
     list(APPEND qt_options -skip qtwebchannel -skip qtwebengine -skip qtwebsockets)
     list(APPEND qt_options -skip qtandroidextras -skip qtactiveqt -skip qttools -skip qtxmlpatterns)
     list(APPEND qt_options -skip qt3d -skip qtcanvas3d -skip qtserialport -skip qtwayland)
-# AVD: These were for 5.5.1
-#    list(APPEND qt_options -skip qtquick1)
-#    list(APPEND qt_options -skip qtwebkit -skip qtwebkit-examples)
-# AVD: Added these for 5.6.2
     list(APPEND qt_options -skip qtwebview )
     list(APPEND qt_options -skip qtquickcontrols2)
-#    list(APPEND qt_options -skip qtquickcontrols)
     list(APPEND qt_options -skip qtgraphicaleffects)
     list(APPEND qt_options -skip qtserialbus)
 
@@ -440,15 +423,12 @@ if(BUILD_QT)
     if(BUILD_OS_OSX)
         list(APPEND qt_options -no-framework)
 	list(APPEND qt_options -skip qtwinextras -skip qtx11extras)
-	# list(APPEND qt_options -skip qtmacextras)
     elseif(BUILD_OS_WINDOWS)
         list(APPEND qt_options -opengl desktop)
 	list(APPEND qt_options -skip qtx11extras -skip qtmacextras)
-	# list(APPEND qt_options -skip qtwinextras)
     elseif(BUILD_OS_LINUX)
         list(APPEND qt_options -no-rpath -qt-xcb)
 	list(APPEND qt_options -skip qtmacextras -skip qtwinextras)
-	# list(APPEND qt_options -skip qtx11extras)
     endif()
 
     if(BUILD_OS_WINDOWS)
@@ -552,7 +532,9 @@ if(BUILD_PYTHONSIX)
     )
 else()
     message(STATUS "---> System PythonSix will be used")
-    add_custom_target(PythonSix)
+    add_custom_target(PythonSix
+        DEPENDS Python
+    )
 endif()
 
 if(BUILD_PYPARSING)
@@ -571,7 +553,9 @@ if(BUILD_PYPARSING)
     )
 else()
     message(STATUS "---> System PyParsing will be used")
-    add_custom_target(PyParsing)
+    add_custom_target(PyParsing
+        DEPENDS Python
+    )
 endif()
 
 if(BUILD_PYTHON_PACKAGING)
@@ -595,7 +579,9 @@ if(BUILD_PYTHON_PACKAGING)
     )
 else()
     message(STATUS "---> System PythonPackaging will be used")
-    add_custom_target(PythonPackaging)
+    add_custom_target(PythonPackaging
+        DEPENDS Python PythonSix PyParsing
+    )
 endif()
 
 if(BUILD_APPDIRS)
@@ -615,7 +601,9 @@ if(BUILD_APPDIRS)
     )
 else()
     message(STATUS "---> System AppDirs will be used")
-    add_custom_target(PythonAppDirs)
+    add_custom_target(PythonAppDirs
+        DEPENDS Python
+    )
 endif()
 
 if(BUILD_PYTHON_SETUPTOOLS)
@@ -634,7 +622,9 @@ if(BUILD_PYTHON_SETUPTOOLS)
     )
 else()
     message(STATUS "---> System PythonSetupTools will be used")
-    add_custom_target(PythonSetupTools)
+    add_custom_target(PythonSetupTools
+        DEPENDS Python PythonPackaging PythonSix PyParsing PythonAppDirs
+    )
 endif()
 
 if(BUILD_PYTHON_UTILS)
@@ -656,7 +646,9 @@ if(BUILD_PYTHON_UTILS)
     )
 else()
     message(STATUS "---> System PythonUtils will be used")
-    add_custom_target(PythonUtils)
+    add_custom_target(PythonUtils
+        DEPENDS Python PythonSetupTools
+    )
 endif()
 
 if(BUILD_NETIFACES)
@@ -674,7 +666,9 @@ if(BUILD_NETIFACES)
     )
 else()
     message(STATUS "---> System NetIfaces will be used")
-    add_custom_target(PythonNetifaces)
+    add_custom_target(PythonNetifaces
+        DEPENDS Python PythonAppDirs PythonUtils
+    )
 endif()
 
 if(BUILD_ZEROCONF)
@@ -693,7 +687,9 @@ if(BUILD_ZEROCONF)
     )
 else()
     message(STATUS "---> System ZeroConf will be used")
-    add_custom_target(PythonZeroconf)
+    add_custom_target(PythonZeroconf
+        DEPENDS PythonNetifaces
+    )
 endif()
 
 if ( BUILD_CYTHON )
@@ -721,7 +717,9 @@ else()
         )
     else()
         message(STATUS "---> System Cython will be used")
-        add_custom_target(Cython)
+        add_custom_target(Cython
+            DEPENDS Python Sip PythonAppDirs PythonSetupTools
+        )
     endif()
 endif()
 
@@ -732,43 +730,29 @@ if(BUILD_PYQT)
     list(APPEND pyqt_command --bindir=${EXTERNALPROJECT_INSTALL_PREFIX}/bin)
     list(APPEND pyqt_command --sipdir=${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip)
     list(APPEND pyqt_command --stubsdir=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
-#    list(APPEND pyqt_command  --no-stubs)
     list(APPEND pyqt_command --verbose)
     list(APPEND pyqt_command --no-python-dbus)
     list(APPEND pyqt_command --no-designer-plugin)
     if(BUILD_OS_WINDOWS)
         list(APPEND pyqt_command --static )
-#        list(APPEND pyqt_command --link-full-dll)
         list(APPEND pyqt_command --target-py-version=3.5 )
         list(APPEND pyqt_command --spec win32-g++)
         list(APPEND pyqt_command --sip ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/sip.exe)
         list(APPEND pyqt_command --qmake=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/qmake.exe)
-# Flags: -DPy_TRACE_DEFS -DMS_WIN32 -D_hypot=hypot -DPy_TRACE_DEFS
         list(APPEND pyqt_command QMAKE_CFLAGS+="-m32 -fPIC -D_hypot=hypot -std=c++11 -static-libstdc++")
         list(APPEND pyqt_command QMAKE_CXXFLAGS+="-m32 -fPIC -D_hypot=hypot -std=c++11 -static-libstdc++")
         list(APPEND pyqt_command QMAKE_LFLAGS+="-LC:/Python35 -LC:/Python35/libs -lpython35")
-#        list(APPEND pyqt_command CFLAGS+="-D_hypot=hypot")
-#        list(APPEND pyqt_command CPPFLAGS+="-D_hypot=hypot")
-#        list(APPEND pyqt_command CXXFLAGS+="-D_hypot=hypot")
     elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
 	list(APPEND pyqt_command --sip=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/sip)
 	list(APPEND pyqt_command --qmake=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/qmake)
     endif()
 
-    # This patches the PyQt 5.4.2 source code to remove the "disconnectNotify" method from QPyQmlObject.
-    # This fixes a deadlock that could randomly occur when deleting QML items.
-    # This workaround should be removed as soon as a new stable release of PyQt is available that includes the fix.
-    #    set(pyqt_patch
-    #        patch qpy/QtQml/qpyqmlobject.cpp ${CMAKE_SOURCE_DIR}/qpyqmlobject.cpp.patch && 
-    #        patch qpy/QtQml/qpyqmlobject.h ${CMAKE_SOURCE_DIR}/qpyqmlobject.h.patch
-    #    )
     if(BUILD_OS_WINDOWS)
        string(REPLACE "/" "\\" pyqt_command "${pyqt_command}")
     endif()
     message(STATUS "---> PyQt config: ${pyqt_command}")
     ExternalProject_Add(PyQt
         DEPENDS Python Qt Sip
-#        URL http://downloads.sourceforge.net/project/pyqt/PyQt5/PyQt-5.5.1/PyQt-gpl-5.5.1.tar.gz
         URL https://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.8.1/PyQt5_gpl-5.8.1.tar.gz/download
 #        PATCH_COMMAND ${pyqt_patch}
         CONFIGURE_COMMAND ${pyqt_command}
@@ -777,15 +761,17 @@ if(BUILD_PYQT)
 else()
     if(BUILD_OS_WIN32)
         add_custom_target(PyQt
+            DEPENDS Python Qt Sip
             COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} PyQt5==5.7.1
             COMMENT "Installing PyQt5"
         )
     else()
         message(STATUS "---> System PyQt will be used")
-        add_custom_target(PyQt)
+        add_custom_target(PyQt
+            DEPENDS Python Qt Sip
+        )
     endif()
 endif()
-
 
 
 if(BUILD_OPENBLAS)
@@ -796,7 +782,6 @@ if(BUILD_OPENBLAS)
     # Let's Use the git untill we have next release
     message(STATUS "---> OpenBLAS config: ${openblas_options}")
     ExternalProject_Add(OpenBLAS
-#	DEPENDS 
         # URL https://github.com/xianyi/OpenBLAS/archive/v0.2.19.tar.gz
 	GIT_REPOSITORY git://github.com/xianyi/OpenBLAS.git
 	GIT_TAG 20a413e154948d8b7fc47e7a6d9f13cae98e3856
@@ -827,7 +812,9 @@ if(BUILD_PYTHON_NOSE)
     )
 else()
     message(STATUS "---> System PythonNose will be used")
-    add_custom_target(PythonNose)
+    add_custom_target(PythonNose
+        DEPENDS Python PythonSetupTools
+    )
 endif()
 
 if(BUILD_NUMPY)
@@ -839,16 +826,6 @@ if(BUILD_NUMPY)
         list(APPEND build_numpy build_ext --compiler=unix --fcompiler=gnu95 )
 
         list(APPEND envvar_numpy CC=gcc CXX=g++ F90=gfortran)
-
- #       set(envvar_numpy_opt 	"-DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes")
- #       set(envvar_numpy_fopt 	"-DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes")
- #       set(envvar_numpy_cflags	"-O3 -fPIC -Wall -Wstrict-prototypes -DNDEBUG -g -fwrapv -g -fstack-protector-strong")
- #       set(envvar_numpy_cppflags	"-O3 -fPIC" )
- #       set(envvar_numpy_f90flags	"-O3 -fPIC" )
- #       set(envvar_numpy_cc	"gcc -pthread" )
- #       set(envvar_numpy_cxx	"g++ -pthread" )
- #       set(envvar_numpy_f90	"gfortran" )
- #       set(envvar_numpy_ldflags	"-Wl,-z,relro")
     elseif (BUILD_OS_OSX)
         list(APPEND build_numpy config )
         list(APPEND build_numpy build_clib ) 
@@ -862,8 +839,6 @@ if(BUILD_NUMPY)
         list(APPEND build_numpy --compiler=mingw32  )
 	list(APPEND build_numpy --fcompiler=gnu95 )
         list(APPEND build_numpy --inplace )
-#        list(APPEND build_numpy --define=__MSVCRT_VERSION__=0x1600 )
-#        list(APPEND build_numpy --undef=__MSVCRT_VERSION__ )
     endif()
 #    set(install_numpy ${PYTHON_EXECUTABLE} setup.py install --prefix ${EXTERNALPROJECT_INSTALL_PREFIX})
     set(install_numpy ${PYTHON_EXECUTABLE} setup.py install --single-version-externally-managed ${python_install})
@@ -883,13 +858,15 @@ if(BUILD_NUMPY)
 else()
     if(BUILD_OS_WIN32)
         add_custom_target(Numpy
-            DEPENDS Cython
+            DEPENDS Python OpenBLAS Sip Cython PythonSetupTools PythonNose
             COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} http://software.ultimaker.com/cura-binary-dependencies/numpy-1.11.3+mkl-cp35-cp35m-win32.whl
             COMMENT "Installing NumPy"
         )
     else()
         message(STATUS "---> System NumPy will be used")
-        add_custom_target(Numpy)
+        add_custom_target(Numpy
+            DEPENDS Python OpenBLAS Sip Cython PythonSetupTools PythonNose
+        )
     endif()
 endif()
 
@@ -935,12 +912,15 @@ if(BUILD_SCIPY)
 elseif(NOT BUILD_SCIPY_LITE)
     if(BUILD_OS_WIN32)
         add_custom_target(Scipy
+            DEPENDS Python PythonUtils Numpy PythonSix PythonPackaging
             COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} http://software.ultimaker.com/cura-binary-dependencies/scipy-0.19.0-cp35-cp35m-win32.whl
             COMMENT "Installing SciPy"
         )
     else()
         message(STATUS "---> System SciPy will be used")
-        add_custom_target(Scipy)
+        add_custom_target(Scipy
+            DEPENDS Python PythonUtils Numpy PythonSix PythonPackaging
+        )
     endif()
 endif()
 
@@ -990,7 +970,9 @@ if(BUILD_PYSERIAL)
     )
 else()
     message(STATUS "---> System PySerial will be used")
-    add_custom_target(PySerial)
+    add_custom_target(PySerial
+        DEPENDS Python
+    )
 endif()
 
 if(BUILD_NUMPY_STL )
@@ -1000,10 +982,7 @@ if(BUILD_NUMPY_STL )
     message(STATUS "---> NumpySTL Install: ${install_numpystl}")
     ExternalProject_Add(NumpySTL
         DEPENDS Python Numpy PythonUtils
-#        URL https://github.com/WoLpH/numpy-stl/archive/v1.9.0.tar.gz
-#        URL_MD5 cda2531edecff4468a4bbe78c6a2833b
         GIT_REPOSITORY https://github.com/WoLpH/numpy-stl.git
-#        GIT_TAG origin/master
 	GIT_TAG 64190e4b4e88a95d38849636f5aad4e0da25af08
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_numpystl}
@@ -1012,7 +991,9 @@ if(BUILD_NUMPY_STL )
     )
 else()
     message(STATUS "---> System NumpySTL will be used")
-    add_custom_target(NumpySTL)
+    add_custom_target(NumpySTL
+        DEPENDS Python Numpy PythonUtils
+    )
 endif()
 
 if(BUILD_TYPING)
@@ -1034,7 +1015,9 @@ if(BUILD_TYPING)
     )
 else()
     message(STATUS "---> System PythonTyping will be used")
-    add_custom_target(PythonTyping)
+    add_custom_target(PythonTyping
+        DEPENDS Python
+    )
 endif()
 
 if(BUILD_OS_OSX)
@@ -1068,8 +1051,10 @@ if(BUILD_SAVITAR)
 # ${EXTRA_PYTHON_DEFINES}
   )
 else()
-  message(STATUS "---> Savitar will not be build")
-  add_custom_target(Savitar)
+    message(STATUS "---> Savitar will not be build")
+    add_custom_target(Savitar
+        DEPENDS Python Sip Numpy
+    )
 endif()
 
 if(BUILD_OS_WIN32)
@@ -1390,29 +1375,6 @@ elseif(BUILD_OS_LINUX)
     # Removing files, that are not needed for runtime
     # From bin dir
     set(CPACK_IGNORE_FILES "")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/qml.*")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/.*\\.pl")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/uic")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/sip")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/rcc")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/qmake")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/qlalr")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/py.*5")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/qdbus")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/protoc")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/bin/moc")
-    # From lib dir
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/.*\\.a")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/.*\\.la")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/.*\\.prl")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/cmake")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/mkspecs")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/lib/pkgconfig")
-    # From share dir
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/share/cmake-.*")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/share/doc")
-    #list(APPEND CPACK_IGNORE_FILES "${CMAKE_BINARY_DIR}/inst/share/sip")
-    
 endif()
 
 message("CPACK_PACKAGE_VERSION_MAJOR ${CURA_MAJOR_VERSION}")
@@ -1425,8 +1387,8 @@ set(CPACK_PACKAGE_VERSION_MAJOR ${CURA_MAJOR_VERSION})
 set(CPACK_PACKAGE_VERSION_MINOR ${CURA_MINOR_VERSION})
 set(CPACK_PACKAGE_VERSION_PATCH ${CURA_PATCH_VERSION})
 set(CPACK_PACKAGE_VERSION ${CURA_VERSION})
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cura2 3D Printing Software")
-set(CPACK_PACKAGE_CONTACT "Arjen Hiemstra <a.hiemstra@ultimaker.com>")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cura2 3D Printing Software Lulzbot Edition")
+set(CPACK_PACKAGE_CONTACT "Aleph Objects <info@alephobjects.com>")
 if(NOT BUILD_OS_OSX)
     set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE)
 endif()
@@ -1457,8 +1419,8 @@ set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 set(CPACK_NSIS_EXECUTABLES_DIRECTORY ".")
 set(CPACK_NSIS_MUI_FINISHPAGE_RUN "Cura2.exe")
 set(CPACK_NSIS_MENU_LINKS
-    "https://ultimaker.com/en/support/software" "Cura Online Documentation"
-    "https://github.com/ultimaker/cura" "Cura Development Resources"
+#    "https://ultimaker.com/en/support/software" "Cura Online Documentation"
+    "https://https://code.alephobjects.com/project/profile/10" "Cura Development Resources"
 )
 if(BUILD_OS_WIN32)
     set(CPACK_NSIS_PACKAGE_ARCHITECTURE "32")
