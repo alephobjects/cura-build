@@ -1095,7 +1095,7 @@ ExternalProject_Add(Cura-PostProcessing
     DEPENDS Python Uranium Savitar
     #GIT_REPOSITORY https://github.com/nallath/PostProcessingPlugin
     GIT_REPOSITORY https://code.alephobjects.com/source/Cura2-PostProcessing.git
-    GIT_TAG origin/master
+    GIT_TAG origin/${CURA_TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
 )
 
