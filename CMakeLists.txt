@@ -377,15 +377,12 @@ endif()
 
 
 if(BUILD_QT)
-    if(BUILD_OS_WINDOWS)
-       # set(qt_url http://download.qt.io/archive/qt/5.6/5.6.2/single/qt-everywhere-opensource-src-5.6.2.zip)
-       # set(qt_md5 b684a2f37b1beebd421b3b7d1eca15dc)
-       set(qt_url http://download.qt.io/archive/qt/5.6/5.6.2/single/qt-everywhere-opensource-src-5.6.2.tar.gz)
-       set(qt_md5 1b1b1f929d0cd83680354a0c83d8e945)
-    else()
-       set(qt_url http://download.qt.io/archive/qt/5.6/5.6.2/single/qt-everywhere-opensource-src-5.6.2.tar.gz)
-       set(qt_md5 1b1b1f929d0cd83680354a0c83d8e945)
-    endif()
+    # set(qt_url http://download.qt.io/archive/qt/5.6/5.6.2/single/qt-everywhere-opensource-src-5.6.2.tar.gz)
+    # set(qt_md5 1b1b1f929d0cd83680354a0c83d8e945)
+    #set(qt_url http://download.qt.io/archive/qt/5.9/5.9.1/single/qt-everywhere-opensource-src-5.9.1.tar.xz)
+    #set(qt_md5 77b4af61c49a09833d4df824c806acaf)
+    set(qt_url http://download.lulzbot.com/Software/Cura2/build-resources/qt-everywhere-opensource-src-5.9.1.tar.gz)
+    set(qt_md5 e2a13e5a80372e814da08e8b15998a79)
 
     if(BUILD_OS_WINDOWS)
        set(qt_options configure.bat )
@@ -403,7 +400,10 @@ if(BUILD_QT)
     list(APPEND qt_options -nomake examples -nomake tests -nomake tools )
     list(APPEND qt_options -no-cups -no-sql-db2 -no-sql-ibase -no-sql-mysql)
     list(APPEND qt_options -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2)
-    list(APPEND qt_options -no-sql-tds -no-openssl -qt-pcre)
+    list(APPEND qt_options -no-sql-tds )
+# It seems like we'll need SSL for Cura2 plugins (Octoprint is using PyQt5.QtNetwork for example)
+#    list(APPEND qt_options -no-openssl )
+    list(APPEND qt_options -qt-pcre)
     if(BUILD_OS_LINUX OR BUILD_OS_OSX) 
         list(APPEND qt_options -no-eglfs)
     endif()
@@ -416,9 +416,20 @@ if(BUILD_QT)
     list(APPEND qt_options -skip qtquickcontrols2)
     list(APPEND qt_options -skip qtgraphicaleffects)
     list(APPEND qt_options -skip qtserialbus)
+    # Adding these to skip for Qt5.9
+    list(APPEND qt_options -skip qtcharts)
+    list(APPEND qt_options -skip qtdatavis3d)
+    list(APPEND qt_options -skip qtgamepad)
+#    list(APPEND qt_options -skip qtnetworkauth)
+    list(APPEND qt_options -skip qtpurchasing)
+    list(APPEND qt_options -skip qtremoteobjects)
+    list(APPEND qt_options -skip qtspeech)
+    list(APPEND qt_options -skip qtvirtualkeyboard)
+    
+    
 
 # Following are not disabled:
-# qtimageformats coin gnuwin32 qtbase qtdeclarative qtsvg qttranslations
+# qtimageformats coin gnuwin32 qtbase qtdeclarative qtsvg qttranslations qtquickcontrols
 
     if(BUILD_OS_OSX)
         list(APPEND qt_options -no-framework)
@@ -462,8 +473,9 @@ if(BUILD_SIP)
 #	list(APPEND sip_command CXXFLAGS+="-DPy_TRACE_DEFS")
     endif()
 
-    set(SIP_VERSION 0x041301)
-    set(SIP_VERSION_STR 4.19.1 )
+    # set(SIP_VERSION 0x041301)
+    # set(SIP_VERSION_STR 4.19.1 )
+    set(SIP_VERSION_STR 4.19.3 )
     # set(SIP_VERSION_NUM )
     set(SIP_BINARY_PATH ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/sip )
     set(SIP_DEFAULT_SIP_DIR ${EXTERNALPROJECT_INSTALL_PREFIX}/share/sip )
@@ -753,7 +765,8 @@ if(BUILD_PYQT)
     message(STATUS "---> PyQt config: ${pyqt_command}")
     ExternalProject_Add(PyQt
         DEPENDS Python Qt Sip
-        URL https://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.8.1/PyQt5_gpl-5.8.1.tar.gz/download
+#        URL https://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.8.1/PyQt5_gpl-5.8.1.tar.gz/download
+	URL https://sourceforge.net/projects/pyqt/files/PyQt5/PyQt-5.9/PyQt5_gpl-5.9.tar.gz/download
 #        PATCH_COMMAND ${pyqt_patch}
         CONFIGURE_COMMAND ${pyqt_command}
         BUILD_IN_SOURCE 1
