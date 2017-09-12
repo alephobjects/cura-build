@@ -1045,7 +1045,7 @@ if(BUILD_OS_OSX)
     set(protobuf_cxx_flags "-fPIC -std=c++11 -stdlib=libc++")
 elseif(BUILD_OS_WINDOWS)
     # All of the code is PIC on Windows, so -fPIC produces just the bug
-    set(protobuf_cxx_flags "-fPIC -std=c++11 -static-libstdc++")
+    set(protobuf_cxx_flags "-std=c++11 -static-libstdc++")
 else()
     set(protobuf_cxx_flags "-fPIC -std=c++11 -static-libstdc++")
 endif()
@@ -1061,7 +1061,8 @@ if(BUILD_SAVITAR)
   if(BUILD_OS_OSX)
     set(savitar_cxx_flags "-fPIC -std=c++11 -stdlib=libc++")
   elseif(BUILD_OS_WINDOWS)
-    set(savitar_cxx_flags "-fPIC -std=c++11 -static-libstdc++")
+    # All of the code is PIC on Windows, so -fPIC produces just the bug
+    set(savitar_cxx_flags "-std=c++11 -static-libstdc++")
   else()
     set(savitar_cxx_flags "-fPIC -std=c++11 -static-libstdc++")
   endif()
@@ -1088,15 +1089,11 @@ else()
 	list(APPEND EXTRA_CBD_ARGS -DPACK_FIRMWARE=copy)
 endif()
 
-if(BUILD_OS_WIN64)
-    # Due to problems building Python modules on Win64 we currently need to disable building Arcus.
-    set(ARCUS_EXTRA_ARGS -DBUILD_PYTHON=OFF)
-endif()
 ExternalProject_Add(Arcus
     DEPENDS Python Protobuf Sip
     GIT_REPOSITORY ${ARCUS_URL}
     GIT_TAG origin/${TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=-static-libstdc++ -DBUILD_EXAMPLES=OFF -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} -DPROTOBUF_PROTOC_EXECUTABLE=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/protoc -DPROTOBUF_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf.a -DPROTOBUF_LITE_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf-lite.a -DPROTOBUF_INCLUDE_DIR=${EXTERNALPROJECT_INSTALL_PREFIX}/include ${ARCUS_EXTRA_ARGS}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=-static-libstdc++ -DBUILD_EXAMPLES=OFF -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} -DPROTOBUF_PROTOC_EXECUTABLE=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/protoc -DPROTOBUF_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf.a -DPROTOBUF_LITE_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf-lite.a -DPROTOBUF_INCLUDE_DIR=${EXTERNALPROJECT_INSTALL_PREFIX}/include
 )
 
 ExternalProject_Add(CuraEngine
@@ -1111,12 +1108,10 @@ ExternalProject_Add(Uranium
     GIT_REPOSITORY ${URANIUM_URL}
     GIT_TAG origin/${URANIUM_TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} 
-# ${EXTRA_PYTHON_DEFINES}
 )
 
 ExternalProject_Add(Cura-PostProcessing
     DEPENDS Python Uranium Savitar
-    #GIT_REPOSITORY https://github.com/nallath/PostProcessingPlugin
     GIT_REPOSITORY https://code.alephobjects.com/source/Cura2-PostProcessing.git
     GIT_TAG origin/${CURA_TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
@@ -1141,7 +1136,6 @@ ExternalProject_Add(Cura
     GIT_REPOSITORY ${CURA_URL}
     GIT_TAG origin/${CURA_TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} -DURANIUM_SCRIPTS_DIR= -DCURA_VERSION=${CURA_VERSION} -DCMAKE_MODULE_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/
-#${EXTRA_PYTHON_DEFINES}
 )
 
 set(_last_repo Cura) # To make sure ordering for extra repositories is preserved
