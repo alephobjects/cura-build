@@ -409,8 +409,6 @@ if(BUILD_QT)
     if(BUILD_OS_LINUX OR BUILD_OS_OSX) 
         list(APPEND qt_options -no-eglfs)
     endif()
-    list(APPEND qt_options -no-gstreamer)
-    
 
     list(APPEND qt_options -skip qtconnectivity)
     list(APPEND qt_options -skip qtdoc)
