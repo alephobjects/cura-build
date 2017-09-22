@@ -32,6 +32,8 @@ option(BUILD_PYPARSING "Include Python Parsing Library" ON)
 option(BUILD_PYTHON_NOSE "Include Python NOSE Library" ON)
 option(BUILD_MARLIN_FIRMWARES "Build Firmware for 3Dprinters as a part of Cura2 build" OFF)
 
+option(SIGN_APP_OSX "Sign the app on OSX build" OFF)
+
 macro(string_option name info default_value)
     if (${name})
         set(${name} ${${name}} CACHE STRING "${info}")
@@ -111,6 +113,12 @@ set(EXTRA_REPOSITORIES "" CACHE STRING "Extra repositories to install. Expected 
 set(EXTERNALPROJECT_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/inst)
 
 set(APPLE_ID_CERT_NAME "" CACHE STRING "Apple Identity name used for signing")
+
+if(BUILD_OS_OSX)
+  if(NOT "${APPLE_ID_CERT_NAME}" STREQUAL "")
+    set(SIGN_APP_OSX ON)
+  endif()
+endif()
 
 # Create the version-related variables
 # These can optionally be overridden from the build enviroment.
@@ -1274,6 +1282,16 @@ if(BUILD_OS_OSX)
     )
 
     install(DIRECTORY ${CMAKE_BINARY_DIR}/dist/Cura.app DESTINATION "." USE_SOURCE_PERMISSIONS)
+
+    if(SIGN_APP_OSX)
+      add_custom_target(sign_app ALL)
+      add_dependencies(sign_app build_app)
+      add_custom_command(
+        TARGET sign_app POST_BUILD
+        COMMAND "codesign -s \"${APPLE_ID_CERT_NAME}\" --deep -v ${CMAKE_BINARY_DIR}/dist/Cura.app"
+        COMMENT "Signing application with ${APPLE_ID_CERT_NAME}"
+      )
+    endif()
 
 elseif(BUILD_OS_WINDOWS)
     set(CPACK_GENERATOR "NSIS")
