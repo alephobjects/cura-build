@@ -1288,8 +1288,9 @@ if(BUILD_OS_OSX)
       add_dependencies(sign_app build_app)
       add_custom_command(
         TARGET sign_app POST_BUILD
-        COMMAND "codesign -s \"${APPLE_ID_CERT_NAME}\" --deep -v ${CMAKE_BINARY_DIR}/dist/Cura.app"
+        COMMAND /usr/bin/codesign -s "${APPLE_ID_CERT_NAME}" --deep -v ${CMAKE_BINARY_DIR}/dist/Cura.app
         COMMENT "Signing application with ${APPLE_ID_CERT_NAME}"
+	VERBATIM
       )
     endif()
 
