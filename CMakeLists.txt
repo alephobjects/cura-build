@@ -1263,7 +1263,7 @@ if(BUILD_OS_OSX)
     list(APPEND command_generate_version PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
     list(APPEND command_generate_version ${PYTHON_EXECUTABLE} scripts/cura_version.py)
     list(APPEND command_generate_version ${CURA_MAJOR_VERSION}.${CURA_MINOR_VERSION}.${CURA_PATCH_VERSION})
-    list(APPEND command_generate_version "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/dist")
+    list(APPEND command_generate_version "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/dist/Cura.app/Contents")
     add_custom_command(
 	TARGET build_app POST_BUILD
 	COMMAND ${command_generate_version}
