@@ -47,6 +47,9 @@ OPTIONS = {
         "uuid",
 	"Savitar",
     ],
+    "packages": [
+        "serial"
+    ],
     "resources": [
         "inst/lib/plugins",
         "inst/lib/qml",
