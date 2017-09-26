@@ -32,6 +32,8 @@ option(BUILD_PYPARSING "Include Python Parsing Library" ON)
 option(BUILD_PYTHON_NOSE "Include Python NOSE Library" ON)
 option(BUILD_MARLIN_FIRMWARES "Build Firmware for 3Dprinters as a part of Cura2 build" OFF)
 
+option(SIGN_APP_OSX "Sign the app on OSX build" OFF)
+
 macro(string_option name info default_value)
     if (${name})
         set(${name} ${${name}} CACHE STRING "${info}")
@@ -109,6 +111,14 @@ set(CURA_ENGINE_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the Cur
 
 set(EXTRA_REPOSITORIES "" CACHE STRING "Extra repositories to install. Expected to have a CMake based build system.")
 set(EXTERNALPROJECT_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/inst)
+
+set(APPLE_ID_CERT_NAME "" CACHE STRING "Apple Identity name used for signing")
+
+if(BUILD_OS_OSX)
+  if(NOT "${APPLE_ID_CERT_NAME}" STREQUAL "")
+    set(SIGN_APP_OSX ON)
+  endif()
+endif()
 
 # Create the version-related variables
 # These can optionally be overridden from the build enviroment.
@@ -216,7 +226,7 @@ if(BUILD_PYTHON)
             -i ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python\\cmake\\patches-win32\\05-PY3-libffi-latest.patch
             -d ${CMAKE_BINARY_DIR}\\Python-prefix\\src\\Python-${PYTHON_VERSION_STRING} )
 
-        set (pythonpatch_configure_command ${CMAKE_COMMAND} -E copy 
+        set (pythonpatch_configure_command ${CMAKE_COMMAND} -E copy
             ${pythonpatch_source_path}\\patch.exe
             ${pythonpatch_destination_path}\\patch.exe )
 
@@ -231,10 +241,10 @@ if(BUILD_PYTHON)
     else()
         set (pythonpatch_build_command)
         add_custom_target(PythonPatch)
-    endif()         
+    endif()
 
     # For now let's switch WIN to CMAKE Python only
-    if(BUILD_OS_WINDOWS) 
+    if(BUILD_OS_WINDOWS)
       # We'll need to find OpenSSL
       find_package(OpenSSL)
       # For windows we'll try to build using CMake for python
@@ -309,19 +319,19 @@ if(BUILD_PYTHON)
       list(APPEND python_configure_command --libexecdir=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
       list(APPEND python_configure_command --includedir=${EXTERNALPROJECT_INSTALL_PREFIX}/include)
       list(APPEND python_configure_command --oldincludedir=${EXTERNALPROJECT_INSTALL_PREFIX}/include)
-      list(APPEND python_configure_command 
-		--enable-shared 
-		--with-threads 
-		--without-pymalloc 
-		${PYTHON_CONFIGURE_CFLAGS} 
+      list(APPEND python_configure_command
+		--enable-shared
+		--with-threads
+		--without-pymalloc
+		${PYTHON_CONFIGURE_CFLAGS}
 		${PYTHON_CONFIGURE_LDFLAGS}
       )
       if (BUILD_OS_OSX)
-        set( python_configure_patch_command COMMAND sed -ie 
+        set( python_configure_patch_command COMMAND sed -ie
            "s/#define HAVE_GETENTROPY 1/\\/* #undef HAVE_GETENTROPY *\\//g" pyconfig.h)
-        list(APPEND python_configure_patch_command COMMAND 
+        list(APPEND python_configure_patch_command COMMAND
            echo "fixing pyconfig.h with sed -ie 's/#define HAVE_GETENTROPY 1/\\/* #undef HAVE_GETENTROPY *\\//g'")
-        list(APPEND python_configure_patch_command COMMAND sed -ie 
+        list(APPEND python_configure_patch_command COMMAND sed -ie
            "s/#define HAVE_CLOCK_GETTIME 1/\\/* #undef HAVE_CLOCK_GETTIME *\\//g" pyconfig.h)
         list(APPEND python_configure_patch_command COMMAND
            echo "fixing pyconfig.h with sed -ie 's/#define HAVE_CLOCK_GETTIME 1/\\/* #undef HAVE_CLOCK_GETTIME *\\//g'")
@@ -333,7 +343,7 @@ if(BUILD_PYTHON)
           URL https://www.python.org/ftp/python/${PYTHON_VERSION_STRING}/Python-${PYTHON_VERSION_STRING}.tgz
 #          PATCH_COMMAND ${python_patch_command}
           CONFIGURE_COMMAND ${python_configure_command} ${python_configure_patch_command}
-	
+
           BUILD_IN_SOURCE 1
       )
    endif()
@@ -406,7 +416,7 @@ if(BUILD_QT)
         list(APPEND qt_options -no-openssl )
     endif()
     list(APPEND qt_options -qt-pcre)
-    if(BUILD_OS_LINUX OR BUILD_OS_OSX) 
+    if(BUILD_OS_LINUX OR BUILD_OS_OSX)
         list(APPEND qt_options -no-eglfs)
     endif()
 
@@ -457,7 +467,7 @@ if(BUILD_QT)
 
     if(BUILD_OS_WINDOWS)
        string(REPLACE "/" "\\" qt_options "${qt_options}")
-    endif()    
+    endif()
     message(STATUS "---> Qt config: ${qt_options}")
     ExternalProject_Add(Qt
         URL ${qt_url}
@@ -535,7 +545,7 @@ elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
 	--install-lib=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR}
 	--install-data=${EXTERNALPROJECT_INSTALL_PREFIX}/share
 	--install-scripts=${EXTERNALPROJECT_INSTALL_PREFIX}/bin
-#	--single-version-externally-managed 
+#	--single-version-externally-managed
 	--record=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR}/record.txt
     )
 endif()
@@ -858,7 +868,7 @@ if(BUILD_NUMPY)
         list(APPEND envvar_numpy CC=gcc CXX=g++ F90=gfortran)
     elseif (BUILD_OS_OSX)
         list(APPEND build_numpy config )
-        list(APPEND build_numpy build_clib ) 
+        list(APPEND build_numpy build_clib )
         list(APPEND build_numpy build_ext )
 #       list(APPEND build_numpy build_ext -j 1 --inplace)
     elseif(BUILD_OS_WINDOWS)
@@ -1075,12 +1085,12 @@ if(BUILD_SAVITAR)
   else()
     set(savitar_cxx_flags "-fPIC -std=c++11 -static-libstdc++")
   endif()
-  message(STATUS "---> Savitar will be build") 
+  message(STATUS "---> Savitar will be build")
   ExternalProject_Add(Savitar
 	DEPENDS Python Sip Numpy
     	GIT_REPOSITORY ${SAVITAR_URL}
     	GIT_TAG origin/${SAVITAR_TAG_OR_BRANCH}
-    	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=${savitar_cxx_flags} -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} 
+    	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=${savitar_cxx_flags} -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR}
 # ${EXTRA_PYTHON_DEFINES}
   )
 else()
@@ -1116,7 +1126,7 @@ ExternalProject_Add(Uranium
     DEPENDS PyQt Arcus
     GIT_REPOSITORY ${URANIUM_URL}
     GIT_TAG origin/${URANIUM_TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} 
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING}
 )
 
 ExternalProject_Add(Cura-PostProcessing
@@ -1178,13 +1188,13 @@ if(BUILD_OS_OSX)
     #   setuptools and distribute provide enhancements to distutils, as well as the mechanisms for creating and working with Python Eggs.
     #   Distribute is a fork of setuptools that amongst others adds support for python 3. All testing of py2app is done using distribute.
     # * macholib
-    #   macholib reads and writes the Mach-O object file format. Used by py2app to build a dependency graph of dyld and framework 
+    #   macholib reads and writes the Mach-O object file format. Used by py2app to build a dependency graph of dyld and framework
     #         dependencies for your application
     # * modulegraph
-    #   modulegraph is a replacement for the Python standard library modulefinder. Stores the module dependency tree in a graph data 
+    #   modulegraph is a replacement for the Python standard library modulefinder. Stores the module dependency tree in a graph data
     #         structure and allows for advanced filtering and analysis capabilities, such as GraphViz dot output.
     # * altgraph
-    #   altgraph is a fork of Istvan Albert‘s graphlib, and it used internally by both macholib and modulegraph. It contains several 
+    #   altgraph is a fork of Istvan Albert‘s graphlib, and it used internally by both macholib and modulegraph. It contains several
     #   small feature and performance enhancements over the original graphlib.
 
     ExternalProject_Add(Py2App
@@ -1251,7 +1261,7 @@ if(BUILD_OS_OSX)
     set(run_py2app LD_LIBRARY_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/lib)
     list(APPEND run_py2app PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
     list(APPEND run_py2app ${PYTHON_EXECUTABLE} setup_osx.py py2app --excludes="PyQt5.uic")
-    
+
     add_custom_command(
         TARGET build_app POST_BUILD
         COMMAND ${run_py2app}
@@ -1263,7 +1273,7 @@ if(BUILD_OS_OSX)
     list(APPEND command_generate_version PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
     list(APPEND command_generate_version ${PYTHON_EXECUTABLE} scripts/cura_version.py)
     list(APPEND command_generate_version ${CURA_MAJOR_VERSION}.${CURA_MINOR_VERSION}.${CURA_PATCH_VERSION})
-    list(APPEND command_generate_version "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/dist")
+    list(APPEND command_generate_version "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/dist/Cura.app/Contents")
     add_custom_command(
 	TARGET build_app POST_BUILD
 	COMMAND ${command_generate_version}
@@ -1272,6 +1282,17 @@ if(BUILD_OS_OSX)
     )
 
     install(DIRECTORY ${CMAKE_BINARY_DIR}/dist/Cura.app DESTINATION "." USE_SOURCE_PERMISSIONS)
+
+    if(SIGN_APP_OSX)
+      add_custom_target(sign_app ALL)
+      add_dependencies(sign_app build_app)
+      add_custom_command(
+        TARGET sign_app POST_BUILD
+        COMMAND /usr/bin/codesign -s "${APPLE_ID_CERT_NAME}" --deep -v ${CMAKE_BINARY_DIR}/dist/Cura.app
+        COMMENT "Signing application with ${APPLE_ID_CERT_NAME}"
+	VERBATIM
+      )
+    endif()
 
 elseif(BUILD_OS_WINDOWS)
     set(CPACK_GENERATOR "NSIS")
@@ -1344,7 +1365,7 @@ elseif(BUILD_OS_LINUX)
     set(CPACK_GENERATOR "DEB")
 
     set(CPACK_INSTALL_CMAKE_PROJECTS "")
-    
+
     #install(FILES "${CMAKE_BINARY_DIR}/dist/cura2" DESTINATION "/usr/bin")
     #install(FILES "${CMAKE_BINARY_DIR}/dist/CuraEngine" DESTINATION "/usr/bin")
     set(CPACK_INSTALLED_DIRECTORIES
@@ -1365,7 +1386,7 @@ elseif(BUILD_OS_LINUX)
     endforeach()
 
     add_custom_command(
-        TARGET build_app POST_BUILD 
+        TARGET build_app POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/dist
         COMMENT "---> Cleaning old cx_Freeze directory : ${CMAKE_BINARY_DIR}/dist"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
@@ -1379,7 +1400,7 @@ elseif(BUILD_OS_LINUX)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
-    set(run_cura_version ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/cura_version.py 
+    set(run_cura_version ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/cura_version.py
 	${CURA_VERSION} ${CMAKE_BINARY_DIR} ${CMAKE_BINARY_DIR}/dist)
     add_custom_command(
         TARGET build_app POST_BUILD
@@ -1387,8 +1408,8 @@ elseif(BUILD_OS_LINUX)
         COMMENT "---> Generating Version File :${run_cura_version}"
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
-    
-    
+
+
 #---
     set(package_dir "_CPack_Packages/Linux/${CPACK_GENERATOR}/Cura2-${CURA_VERSION}-Linux/")
     set(CPACK_INSTALL_COMMANDS
@@ -1415,6 +1436,7 @@ set(CPACK_PACKAGE_VERSION_PATCH ${CURA_PATCH_VERSION})
 set(CPACK_PACKAGE_VERSION ${CURA_VERSION})
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cura2 3D Printing Software Lulzbot Edition")
 set(CPACK_PACKAGE_CONTACT "Aleph Objects <info@alephobjects.com>")
+set(CPACK_BUNDLE_APPLE_CERT_APP ${APPLE_ID_CERT_NAME})
 if(NOT BUILD_OS_OSX)
     set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE)
 endif()
