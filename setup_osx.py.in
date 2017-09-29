@@ -109,7 +109,7 @@ shutil.copy("inst/bin/CuraEngine", "dist/Cura.app/Contents/MacOS/CuraEngine")
 # them anyway.
 for path, dirs, files in os.walk("dist/Cura.app/Contents"):
     for file in files:
-        if "debug" in file:
+        if "debug" in file and not file.lower().endswith(".json"):
             print("Removing {0}".format(file))
             os.remove(os.path.join(path, file))
 
