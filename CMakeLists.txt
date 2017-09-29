@@ -1143,15 +1143,15 @@ ExternalProject_Add(cura-binary-data
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} ${EXTRA_CBD_ARGS}
 )
 
-ExternalProject_Add(fdm_materials
-    DEPENDS Python Uranium Savitar
-    GIT_REPOSITORY https://github.com/ultimaker/fdm_materials
-    GIT_TAG origin/${TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
-)
+# ExternalProject_Add(fdm_materials
+#    DEPENDS Python Uranium Savitar
+#    GIT_REPOSITORY https://github.com/ultimaker/fdm_materials
+#    GIT_TAG origin/${TAG_OR_BRANCH}
+#    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
+# )
 
 ExternalProject_Add(Cura
-    DEPENDS Uranium CuraEngine Savitar NumpySTL PythonTyping PySerial PythonZeroconf Scipy Numpy PythonNetifaces fdm_materials cura-binary-data Cura-PostProcessing PythonSix
+    DEPENDS Uranium CuraEngine Savitar NumpySTL PythonTyping PySerial PythonZeroconf Scipy Numpy PythonNetifaces cura-binary-data Cura-PostProcessing PythonSix
     GIT_REPOSITORY ${CURA_URL}
     GIT_TAG origin/${CURA_TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} -DURANIUM_SCRIPTS_DIR= -DCURA_VERSION=${CURA_VERSION} -DCMAKE_MODULE_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/
