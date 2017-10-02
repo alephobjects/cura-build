@@ -31,6 +31,7 @@ option(BUILD_PYTHON_PACKAGING "Include Python Packaging Library" ON)
 option(BUILD_PYPARSING "Include Python Parsing Library" ON)
 option(BUILD_PYTHON_NOSE "Include Python NOSE Library" ON)
 option(BUILD_MARLIN_FIRMWARES "Build Firmware for 3Dprinters as a part of Cura2 build" OFF)
+option(BUILD_PYOBJC_CORE "Build pyobjc-core library" OFF)
 
 option(SIGN_APP_OSX "Sign the app on OSX build" OFF)
 
@@ -118,6 +119,11 @@ if(BUILD_OS_OSX)
   if(NOT "${APPLE_ID_CERT_NAME}" STREQUAL "")
     set(SIGN_APP_OSX ON)
   endif()
+endif()
+
+# Set build PyObjc to ON for OSX
+if(BUILD_OS_OSX)
+  set(BUILD_PYOBJC_CORE ON)
 endif()
 
 # Create the version-related variables
@@ -1015,6 +1021,27 @@ else()
     )
 endif()
 
+message("IS OSX -> ${BUILD_OS_OSX} - ${BUILD_PYOBJC_CORE}")
+if(BUILD_PYOBJC_CORE)
+  set(build_pyobjc_core ${PYTHON_EXECUTABLE} setup.py build)
+  set(install_pyobjc_core ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose --single-version-externally-managed)
+  message("---> PyObjc-Core Build: ${build_pyobjc_core}")
+  ExternalProject_Add(PyObjcCore
+      DEPENDS Python
+      URL https://bitbucket.org/ronaldoussoren/pyobjc/get/pyobjc-3.2.1.tar.gz
+      CONFIGURE_COMMAND ""
+      BUILD_COMMAND ${build_pyobjc_core}
+      INSTALL_COMMAND ${install_pyobjc_core}
+      BINARY_DIR PyObjcCore/pyobjc-core
+      SOURCE_DIR PyObjcCore
+  )
+else()
+  message("---> PyObjc will not be build")
+  add_custom_target(PyObjcCore
+    DEPENDS Python
+  )
+endif()
+
 if(BUILD_NUMPY_STL )
     set(build_numpystl ${PYTHON_EXECUTABLE} setup.py build)
     set(install_numpystl ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose --single-version-externally-managed)
@@ -1151,7 +1178,7 @@ ExternalProject_Add(cura-binary-data
 # )
 
 ExternalProject_Add(Cura
-    DEPENDS Uranium CuraEngine Savitar NumpySTL PythonTyping PySerial PythonZeroconf Scipy Numpy PythonNetifaces cura-binary-data Cura-PostProcessing PythonSix
+    DEPENDS Uranium CuraEngine Savitar NumpySTL PythonTyping PySerial PythonZeroconf Scipy Numpy PythonNetifaces cura-binary-data Cura-PostProcessing PythonSix PyObjcCore
     GIT_REPOSITORY ${CURA_URL}
     GIT_TAG origin/${CURA_TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DMINIMUM_PYTHON_VERSION=${PYTHON_VERSION_STRING} -DURANIUM_SCRIPTS_DIR= -DCURA_VERSION=${CURA_VERSION} -DCMAKE_MODULE_PATH=${EXTERNALPROJECT_INSTALL_PREFIX}/share/cmake-${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION}/Modules/

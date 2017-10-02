@@ -48,7 +48,8 @@ OPTIONS = {
 	"Savitar",
     ],
     "packages": [
-        "serial"
+        "serial",
+        "objc"
     ],
     "resources": [
         "inst/lib/plugins",
