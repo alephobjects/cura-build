@@ -412,8 +412,10 @@ if(BUILD_QT)
     list(APPEND qt_options -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2 -no-sql-tds)
     list(APPEND qt_options -no-icu)
     # Let's try to use system-provided harfbuzz
-    list(APPEND qt_options -system-harfbuzz)
-    # list(APPEND qt_options -qt-harfbuzz)
+    if(BUILD_OS_LINUX)
+        list(APPEND qt_options -system-harfbuzz)
+        # list(APPEND qt_options -qt-harfbuzz)
+    endif()
     # Bundle PNG mainly because stretch is using libpng16 and jessie uses libpng12
     list(APPEND qt_options -qt-libpng)
 
