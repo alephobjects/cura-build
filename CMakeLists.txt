@@ -411,6 +411,8 @@ if(BUILD_QT)
     list(APPEND qt_options -no-cups -no-sql-db2 -no-sql-ibase -no-sql-mysql)
     list(APPEND qt_options -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2 -no-sql-tds)
     list(APPEND qt_options -no-icu)
+    list(APPEND qt_options -qt-harfbuzz)
+    list(APPEND qt_options -qt-libpng)
 
     # It seems like we'll need SSL for Cura2 plugins (Octoprint is using PyQt5.QtNetwork for example)
     if(BUILD_OS_OSX OR BUILD_OS_WINDOWS)
