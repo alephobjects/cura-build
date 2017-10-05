@@ -411,7 +411,10 @@ if(BUILD_QT)
     list(APPEND qt_options -no-cups -no-sql-db2 -no-sql-ibase -no-sql-mysql)
     list(APPEND qt_options -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2 -no-sql-tds)
     list(APPEND qt_options -no-icu)
-    list(APPEND qt_options -qt-harfbuzz)
+    # Let's try to use system-provided harfbuzz
+    list(APPEND qt_options -system-harfbuzz)
+    # list(APPEND qt_options -qt-harfbuzz)
+    # Bundle PNG mainly because stretch is using libpng16 and jessie uses libpng12
     list(APPEND qt_options -qt-libpng)
 
     # It seems like we'll need SSL for Cura2 plugins (Octoprint is using PyQt5.QtNetwork for example)
@@ -1478,6 +1481,7 @@ set(CPACK_RPM_PACKAGE_RELOCATABLE OFF)
 
 set(DEB_DEPENDS
     "python3 (>= ${MINIMUM_PYTHON_VERSION})"
+    "libharfbuzz0b"
     "libgfortran3"
 )
 string(REPLACE ";" "," DEB_DEPENDS "${DEB_DEPENDS}")
