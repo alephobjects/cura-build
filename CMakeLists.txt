@@ -1184,6 +1184,26 @@ endforeach()
 
 #----- Installers Needs to be build outside of the Cura2 -----#
 if(BUILD_OS_OSX)
+    # For power management we'll need PyObjc packages for MACOS
+    ExternalProject_Add(pyobjc-core
+        DEPENDS Python
+        URL https://pypi.python.org/packages/b0/4f/93d8b4beac7b686c3f1a8f682062a9e65c87e5e45a99863ea7e4ba43813f/pyobjc-core-4.0.tar.gz
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
+        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose
+        COMMENT "Building pyobjc-core"
+        BUILD_IN_SOURCE 1
+    )
+    ExternalProject_Add(pyobjc-framework-cocoa
+        DEPENDS Python pyobjc-core
+        URL https://pypi.python.org/packages/a7/8d/fc2b9d569ba23775724849eeed39a53665b3b1058eac00c3d3ac3a54e3cc/pyobjc-framework-Cocoa-4.0.tar.gz
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
+        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose
+        COMMENT "Building pyobjc-framework-cocoa"
+        BUILD_IN_SOURCE 1
+    )
+
     #It seems that py2app depends on The following:
     # * setuptools or distribute
     #   setuptools and distribute provide enhancements to distutils, as well as the mechanisms for creating and working with Python Eggs.
@@ -1244,7 +1264,7 @@ if(BUILD_OS_OSX)
     configure_file(setup_osx.py.in setup_osx.py @ONLY)
 
     add_custom_target(build_app ALL)
-    add_dependencies(build_app ${_last_repo} Py2App)
+    add_dependencies(build_app ${_last_repo} Py2App pyobjc-framework-cocoa)
 
     foreach(repo ${EXTRA_REPOSITORIES})
         separate_arguments(items UNIX_COMMAND "${repo}")
