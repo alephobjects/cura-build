@@ -144,7 +144,7 @@ unset(CURA_PATCH_VERSION CACHE)
 if(DEFINED ENV{CURA_PATCH_VERSION})
     set(CURA_PATCH_VERSION $ENV{CURA_PATCH_VERSION} CACHE STRING "Cura Patch Version" FORCE)
 else()
-    set(CURA_PATCH_VERSION "37" CACHE STRING "Cura Patch Version")
+    set(CURA_PATCH_VERSION "38" CACHE STRING "Cura Patch Version")
 endif()
 unset(CURA_EXTRA_VERSION CACHE)
 if(DEFINED ENV{CURA_EXTRA_VERSION})
@@ -416,6 +416,15 @@ if(BUILD_QT)
     list(APPEND qt_options -nomake examples -nomake tests -nomake tools )
     list(APPEND qt_options -no-cups -no-sql-db2 -no-sql-ibase -no-sql-mysql)
     list(APPEND qt_options -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite -no-sql-sqlite2 -no-sql-tds)
+    list(APPEND qt_options -no-icu)
+    # Let's try to use system-provided harfbuzz
+    if(BUILD_OS_LINUX)
+        # list(APPEND qt_options -system-harfbuzz)
+        # list(APPEND qt_options -qt-harfbuzz)
+    endif()
+    list(APPEND qt_options -no-harfbuzz)
+    # Bundle PNG mainly because stretch is using libpng16 and jessie uses libpng12
+    list(APPEND qt_options -qt-libpng)
 
     # It seems like we'll need SSL for Cura2 plugins (Octoprint is using PyQt5.QtNetwork for example)
     if(BUILD_OS_OSX OR BUILD_OS_WINDOWS)
@@ -1210,6 +1219,26 @@ endforeach()
 
 #----- Installers Needs to be build outside of the Cura2 -----#
 if(BUILD_OS_OSX)
+    # For power management we'll need PyObjc packages for MACOS
+    ExternalProject_Add(pyobjc-core
+        DEPENDS Python
+        URL https://pypi.python.org/packages/b0/4f/93d8b4beac7b686c3f1a8f682062a9e65c87e5e45a99863ea7e4ba43813f/pyobjc-core-4.0.tar.gz
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
+        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose
+        COMMENT "Building pyobjc-core"
+        BUILD_IN_SOURCE 1
+    )
+    ExternalProject_Add(pyobjc-framework-cocoa
+        DEPENDS Python pyobjc-core
+        URL https://pypi.python.org/packages/a7/8d/fc2b9d569ba23775724849eeed39a53665b3b1058eac00c3d3ac3a54e3cc/pyobjc-framework-Cocoa-4.0.tar.gz
+        CONFIGURE_COMMAND ""
+        BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
+        INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose
+        COMMENT "Building pyobjc-framework-cocoa"
+        BUILD_IN_SOURCE 1
+    )
+
     #It seems that py2app depends on The following:
     # * setuptools or distribute
     #   setuptools and distribute provide enhancements to distutils, as well as the mechanisms for creating and working with Python Eggs.
@@ -1270,7 +1299,7 @@ if(BUILD_OS_OSX)
     configure_file(setup_osx.py.in setup_osx.py @ONLY)
 
     add_custom_target(build_app ALL)
-    add_dependencies(build_app ${_last_repo} Py2App)
+    add_dependencies(build_app ${_last_repo} Py2App pyobjc-framework-cocoa)
 
     foreach(repo ${EXTRA_REPOSITORIES})
         separate_arguments(items UNIX_COMMAND "${repo}")
@@ -1482,6 +1511,7 @@ set(CPACK_RPM_PACKAGE_RELOCATABLE OFF)
 
 set(DEB_DEPENDS
     "python3 (>= ${MINIMUM_PYTHON_VERSION})"
+    "libharfbuzz0b"
     "libgfortran3"
 )
 string(REPLACE ";" "," DEB_DEPENDS "${DEB_DEPENDS}")
