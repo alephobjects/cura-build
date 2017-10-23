@@ -359,6 +359,7 @@ message(STATUS "---> Python executable: ${PYTHON_EXECUTABLE}")
 message(STATUS "---> Python libraries: ${PYTHON_LIBRARIES}")
 message(STATUS "---> Python includes: ${PYTHON_INCLUDE_DIRS}")
 message(STATUS "---> Python libraries version: ${PYTHONLIBS_VERSION_STRING}")
+message(STATUS "---> Python extra defines: ${EXTRA_PYTHON_DEFINES}")
 
 if(BUILD_OS_WINDOWS)
     set(PYTHON_DIRECTORY "python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}")
@@ -1099,8 +1100,7 @@ if(BUILD_SAVITAR)
 	DEPENDS Python Sip Numpy
     	GIT_REPOSITORY ${SAVITAR_URL}
     	GIT_TAG origin/${SAVITAR_TAG_OR_BRANCH}
-    	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=${savitar_cxx_flags} -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR}
-# ${EXTRA_PYTHON_DEFINES}
+    	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=${savitar_cxx_flags} -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} ${EXTRA_PYTHON_DEFINES}
   )
 else()
     message(STATUS "---> Savitar will not be build")
@@ -1121,7 +1121,7 @@ ExternalProject_Add(Arcus
     DEPENDS Python Protobuf Sip
     GIT_REPOSITORY ${ARCUS_URL}
     GIT_TAG origin/${TAG_OR_BRANCH}
-    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=-static-libstdc++ -DBUILD_EXAMPLES=OFF -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} -DPROTOBUF_PROTOC_EXECUTABLE=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/protoc -DPROTOBUF_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf.a -DPROTOBUF_LITE_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf-lite.a -DPROTOBUF_INCLUDE_DIR=${EXTERNALPROJECT_INSTALL_PREFIX}/include
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=-static-libstdc++ -DBUILD_EXAMPLES=OFF -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} -DPROTOBUF_PROTOC_EXECUTABLE=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/protoc -DPROTOBUF_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf.a -DPROTOBUF_LITE_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf-lite.a -DPROTOBUF_INCLUDE_DIR=${EXTERNALPROJECT_INSTALL_PREFIX}/include ${EXTRA_PYTHON_DEFINES}
 )
 
 ExternalProject_Add(CuraEngine
@@ -1483,9 +1483,55 @@ set(CPACK_RPM_PACKAGE_REQUIRES ${RPM_REQUIRES})
 set(CPACK_RPM_PACKAGE_RELOCATABLE OFF)
 
 set(DEB_DEPENDS
-    "python3 (>= ${MINIMUM_PYTHON_VERSION})"
+#    "python3 (>= ${MINIMUM_PYTHON_VERSION})"
+    "libice6"
+    "libsm6"
+    "libxi6"
+    "libfreetype6"
+    "libfontconfig1"
+    "libbsd0"
+    "libdrm2"
+    "libxxf86vm1"
+    "libxdmcp6"
+    "libxau6"
+    "libx11-6"
+    "libx11-xcb1"
+    "libxfixes3"
+    "libxdamage1"
+    "libxext6"
+    "libglapi-mesa"
+    "libxshmfence1"
+    "libxcb-dri2-0"
+    "libxcb-glx0"
+    "libxcb-sync1"
+    "libxcb-present0"
+    "libxcb-dri3-0"
+    "libxcb1"
+    "libexpat1"
+    "libgl1-mesa-glx"
+    "libgpg-error0"
+    "libgcrypt20"
+    "liblz4-1"
+    "liblzma5"
+    "libselinux1"
+    "libsystemd0"
+    "libdbus-1-3"
+    "libpcre3"
+    "libstdc++6"
+    "libglib2.0-0"
+    "lib64z1 | zlib1g"
+    "libgcc1"
+    "libquadmath0"
+    "libc6"
+    "libgomp1"
+    "libssl1.0.2 | libssl1.0.0"
+    "libtinfo5"
+    "libreadline6 | libreadline7"
     "libharfbuzz0b"
     "libgfortran3"
+    "libpng16-16 | libpng12-0"
+    "libuuid1"
+    "libselinux1"
 )
 string(REPLACE ";" "," DEB_DEPENDS "${DEB_DEPENDS}")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS ${DEB_DEPENDS})
