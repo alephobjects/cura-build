@@ -92,11 +92,11 @@ for dirpath, dirnames, filenames in os.walk(os.path.dirname(cura.__file__)):
             OPTIONS["includes"] += [module_name + "." + os.path.splitext(filename)[0]]
 
 setup(
-    name="Cura",
+    name="cura-lulzbot",
     app=["inst/bin/cura_app.py"],
     version="@CURA_MAJOR_VERSION@.@CURA_MINOR_VERSION@.@CURA_PATCH_VERSION@",
-    author="Ultimaker",
-    url="http://software.ultimaker.com/",
+    author="Aleph Objects",
+    url="http://www.lulzbot.com/cura",
     license="GNU AFFERO GENERAL PUBLIC LICENSE (AGPL)",
     options={"py2app": OPTIONS},
     setup_requires=['py2app'],

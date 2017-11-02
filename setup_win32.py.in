@@ -100,17 +100,17 @@ shutil.rmtree("dist", True)
 executables = [
     Executable(script="@EXTERNALPROJECT_INSTALL_PREFIX@/bin/cura_app.py",
                base="Win32GUI",
-               targetName = "Cura2.exe",
+               targetName = "cura-lulzbot.exe",
                icon="@CMAKE_SOURCE_DIR@/cura.ico"
                )
 ]
 
 setup(
-    name="Cura2",
+    name="cura-lulzbot",
     version="@CURA_MAJOR_VERSION@.@CURA_MINOR_VERSION@.@CURA_PATCH_VERSION@",
-    author="Ultimaker",
-    author_email="a.hiemstra@ultimaker.com",
-    url="http://software.ultimaker.com/",
+    author="Aleph Objects",
+    author_email="info@lulzbot.com",
+    url="http://www.lulzbot.com/cura",
     license="GNU AFFERO GENERAL PUBLIC LICENSE (AGPL)",
     scripts=["inst/bin/cura_app.py"],
     #console=[{"script": "cura_app.py"}],

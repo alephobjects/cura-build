@@ -30,7 +30,7 @@ option(BUILD_PYTHON_SETUPTOOLS "Include Python SetupTools Library" ON)
 option(BUILD_PYTHON_PACKAGING "Include Python Packaging Library" ON)
 option(BUILD_PYPARSING "Include Python Parsing Library" ON)
 option(BUILD_PYTHON_NOSE "Include Python NOSE Library" ON)
-option(BUILD_MARLIN_FIRMWARES "Build Firmware for 3Dprinters as a part of Cura2 build" OFF)
+option(BUILD_MARLIN_FIRMWARES "Build Firmware for 3Dprinters as a part of Cura build" OFF)
 
 option(SIGN_APP_OSX "Sign the app on OSX build" OFF)
 
@@ -421,7 +421,7 @@ if(BUILD_QT)
     # Bundle PNG mainly because stretch is using libpng16 and jessie uses libpng12
     list(APPEND qt_options -qt-libpng)
 
-    # It seems like we'll need SSL for Cura2 plugins (Octoprint is using PyQt5.QtNetwork for example)
+    # It seems like we'll need SSL for Cura plugins (Octoprint is using PyQt5.QtNetwork for example)
     if(BUILD_OS_OSX OR BUILD_OS_WINDOWS)
         list(APPEND qt_options -no-openssl )
     endif()
@@ -1190,7 +1190,7 @@ foreach(repo ${EXTRA_REPOSITORIES})
 endforeach()
 
 
-#----- Installers Needs to be build outside of the Cura2 -----#
+#----- Installers Needs to be build outside of the Cura -----#
 if(BUILD_OS_OSX)
     # For power management we'll need PyObjc packages for MACOS
     ExternalProject_Add(pyobjc-core
@@ -1395,12 +1395,8 @@ elseif(BUILD_OS_LINUX)
 
     set(CPACK_INSTALL_CMAKE_PROJECTS "")
 
-    #install(FILES "${CMAKE_BINARY_DIR}/dist/cura2" DESTINATION "/usr/bin")
-    #install(FILES "${CMAKE_BINARY_DIR}/dist/CuraEngine" DESTINATION "/usr/bin")
     set(CPACK_INSTALLED_DIRECTORIES
-       "${CMAKE_BINARY_DIR}/dist;/usr/share/cura2"
-#       "${CMAKE_BINARY_DIR}/dist/lib;/opt/cura2/lib"
-#       "${CMAKE_BINARY_DIR}/dist/share;/opt/cura2/share"
+       "${CMAKE_BINARY_DIR}/dist;/usr/share/cura-lulzbot"
     )
 #---
     configure_file(setup_linux.py.in setup_linux.py @ONLY)
@@ -1421,7 +1417,7 @@ elseif(BUILD_OS_LINUX)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
-    set(run_cx_freeze ${PYTHON_EXECUTABLE} setup_linux.py build --build-exe=${CMAKE_BINARY_DIR}/dist/usr/share/cura2)
+    set(run_cx_freeze ${PYTHON_EXECUTABLE} setup_linux.py build --build-exe=${CMAKE_BINARY_DIR}/dist/usr/share/cura-lulzbot)
     add_custom_command(
         TARGET build_app POST_BUILD
         COMMAND ${run_cx_freeze}
@@ -1440,13 +1436,13 @@ elseif(BUILD_OS_LINUX)
 
 
 #---
-    set(package_dir "_CPack_Packages/Linux/${CPACK_GENERATOR}/Cura2-${CURA_VERSION}-Linux/")
+    set(package_dir "_CPack_Packages/Linux/${CPACK_GENERATOR}/cura-lulzbot-${CURA_VERSION}-Linux/")
     set(CPACK_INSTALL_COMMANDS
 	"${CMAKE_COMMAND} -E remove_directory ${package_dir}"
         "${CMAKE_COMMAND} -E make_directory ${package_dir}/usr/bin"
         "${CMAKE_COMMAND} -E make_directory ${package_dir}/usr/share/applications"
-        "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura2 ${package_dir}/usr/bin/"
-        "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura2.desktop ${package_dir}/usr/share/applications/"
+        "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura-lulzbot ${package_dir}/usr/bin/"
+        "${CMAKE_COMMAND} -E copy ${CMAKE_SOURCE_DIR}/cura-lulzbot.desktop ${package_dir}/usr/share/applications/"
     )
     # Removing files, that are not needed for runtime
     # From bin dir
@@ -1457,20 +1453,20 @@ message("CPACK_PACKAGE_VERSION_MAJOR ${CURA_MAJOR_VERSION}")
 message("CPACK_PACKAGE_VERSION_MINOR ${CURA_MINOR_VERSION}")
 message("CPACK_PACKAGE_VERSION_PATCH ${CURA_PATCH_VERSION}")
 
-set(CPACK_PACKAGE_NAME "Cura2")
-set(CPACK_PACKAGE_VENDOR "Ultimaker")
+set(CPACK_PACKAGE_NAME "cura-lulzbot")
+set(CPACK_PACKAGE_VENDOR "Aleph Objects")
 set(CPACK_PACKAGE_VERSION_MAJOR ${CURA_MAJOR_VERSION})
 set(CPACK_PACKAGE_VERSION_MINOR ${CURA_MINOR_VERSION})
 set(CPACK_PACKAGE_VERSION_PATCH ${CURA_PATCH_VERSION})
 set(CPACK_PACKAGE_VERSION ${CURA_VERSION})
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cura2 3D Printing Software Lulzbot Edition")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Cura LulzBot Edition 3D Printing Software")
 set(CPACK_PACKAGE_CONTACT "Aleph Objects <info@alephobjects.com>")
 set(CPACK_BUNDLE_APPLE_CERT_APP ${APPLE_ID_CERT_NAME})
 if(NOT BUILD_OS_OSX)
     set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE)
 endif()
-set(CPACK_PACKAGE_EXECUTABLES Cura2 "Cura2 ${CURA_MAJOR_VERSION}.${CURA_MINOR_VERSION}.${CURA_PATCH_VERSION}")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "Cura2 ${CURA_MAJOR_VERSION}.${CURA_MINOR_VERSION}")
+set(CPACK_PACKAGE_EXECUTABLES cura-lulzbot "cura-lulzbot ${CURA_MAJOR_VERSION}.${CURA_MINOR_VERSION}.${CURA_PATCH_VERSION}")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "cura-lulzbot ${CURA_MAJOR_VERSION}.${CURA_MINOR_VERSION}")
 
 set(RPM_REQUIRES
     "python3 >= ${MINIMUM_PYTHON_VERSION}"
@@ -1536,14 +1532,11 @@ set(DEB_DEPENDS
 string(REPLACE ";" "," DEB_DEPENDS "${DEB_DEPENDS}")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS ${DEB_DEPENDS})
 set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE amd64)
-# Set the right epoch so Debian knows this is a more recent version
-#set(CPACK_DEBIAN_PACKAGE_VERSION "2:${CPACK_PACKAGE_VERSION}")
 
 set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 set(CPACK_NSIS_EXECUTABLES_DIRECTORY ".")
-set(CPACK_NSIS_MUI_FINISHPAGE_RUN "Cura2.exe")
+set(CPACK_NSIS_MUI_FINISHPAGE_RUN "cura-lulzbot.exe")
 set(CPACK_NSIS_MENU_LINKS
-#    "https://ultimaker.com/en/support/software" "Cura Online Documentation"
     "https://https://code.alephobjects.com/project/profile/10" "Cura Development Resources"
 )
 if(BUILD_OS_WIN32)

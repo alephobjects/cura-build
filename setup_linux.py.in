@@ -118,14 +118,14 @@ build_options = {
 base = "Win32GUI" if sys.platform == "win32" else None
 
 executables = [
-    Executable(os.path.join("@EXTERNALPROJECT_INSTALL_PREFIX@", "bin", "cura2"), base = base)
+    Executable(os.path.join("@EXTERNALPROJECT_INSTALL_PREFIX@", "bin", "cura-lulzbot"), base = base)
 ]
 
 setup(
-    name = "Cura2",
+    name = "cura-lulzbot",
     version = "@CURA_MAJOR_VERSION@.@CURA_MINOR_VERSION@.@CURA_PATCH_VERSION@",
-    author = "Ultimaker B.V.",
-    url="http://software.ultimaker.com/",
+    author = "Aleph Objects",
+    url="http://www.lulzbot.com/cura",
     description = "3D Slicer Software",
     license="GNU AFFERO GENERAL PUBLIC LICENSE (AGPL)",
 

@@ -20,7 +20,7 @@ brew link openssl --force
 cd /Applications/Xcode.app/Contents/Developer/usr/bin/
 sudo ln -s xcodebuild xcrun
 ```
-7. Run these commands from the Cura2Build directory:
+7. Run these commands from the CuraBuild directory:
 ```
 mkdir build
 cd build
@@ -259,7 +259,7 @@ cd docker && \
 docker build -t <your-tag> -f images/ubuntu/xenial/Dockerfile .
 ```
 
-Docker files and build scripts for Cura2 builds.
+Docker files and build scripts for Cura LulzBot Edition builds.
 
 
 Building DEB packages
@@ -274,7 +274,7 @@ docker run -e UNIT=<unit-name> -v <host-out-directory>:/out keitaro/alephobjects
 
 Where:
  * `unit-name` is the name of the library you want to build. Possible values are: *libarcus*, *libsavitar*, *pythonuranium*, *curaengine*, *cura2*, *cbd*, *postprocessing_plugin*, *all*. This would build a
- DEB package for Arcus, Savitar, Uranium, Cura Engine, Cura Binary Data, Cura2 and Cura2 PostProcessing Plugin respectively. If no UNIT is given, by default would build all packages.
+ DEB package for Arcus, Savitar, Uranium, Cura Engine, Cura Binary Data, Cura and Cura PostProcessing Plugin respectively. If no UNIT is given, by default would build all packages.
  * `host-out-directory` is the path to a directory where the generated .deb packages will be generated. This parameter is required - you must specify a host directory where the
  packages will be copied over after building in the container. If you want to generate in you working directory just pass `$(pwd)` as parameter.
 
@@ -290,7 +290,7 @@ These are the available ENV variables that control the builds:
 **General**
 
  * UNIT (default "All") - which unit to build.  Possible values are: *libarcus*, *libsavitar*, *pythonuranium*, *curaengine*, *cura2*, *all*. This would build a
- DEB package for Arcus, Savitar, Uranium, Cura Engine and Cura2 respectively. If no UNIT is given, by default would build all packages.
+ DEB package for Arcus, Savitar, Uranium, Cura Engine and Cura respectively. If no UNIT is given, by default would build all packages.
  * DIST (default "stretch") - the target distro for which to build the packages. Possible values are *stretch* (for Debian stretch), *zesty* (for Ubuntu Zesty) and *xenial*(for Ubuntu Xenial LTS).
 
 
@@ -322,11 +322,11 @@ These are the available ENV variables that control the builds:
 * CURAENGINE_GIT_REPO (default "https://code.alephobjects.com/diffusion/CTE/cura-engine.git") - curaengine Git repository URL.
 
 
-**Cura2 env variables**
+**Cura env variables**
 
-* CURA2_PKG_VERSION (default is the version id CPackConfig.cmake) - cura2 debian package version.
-* CURA2_GIT_REVISION (default "master") - cura2 revision to checkout when building from repository.
-* CURA2_GIT_REPO (default "https://code.alephobjects.com/source/Cura2.git") - cura2 Git repository URL.
+* CURA_LULZBOT_PKG_VERSION (default is the version id CPackConfig.cmake) - cura2 debian package version.
+* CURA_LULZBOT_GIT_REVISION (default "master") - cura2 revision to checkout when building from repository.
+* CURA_LULZBOT_GIT_REPO (default "https://code.alephobjects.com/source/Cura2.git") - cura2 Git repository URL.
 
 
 **FDM Material env variables**
@@ -343,25 +343,25 @@ These are the available ENV variables that control the builds:
 * ENV CBD_PACK_FIRMWARE (Default "all", available values are "all", "lulzbot", "ultimaker") - pack specific firmware. By default it will pack all firmware. If you pass "ultimaker" it will pack only the firmware provided by Ultimaker. If passed "lulzbot" it will pack the firmware that is not provided by Ultimaker.
 
 
-**Cura2 PostProcessing Plugin variables**
+**Cura PostProcessing Plugin variables**
 
- * CURA2_POSTPROCESSING_GIT_REPO (Default https://code.alephobjects.com/source/Cura2-PostProcessing.git) - Cura2 PostProcessing plugin git repository URL.
- * CURA2_POSTPROCESSING_GIT_REVISION (Default master) - which git revision to build
- * CURA2_POSTPROCESSING_VERSION - debian package version
+ * CURA_LULZBOT_POSTPROCESSING_GIT_REPO (Default https://code.alephobjects.com/source/Cura2-PostProcessing.git) - Cura2 PostProcessing plugin git repository URL.
+ * CURA_LULZBOT_POSTPROCESSING_GIT_REVISION (Default master) - which git revision to build
+ * CURA_LULZBOT_POSTPROCESSING_VERSION - debian package version
 
 
 **Dependencies versions management**
 
-* CURA2_DEPS_MINIMUM_ARCUS_VERSION (defaults to ARCUS_PKG_VERSION) - arcus dependency version.
-* CURA2_DEPS_MINIMUM_SAVITAR_VERSION (defaults to SAVITAR_PKG_VERSION) - savitar dependency version.
-* CURA2_DEPS_MINIMUM_URANIUM_VERSION (defaults to URANIUM_PKG_VERSION) - uranium dependency version.
-* CURA2_DEPS_MINIMUM_CURAENGINE_VERSION (defaults to CURAENGINE_PKG_VERSION) - curaengine dependency version.
+* CURA_LULZBOT_DEPS_MINIMUM_ARCUS_VERSION (defaults to ARCUS_PKG_VERSION) - arcus dependency version.
+* CURA_LULZBOT_DEPS_MINIMUM_SAVITAR_VERSION (defaults to SAVITAR_PKG_VERSION) - savitar dependency version.
+* CURA_LULZBOT_DEPS_MINIMUM_URANIUM_VERSION (defaults to URANIUM_PKG_VERSION) - uranium dependency version.
+* CURA_LULZBOT_DEPS_MINIMUM_CURAENGINE_VERSION (defaults to CURAENGINE_PKG_VERSION) - curaengine dependency version.
 
 
 **Python Deps version**
 
-* CURA2_PYTHON_DEPS_PKG_VERSION (default "0.1.0") - cura2-python-deps debian package version.
-* MINIMUM_CURA2_PYTHON_DEPS_PKG_VERSION (default "0.1.0") - cura2-python-deps dependency version.
+* CURA_LULZBOT_PYTHON_DEPS_PKG_VERSION (default "0.1.0") - cura-lulzbot-python-deps debian package version.
+* MINIMUM_CURA_LULZBOT_PYTHON_DEPS_PKG_VERSION (default "0.1.0") - cura-lulzbot-python-deps dependency version.
 
 
 Examples
@@ -370,7 +370,7 @@ Examples
 
 **Build all for stretch from local directory**
 
-First make sure you have checked out the source code for all packages (arcus, savitar, uranium, cura-engine, Cura2) in a directory of the host - for example: /home/user/build .
+First make sure you have checked out the source code for all packages (arcus, savitar, uranium, cura-engine, Cura) in a directory of the host - for example: /home/user/build .
 Lets say we want the built packages in /tmp/debian-stretch.
 ```
 docker run -ti -e UNIT=all -e DIST=stretch -v /home/user/build:/Cura2build/build -v /tmp/debian-stretch:/out keitaro/alephobjects:stretch
@@ -378,7 +378,7 @@ docker run -ti -e UNIT=all -e DIST=stretch -v /home/user/build:/Cura2build/build
 After the build is complete, you'll get the packages in /tmp/debian-stretch:
 ```
 $ ls /tmp/debian-stretch
-arcus-15.05.91_amd64.deb  Cura2-2.5.10-Linux.deb  CuraEngine-15.05.90_amd64.deb  savitar-15.05.91_amd64.deb  uranium-15.05.93-Linux.deb
+arcus-15.05.91_amd64.deb  cura-lulzbot-2.5.10-Linux.deb  CuraEngine-15.05.90_amd64.deb  savitar-15.05.91_amd64.deb  uranium-15.05.93-Linux.deb
 ```
 
 
@@ -396,7 +396,7 @@ docker run -ti -e UNIT=all -e DIST=xenial -v /home/user/build:/Cura2build/build 
 Then we'll get the following packages in /tmp/ubuntu-xenial:
 ```
 $ ls /tmp/ubuntu-xenial
-arcus-15.05.91_amd64.deb  Cura2-2.5.10-Linux.deb  cura2-python-deps-0.1.0.deb  CuraEngine-15.05.90_amd64.deb  protobuf-3.3.0.deb  savitar-15.05.91_amd64.deb  uranium-15.05.93-Linux.deb
+arcus-15.05.91_amd64.deb  cura-lulzbot-2.5.10-Linux.deb  cura-lulzbot-python-deps-0.1.0.deb  CuraEngine-15.05.90_amd64.deb  protobuf-3.3.0.deb  savitar-15.05.91_amd64.deb  uranium-15.05.93-Linux.deb
 ```
 
 Building Arcus
@@ -443,13 +443,13 @@ docker run -e UNIT=curaengine -v $(pwd):/out keitaro/alephobjects:stretch
 
 The build will generate a DEB package in your current directory.
 
-Building Cura2
+Building Cura
 =============
 
-To build Cura2 run the following command:
+To build Cura run the following command:
 
 ```
-docker run -e UNIT=cura2 -v $(pwd):/out keitaro/alephobjects:stretch
+docker run -e UNIT=cura-lulzbot -v $(pwd):/out keitaro/alephobjects:stretch
 ```
 
 The build will generate a DEB package in your current directory.
@@ -483,7 +483,7 @@ The build will generate a DEB package in your current directory.
 Building Cura2 PostProcessing plugin
 =========================
 
-To build Cura2 PostProcessing plugin run the following command:
+To build Cura PostProcessing plugin run the following command:
 
 ```
 docker run -e UNIT=postprocessing_plugin -v $(pwd):/out keitaro/alephobjects:stretch
@@ -498,7 +498,7 @@ Building local code
 To build local code for specific package run the following command:
 
 ```
-docker run -e UNIT=(libarcus|libsavitar|pythonuranium|curaengine|cura2) -v $(pwd):/out -v $(pwd):/Cura2build/build keitaro/alephobjects:stretch
+docker run -e UNIT=(libarcus|libsavitar|pythonuranium|curaengine|cura-lulzbot) -v $(pwd):/out -v $(pwd):/Cura2build/build keitaro/alephobjects:stretch
 ```
 
 In your current directory you must have cloned the package that you want to build.
