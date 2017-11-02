@@ -1,0 +1,2 @@
+#!/bin/bash
+LD_LIBRARY_PATH=/usr/share/cura-lulzbot:/usr/share/cura-lulzbot/lib QT_PLUGIN_PATH=/usr/share/cura-lulzbot/qt/plugins QML2_IMPORT_PATH=/usr/share/cura-lulzbot/qml:/usr/share/cura-lulzbot/qt/qml /usr/share/cura-lulzbot/cura-lulzbot "$@"
