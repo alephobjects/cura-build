@@ -1345,14 +1345,6 @@ elseif(BUILD_OS_WINDOWS)
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
     )
 
-    if(BUILD_OS_WIN32)
-        add_custom_command(
-            TARGET build_exe POST_BUILD
-            COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} cx_Freeze
-            COMMENT "Installing cx_Freeze"
-        )
-    endif()
-
     add_custom_command(
         TARGET build_exe POST_BUILD
         COMMAND ${PYTHON_EXECUTABLE} setup_win32.py build
