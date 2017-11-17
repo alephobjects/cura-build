@@ -60,6 +60,7 @@ def findSubPackages(root_package_path, package_name):
     return includes
 
 includes = [
+    "_codecs",
     "sip", 
     "ctypes",
     "uuid",
