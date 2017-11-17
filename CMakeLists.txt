@@ -1236,19 +1236,7 @@ if(BUILD_OS_OSX)
         COMMENT "Building py2app"
         BUILD_IN_SOURCE 1
     )
-elseif(BUILD_OS_WINDOWS)
-    # Currently, py2exe can not be built with MinGW since the code apparently uses
-    # a lot of MSVC-isms. So instead, install py2exe in your Python installation and
-    # use that.
-    # ExternalProject_Add(Py2Exe
-        # DEPENDS Python
-        # URL https://pypi.python.org/packages/source/p/py2exe/py2exe-0.9.2.0.zip
-        # CONFIGURE_COMMAND ""
-        # BUILD_COMMAND ${PYTHON_EXECUTABLE} setup.py build
-        # INSTALL_COMMAND ${PYTHON_EXECUTABLE} setup.py install ${python_install}
-        # BUILD_IN_SOURCE 1
-    # )
-elseif(BUILD_OS_LINUX)
+elseif(BUILD_OS_LINUX OR BUILD_OS_WINDOWS)
     set (envvar_cxFreeze)
     if(BUILD_OS_LINUX)
         list(APPEND envvar_cxFreeze CC=gcc CXX=g++ F90=gfortran)
@@ -1257,7 +1245,9 @@ elseif(BUILD_OS_LINUX)
     endif()
     ExternalProject_Add( cxFreeze
 	DEPENDS Python PythonAppDirs
-	URL https://pypi.python.org/packages/d0/6d/9492644452727094543575de9846af5a2b9c764f760e2d414af7c876618c/cx_Freeze-5.0.1.tar.gz
+	# URL https://pypi.python.org/packages/d0/6d/9492644452727094543575de9846af5a2b9c764f760e2d414af7c876618c/cx_Freeze-5.0.1.tar.gz
+	GIT_REPOSITORY https://github.com/anthony-tuininga/cx_Freeze.git
+        GIT_TAG ddff489431601438e61bb3f8239b9b14a61328c1
 	CONFIGURE_COMMAND ""
 	BUILD_COMMAND ${envvar_cxFreeze} ${PYTHON_EXECUTABLE} setup.py --no-user-cfg build_ext --library-dirs=${EXTERNALPROJECT_INSTALL_PREFIX}/lib
 	INSTALL_COMMAND ${envvar_cxFreeze} ${PYTHON_EXECUTABLE} setup.py --no-user-cfg install ${python_install} --verbose
