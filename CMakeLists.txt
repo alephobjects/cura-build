@@ -1302,7 +1302,7 @@ if(BUILD_OS_OSX)
     list(APPEND command_generate_version PYTHONPATH=${EXTERNALPROJECT_INSTALL_PREFIX}/${PYTHON_SITE_PACKAGES_DIR})
     list(APPEND command_generate_version ${PYTHON_EXECUTABLE} scripts/cura_version.py)
     list(APPEND command_generate_version ${CURA_MAJOR_VERSION}.${CURA_MINOR_VERSION}.${CURA_PATCH_VERSION})
-    list(APPEND command_generate_version "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/dist/Cura.app/Contents")
+    list(APPEND command_generate_version "${CMAKE_BINARY_DIR}" "${CMAKE_BINARY_DIR}/dist/cura-lulzbot.app/Contents")
     add_custom_command(
 	TARGET build_app POST_BUILD
 	COMMAND ${command_generate_version}
@@ -1310,14 +1310,14 @@ if(BUILD_OS_OSX)
 	WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
 
-    install(DIRECTORY ${CMAKE_BINARY_DIR}/dist/Cura.app DESTINATION "." USE_SOURCE_PERMISSIONS)
+    install(DIRECTORY ${CMAKE_BINARY_DIR}/dist/cura-lulzbot.app DESTINATION "." USE_SOURCE_PERMISSIONS)
 
     if(SIGN_APP_OSX)
       add_custom_target(sign_app ALL)
       add_dependencies(sign_app build_app)
       add_custom_command(
         TARGET sign_app POST_BUILD
-        COMMAND /usr/bin/codesign -s "${APPLE_ID_CERT_NAME}" --deep -v ${CMAKE_BINARY_DIR}/dist/Cura.app
+        COMMAND /usr/bin/codesign -s "${APPLE_ID_CERT_NAME}" --deep -v ${CMAKE_BINARY_DIR}/dist/cura-lulzbot.app
         COMMENT "Signing application with ${APPLE_ID_CERT_NAME}"
 	VERBATIM
       )
