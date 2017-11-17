@@ -104,11 +104,11 @@ setup(
 
 # Copy the backend executable
 print("Copying CuraEngine to Contents/MacOS")
-shutil.copy("inst/bin/CuraEngine", "dist/Cura.app/Contents/MacOS/CuraEngine")
+shutil.copy("inst/bin/CuraEngine", "dist/cura-lulzbot.app/Contents/MacOS/CuraEngine")
 
 # Remove all *_debug.x.dylib files since we do not need them but py2app copies 
 # them anyway.
-for path, dirs, files in os.walk("dist/Cura.app/Contents"):
+for path, dirs, files in os.walk("dist/cura-lulzbot.app/Contents"):
     for file in files:
         if "debug" in file and not file.lower().endswith(".json"):
             print("Removing {0}".format(file))
@@ -116,19 +116,19 @@ for path, dirs, files in os.walk("dist/Cura.app/Contents"):
 
 # Py2App does not handle @rpath properly and fails to find the required libraries.
 # So we need to copy it manually.
-shutil.copy("inst/lib/libQt5Core.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Core.5.dylib")
-shutil.copy("inst/lib/libQt5Gui.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Gui.5.dylib")
-shutil.copy("inst/lib/libQt5MacExtras.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5MacExtras.5.dylib")
-shutil.copy("inst/lib/libQt5Network.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Network.5.dylib")
-shutil.copy("inst/lib/libQt5OpenGL.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5OpenGL.5.dylib")
-shutil.copy("inst/lib/libQt5Qml.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Qml.5.dylib")
-shutil.copy("inst/lib/libQt5Quick.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Quick.5.dylib")
-shutil.copy("inst/lib/libQt5QuickWidgets.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5QuickWidgets.5.dylib")
-shutil.copy("inst/lib/libQt5Svg.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Svg.5.dylib")
-shutil.copy("inst/lib/libQt5Widgets.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Widgets.5.dylib")
-shutil.copy("inst/lib/libQt5Xml.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5Xml.5.dylib")
-shutil.copy("inst/lib/libQt5DBus.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5DBus.5.dylib")
-shutil.copy("inst/lib/libQt5PrintSupport.5.dylib", "dist/Cura.app/Contents/Frameworks/libQt5PrintSupport.5.dylib")
+shutil.copy("inst/lib/libQt5Core.5.dylib", "dist/cura-lulzbot.app/Contents/Frameworks/libQt5Core.5.dylib")
+shutil.copy("inst/lib/libQt5Gui.5.dylib", "dist/cura-lulzbot.app/Contents/Frameworks/libQt5Gui.5.dylib")
+shutil.copy("inst/lib/libQt5MacExtras.5.dylib", "dist/cura-lulzbot.app/Contents/Frameworks/libQt5MacExtras.5.dylib")
+shutil.copy("inst/lib/libQt5Network.5.dylib", "dist/cura-lulzbot.app/Contents/Frameworks/libQt5Network.5.dylib")
+shutil.copy("inst/lib/libQt5OpenGL.5.dylib", "dist/cura-lulzbot.app/Contents/Frameworks/libQt5OpenGL.5.dylib")
+shutil.copy("inst/lib/libQt5Qml.5.dylib", "dist/cura-lulzbot.app/Contents/Frameworks/libQt5Qml.5.dylib")
+shutil.copy("inst/lib/libQt5Quick.5.dylib", "dist/cura-lulzbot.app/Contents/Frameworks/libQt5Quick.5.dylib")
+shutil.copy("inst/lib/libQt5QuickWidgets.5.dylib", "dist/cura-lulzbot.app/Contents/Frameworks/libQt5QuickWidgets.5.dylib")
+shutil.copy("inst/lib/libQt5Svg.5.dylib", "dist/cura-lulzbot.app/Contents/Frameworks/libQt5Svg.5.dylib")
+shutil.copy("inst/lib/libQt5Widgets.5.dylib", "dist/cura-lulzbot.app/Contents/Frameworks/libQt5Widgets.5.dylib")
+shutil.copy("inst/lib/libQt5Xml.5.dylib", "dist/cura-lulzbot.app/Contents/Frameworks/libQt5Xml.5.dylib")
+shutil.copy("inst/lib/libQt5DBus.5.dylib", "dist/cura-lulzbot.app/Contents/Frameworks/libQt5DBus.5.dylib")
+shutil.copy("inst/lib/libQt5PrintSupport.5.dylib", "dist/cura-lulzbot.app/Contents/Frameworks/libQt5PrintSupport.5.dylib")
 
 # Ensure we set the right @rpath value.
-os.system("install_name_tool -add_rpath @executable_path/../Frameworks dist/Cura.app/Contents/MacOS/Cura")
+os.system("install_name_tool -add_rpath @executable_path/../Frameworks dist/cura-lulzbot.app/Contents/MacOS/Cura")
