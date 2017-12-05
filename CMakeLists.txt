@@ -1141,14 +1141,16 @@ ExternalProject_Add(Uranium
 ExternalProject_Add(Cura-PostProcessing
     DEPENDS Python Uranium Savitar
     GIT_REPOSITORY https://code.alephobjects.com/source/Cura2-PostProcessing.git
-    GIT_TAG origin/${CURA_TAG_OR_BRANCH}
+    # GIT_TAG origin/${CURA_TAG_OR_BRANCH}
+    GIT_TAG origin/master
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
 )
 
 ExternalProject_Add(cura-binary-data
 	DEPENDS Python Uranium Savitar
 	GIT_REPOSITORY https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git
-	GIT_TAG origin/${TAG_OR_BRANCH}
+	# GIT_TAG origin/${TAG_OR_BRANCH}
+	GIT_TAG origin/master
 	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} ${EXTRA_CBD_ARGS}
 )
 
