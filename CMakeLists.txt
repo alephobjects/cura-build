@@ -103,7 +103,7 @@ elseif(BUILD_OS_OSX)
 	set(BUILD_TYPING OFF)
 endif()
 
-set(TAG_OR_BRANCH "master" CACHE STRING "The name of the tag or branch to build")
+set(TAG_OR_BRANCH "stable_2.6" CACHE STRING "The name of the tag or branch to build")
 set(SAVITAR_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the Savitar tag or branch to build")
 set(CURA_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the Cura tag or branch to build")
 set(URANIUM_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the Uranium tag or branch to build")
