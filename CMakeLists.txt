@@ -449,7 +449,7 @@ if(BUILD_QT)
     list(APPEND qt_options -skip qtserialport)
     list(APPEND qt_options -skip qtwayland)
     list(APPEND qt_options -skip qtwebview)
-    list(APPEND qt_options -skip qtquickcontrols2)
+#    list(APPEND qt_options -skip qtquickcontrols2)
     list(APPEND qt_options -skip qtgraphicaleffects)
     list(APPEND qt_options -skip qtserialbus)
     # Adding these to skip for Qt5.9
