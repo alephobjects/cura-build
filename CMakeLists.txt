@@ -89,8 +89,8 @@ if(BUILD_OS_WINDOWS)
         set(BUILD_SIP OFF)
     else()
         set(BUILD_PYTHON OFF)
-#        set(BUILD_QT OFF)
-#        set(BUILD_PYQT OFF)
+        set(BUILD_QT OFF)
+        set(BUILD_PYQT OFF)
         set(BUILD_OPENBLAS OFF)
         set(BUILD_NUMPY OFF)
         set(BUILD_SCIPY OFF)
@@ -792,8 +792,9 @@ if(BUILD_PYQT)
         list(APPEND pyqt_command --spec win32-g++)
         list(APPEND pyqt_command --sip ${EXTERNALPROJECT_INSTALL_PREFIX}/bin/sip.exe)
         list(APPEND pyqt_command --qmake=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/qmake.exe)
-        list(APPEND pyqt_command QMAKE_CFLAGS+="-m32 -fPIC -D_hypot=hypot -std=c++11 -static-libstdc++")
-        list(APPEND pyqt_command QMAKE_CXXFLAGS+="-m32 -fPIC -D_hypot=hypot -std=c++11 -static-libstdc++")
+	# All the code on WIN is position independent, removing -fPIC
+        list(APPEND pyqt_command QMAKE_CFLAGS+="-m32 -D_hypot=hypot -std=c++11 -static-libstdc++")
+        list(APPEND pyqt_command QMAKE_CXXFLAGS+="-m32 -D_hypot=hypot -std=c++11 -static-libstdc++")
         list(APPEND pyqt_command QMAKE_LFLAGS+="-LC:/Python352 -LC:/Python352/libs -lpython35")
     elseif(BUILD_OS_LINUX OR BUILD_OS_OSX)
 	list(APPEND pyqt_command --sip=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/sip)
@@ -816,7 +817,7 @@ else()
     if(BUILD_OS_WIN32)
         add_custom_target(PyQt
             DEPENDS Python Qt Sip
-            COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} PyQt5==5.7.1
+            COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} PyQt5==5.9
             COMMENT "Installing PyQt5"
         )
     else()
