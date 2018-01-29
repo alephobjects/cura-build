@@ -512,7 +512,7 @@ if(BUILD_SIP)
 
     if(BUILD_OS_WINDOWS)
         set(SIP_VERSION 0x041301)
-        set(SIP_VERSION_STR 4.19.1 )
+        set(SIP_VERSION_STR 4.19.3 )
     else()
         set(SIP_VERSION 0x041301)
         set(SIP_VERSION_STR 4.19.3 )
