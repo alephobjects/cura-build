@@ -20,8 +20,9 @@ def generate(cura_version, cmake_binary_dir, target_dir):
         "engine": get_commit_hash("CuraEngine", cmake_binary_dir),
         "libarcus": get_commit_hash("Arcus", cmake_binary_dir),
         "libsavitar": get_commit_hash("Savitar", cmake_binary_dir),
-        "binarydata":get_commit_hash("cura-binary-data", cmake_binary_dir),
-	"build": get_curabuild_commit_hash(cmake_binary_dir)
+        "binarydata": get_commit_hash("cura-binary-data", cmake_binary_dir),
+        "postprocessing": get_commit_hash("Cura-PostProcessing", cmake_binary_dir),
+        "build": get_curabuild_commit_hash(cmake_binary_dir)
     }
 
     with open(target_dir + "/version.json", 'w') as output_file:
