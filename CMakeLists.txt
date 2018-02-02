@@ -104,10 +104,15 @@ elseif(BUILD_OS_OSX)
 endif()
 
 set(TAG_OR_BRANCH "stable_2.6" CACHE STRING "The name of the tag or branch to build")
+
 set(SAVITAR_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the Savitar tag or branch to build")
 set(CURA_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the Cura tag or branch to build")
 set(URANIUM_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the Uranium tag or branch to build")
 set(CURA_ENGINE_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the CuraEngine tag or branch to build")
+set(CURA_BINARY_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the Cura Binary Data tag or branch to build")
+set(CURA_POSTPROCESSING_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the Cura Post Processing Plugin tag or branch to build")
+set(ARCUS_TAG_OR_BRANCH ${TAG_OR_BRANCH} CACHE STRING "The name of the Arcus tag or branch to build")
+
 
 set(EXTRA_REPOSITORIES "" CACHE STRING "Extra repositories to install. Expected to have a CMake based build system.")
 set(EXTERNALPROJECT_INSTALL_PREFIX ${CMAKE_BINARY_DIR}/inst)
@@ -1120,7 +1125,7 @@ endif()
 ExternalProject_Add(Arcus
     DEPENDS Python Protobuf Sip
     GIT_REPOSITORY ${ARCUS_URL}
-    GIT_TAG origin/${TAG_OR_BRANCH}
+    GIT_TAG origin/${ARCUS_TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} -DCMAKE_CXX_FLAGS=-static-libstdc++ -DBUILD_EXAMPLES=OFF -DBUILD_STATIC=ON -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -DPYTHON_SITE_PACKAGES_DIR=${PYTHON_SITE_PACKAGES_DIR} -DPROTOBUF_PROTOC_EXECUTABLE=${EXTERNALPROJECT_INSTALL_PREFIX}/bin/protoc -DPROTOBUF_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf.a -DPROTOBUF_LITE_LIBRARY=${EXTERNALPROJECT_INSTALL_PREFIX}/lib/libprotobuf-lite.a -DPROTOBUF_INCLUDE_DIR=${EXTERNALPROJECT_INSTALL_PREFIX}/include ${EXTRA_PYTHON_DEFINES}
 )
 
@@ -1141,15 +1146,15 @@ ExternalProject_Add(Uranium
 ExternalProject_Add(Cura-PostProcessing
     DEPENDS Python Uranium Savitar
     GIT_REPOSITORY https://code.alephobjects.com/source/Cura2-PostProcessing.git
-    GIT_TAG origin/${CURA_TAG_OR_BRANCH}
+    GIT_TAG origin/${CURA_POSTPROCESSING_TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
 )
 
 ExternalProject_Add(cura-binary-data
-	DEPENDS Python Uranium Savitar
-	GIT_REPOSITORY https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git
-	GIT_TAG origin/${TAG_OR_BRANCH}
-	CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} ${EXTRA_CBD_ARGS}
+    DEPENDS Python Uranium Savitar
+    GIT_REPOSITORY https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git
+    GIT_TAG origin/${CURA_BINARY_TAG_OR_BRANCH}
+    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} ${EXTRA_CBD_ARGS}
 )
 
 # ExternalProject_Add(fdm_materials
