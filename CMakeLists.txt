@@ -817,7 +817,7 @@ else()
     if(BUILD_OS_WIN32)
         add_custom_target(PyQt
             DEPENDS Python Qt Sip
-            COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} PyQt5==5.7.1
+            COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} PyQt5==5.9
             COMMENT "Installing PyQt5"
         )
     else()
