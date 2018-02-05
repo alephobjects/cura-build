@@ -715,7 +715,7 @@ if(BUILD_NETIFACES)
     message(STATUS "---> PythonNetifaces Build: ${build_python_netifaces}")
     message(STATUS "---> PythonNetifaces Install: ${install_python_netifaces}")
     ExternalProject_Add(PythonNetifaces
-        DEPENDS Python PythonAppDirs PythonUtils
+        DEPENDS Python PythonAppDirs
         URL https://pypi.python.org/packages/18/fa/dd13d4910aea339c0bb87d2b3838d8fd923c11869b1f6e741dbd0ff3bc00/netifaces-0.10.4.tar.gz
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_python_netifaces}
@@ -725,7 +725,7 @@ if(BUILD_NETIFACES)
 else()
     message(STATUS "---> System NetIfaces will be used")
     add_custom_target(PythonNetifaces
-        DEPENDS Python PythonAppDirs PythonUtils
+        DEPENDS Python PythonAppDirs
     )
 endif()
 
@@ -960,7 +960,7 @@ if(BUILD_SCIPY)
     message(STATUS "---> SciPy build: ${build_scipy}")
     message(STATUS "---> SciPy install: ${install_scipy}")
     ExternalProject_Add(Scipy
-        DEPENDS Python PythonUtils Numpy PythonSix PythonPackaging
+        DEPENDS Python Numpy PythonSix PythonPackaging
         # URL http://downloads.sourceforge.net/project/scipy/scipy/0.16.1/scipy-0.16.1.tar.gz
 	GIT_REPOSITORY git://github.com/scipy/scipy.git
 	GIT_TAG 46cbf563f5010b27017324ca66e1daffb6d21c47
@@ -972,14 +972,14 @@ if(BUILD_SCIPY)
 elseif(NOT BUILD_SCIPY_LITE)
     if(BUILD_OS_WIN32)
         add_custom_target(Scipy
-            DEPENDS Python PythonUtils Numpy PythonSix PythonPackaging
+            DEPENDS Python Numpy PythonSix PythonPackaging
             COMMAND ${PYTHON_EXECUTABLE} -m pip install --target=${PYTHONPATH} http://software.ultimaker.com/cura-binary-dependencies/scipy-0.19.0-cp35-cp35m-win32.whl
             COMMENT "Installing SciPy"
         )
     else()
         message(STATUS "---> System SciPy will be used")
         add_custom_target(Scipy
-            DEPENDS Python PythonUtils Numpy PythonSix PythonPackaging
+            DEPENDS Python Numpy PythonSix PythonPackaging
         )
     endif()
 endif()
@@ -1005,7 +1005,7 @@ if (BUILD_SCIPY_LITE)
     message(STATUS "---> SciPyLite Build: ${build_scipy_lite}")
     message(STATUS "---> SciPyLite Install: ${install_scipy_lite}")
     ExternalProject_Add(Scipy
-        DEPENDS Python PythonUtils Numpy PythonSix PyHull
+        DEPENDS Python Numpy PythonSix PyHull
         GIT_REPOSITORY https://code.alephobjects.com/source/CuraSciPyLite.git
         GIT_TAG origin/master
         CONFIGURE_COMMAND ""
