@@ -19,7 +19,7 @@ option(BUILD_SCIPY "Include Scipy" ON)
 option(BUILD_SCIPY_LITE "Include Scipy Lite" OFF)
 option(BUILD_PYSERIAL "Include PySerial" ON)
 option(BUILD_NUMPY_STL "Include Numpy-STL" ON)
-option(BUILD_PYTHON_UTILS "Include Python-Utils" ON)
+# option(BUILD_PYTHON_UTILS "Include Python-Utils" ON)
 option(BUILD_ZEROCONF "Include python-zeroconf" ON)
 option(BUILD_TYPING "Include python-typing" ON)
 option(BUILD_SAVITAR "Include Savitar Library" ON)
@@ -685,29 +685,29 @@ else()
     )
 endif()
 
-if(BUILD_PYTHON_UTILS)
-    set(build_python_utils ${PYTHON_EXECUTABLE} setup.py build)
-    set(install_python_utils ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose --single-version-externally-managed)
-    if(BUILD_OS_WINDOWS)
-       string(REPLACE "/" "\\" install_python_utils "${install_python_utils}")
-    endif()
-    message(STATUS "---> PythonUtils Build: ${build_python_utils}")
-    message(STATUS "---> PythonUtils Install: ${install_python_utils}")
-    ExternalProject_Add(PythonUtils
-        DEPENDS Python PythonSetupTools
-        GIT_REPOSITORY https://github.com/WoLpH/python-utils.git
-        GIT_TAG origin/master
-        CONFIGURE_COMMAND ""
-        BUILD_COMMAND ${build_python_utils}
-        INSTALL_COMMAND ${install_python_utils}
-        BUILD_IN_SOURCE 1
-    )
-else()
-    message(STATUS "---> System PythonUtils will be used")
-    add_custom_target(PythonUtils
-        DEPENDS Python PythonSetupTools
-    )
-endif()
+# if(BUILD_PYTHON_UTILS)
+#    set(build_python_utils ${PYTHON_EXECUTABLE} setup.py build)
+#    set(install_python_utils ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose --single-version-externally-managed)
+#    if(BUILD_OS_WINDOWS)
+#       string(REPLACE "/" "\\" install_python_utils "${install_python_utils}")
+#    endif()
+#    message(STATUS "---> PythonUtils Build: ${build_python_utils}")
+#    message(STATUS "---> PythonUtils Install: ${install_python_utils}")
+#    ExternalProject_Add(PythonUtils
+#        DEPENDS Python PythonSetupTools
+#        GIT_REPOSITORY https://github.com/WoLpH/python-utils.git
+#        GIT_TAG origin/master
+#        CONFIGURE_COMMAND ""
+#        BUILD_COMMAND ${build_python_utils}
+#        INSTALL_COMMAND ${install_python_utils}
+#        BUILD_IN_SOURCE 1
+#    )
+#else()
+#    message(STATUS "---> System PythonUtils will be used")
+#    add_custom_target(PythonUtils
+#        DEPENDS Python PythonSetupTools
+#    )
+#endif()
 
 if(BUILD_NETIFACES)
     set(build_python_netifaces ${PYTHON_EXECUTABLE} setup.py build)
@@ -1041,9 +1041,9 @@ if(BUILD_NUMPY_STL )
     message(STATUS "---> NumpySTL Build: ${build_numpystl}")
     message(STATUS "---> NumpySTL Install: ${install_numpystl}")
     ExternalProject_Add(NumpySTL
-        DEPENDS Python Numpy PythonUtils
-        GIT_REPOSITORY https://github.com/WoLpH/numpy-stl.git
-	GIT_TAG 64190e4b4e88a95d38849636f5aad4e0da25af08
+        DEPENDS Python Numpy
+        GIT_REPOSITORY https://code.alephobjects.com/source/numpy-stl.git
+	# GIT_TAG 64190e4b4e88a95d38849636f5aad4e0da25af08
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_numpystl}
         INSTALL_COMMAND ${install_numpystl}
@@ -1052,7 +1052,7 @@ if(BUILD_NUMPY_STL )
 else()
     message(STATUS "---> System NumpySTL will be used")
     add_custom_target(NumpySTL
-        DEPENDS Python Numpy PythonUtils
+        DEPENDS Python Numpy
     )
 endif()
 
