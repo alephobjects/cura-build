@@ -1037,7 +1037,7 @@ endif()
 
 if(BUILD_NUMPY_STL )
     set(build_numpystl ${PYTHON_EXECUTABLE} setup.py build)
-    set(install_numpystl ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose --single-version-externally-managed)
+    set(install_numpystl ${PYTHON_EXECUTABLE} setup.py install ${python_install} --verbose)
     message(STATUS "---> NumpySTL Build: ${build_numpystl}")
     message(STATUS "---> NumpySTL Install: ${install_numpystl}")
     ExternalProject_Add(NumpySTL
