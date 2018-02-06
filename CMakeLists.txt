@@ -1038,7 +1038,7 @@ if(BUILD_NUMPY_STL )
     ExternalProject_Add(NumpySTL
         DEPENDS Python Numpy
         GIT_REPOSITORY https://code.alephobjects.com/source/numpy-stl.git
-	# GIT_TAG 64190e4b4e88a95d38849636f5aad4e0da25af08
+        GIT_TAG origin/master
         CONFIGURE_COMMAND ""
         BUILD_COMMAND ${build_numpystl}
         INSTALL_COMMAND ${install_numpystl}
