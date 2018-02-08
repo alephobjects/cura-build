@@ -130,54 +130,30 @@ Before make package - copy arduino to cura-build/
 
 cura-build can build Ubuntu/Debian packages of Cura.
 
-Dependencies:
-
-* python3 (>= 3.4.0)
-* python3-dev (>= 3.4.0)
-* python3-pyqt5 (>= 5.4.0)
-* python3-pyqt5.qtopengl (>= 5.4.0)
-* python3-pyqt5.qtquick (>= 5.4.0)
-* python3-pyqt5.qtsvg (>= 5.4.0)
-* python3-numpy (>= 1.8.0)
-* python3-serial (>= 2.6)
-* python3-opengl (>= 3.0)
-* python3-setuptools
-* python3-dev
-* qml-module-qtquick2 (>= 5.4.0)
-* qml-module-qtquick-window2 (>= 5.4.0)
-* qml-module-qtquick-layouts (>= 5.4.0)
-* qml-module-qtquick-dialogs (>= 5.4.0)
-* qml-module-qtquick-controls (>= 5.4.0)
-* libxcb1-dev
-* libx11-dev
-* zlib1g
-* build-essential
-* pkg-config
-* cmake
-* gfortran
-
-To build, make sure these dependencies are installed, then clone this repository and run the following commands from your clone:
-
+* For Stretch (needed for initial setup):
 ```shell
-Install OpenGL dev libs:
-sudo apt-get install mesa-common-dev
-sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev
+apt-get install libsm-dev libxi-dev libfontconfig1-dev libbsd-dev libxdmcp-dev libxcb1-dev libgl1-mesa-dev libgcrypt20-dev liblz4-dev liblzma-dev libselinux1-dev libsystemd-dev libdbus-1-dev libstdc++-6-dev libglib2.0-dev libc6-dev libssl1.0-dev libtinfo-dev libreadline-dev libharfbuzz-dev libxkbcommon-dev gfortran gcc uuid-dev git wget curl cmake build-essential
 
-sudo apt-get install gfortran python3 python3-dev python3-pyqt5 python3-pyqt5.qtopengl python3-pyqt5.qtquick python3-pyqt5.qtsvg python3-numpy python3-serial python3-opengl python3-setuptools qml-module-qtquick2 qml-module-qtquick-window2 qml-module-qtquick-layouts qml-module-qtquick-dialogs qml-module-qtquick-controls gfortran pkg-config libxcb1-dev libx11-dev
-x11proto-gl-dev x11proto-composite-dev x11proto-core-dev x11proto-damage-dev x11proto-dri2-dev x11proto-fixes-dev x11proto-gl-dev x11proto-input-dev x11proto-kb-dev x11proto-randr-dev x11proto-record-dev x11proto-render-dev x11proto-xext-dev x11proto-xf86vidmode-dev x11proto-xinerama-dev
 
 git clone https://code.alephobjects.com/source/Cura2build.git
 
 cd Cura2build
+
+mkdir build
+
+./build_deb_package.sh
 ```
 
+* One then can run CuraLE directly from build:
 ```shell
-mkdir build
-cd build
-cmake -DMINIMUM_PYTHON_VERSION=3.4.0 -DCURA_TAG_OR_BRANCH=devel -DURANIUM_TAG_OR_BRANCH=devel ..
-make
-make package
+cd build/dist; ./cura-lulzbot
 ```
+
+* In order to rebuild just re-run
+```shell
+./build_deb_package.sh
+```
+
 ## CentOS/Linux
 
 cura-build can build CentOS/RHEL packages of Cura.
