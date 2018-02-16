@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cd build
-cmake ../
+cmake -DTAG_OR_BRANCH=master ../
 ## For trying out model Subdivider
 # cmake -DMINIMUM_PYTHON_VERSION=3.4.0 -DCURA_TAG_OR_BRANCH=model_subdivider -DURANIUM_TAG_OR_BRANCH=model_subdivider ../
 ## For trying out SciPy Lite
