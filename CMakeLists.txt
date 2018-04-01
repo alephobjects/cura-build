@@ -43,11 +43,13 @@ macro(string_option name info default_value)
 endmacro()
 
 string_option(MINIMUM_PYTHON_VERSION "Minimum Python Version" "3.5.0")
-string_option(ARCUS_URL "Arcus Git Url" "https://code.alephobjects.com/diffusion/LA/arcus.git")
+string_option(ARCUS_URL "Arcus Git Url" "https://code.alephobjects.com/source/arcus.git")
 string_option(SAVITAR_URL "Savitar Git Url" "https://code.alephobjects.com/source/savitar.git")
-string_option(CURA_URL "Cura Git Url" "https://code.alephobjects.com/diffusion/CT/Cura2.git")
-string_option(CURAENGINE_URL "CuraEngine Git Url" "https://code.alephobjects.com/diffusion/CTE/cura-engine.git")
+string_option(CURA_URL "Cura Git Url" "https://code.alephobjects.com/source/cura-lulzbot.git")
+string_option(CURAENGINE_URL "CuraEngine Git Url" "https://code.alephobjects.com/source/curaengine-lulzbot.git")
 string_option(URANIUM_URL "Uranium Git Url" "https://code.alephobjects.com/diffusion/U/uranium.git")
+string_option(CURA_POSTPROCESSING_URL "PostProcessing Url" "https://code.alephobjects.com/source/cura-lulzbot-postprocessing.git")
+string_option(CURA_BINARY_URL "Binary Data Url" "https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git")
 
 if(WIN32)
     option(BUILD_64BIT "Create a 64-bit build" OFF)
@@ -393,10 +395,6 @@ endif()
 
 
 if(BUILD_QT)
-    # set(qt_url http://download.qt.io/archive/qt/5.6/5.6.2/single/qt-everywhere-opensource-src-5.6.2.tar.gz)
-    # set(qt_md5 1b1b1f929d0cd83680354a0c83d8e945)
-    #set(qt_url http://download.qt.io/archive/qt/5.9/5.9.1/single/qt-everywhere-opensource-src-5.9.1.tar.xz)
-    #set(qt_md5 77b4af61c49a09833d4df824c806acaf)
     set(qt_url http://download.lulzbot.com/Software/Cura2/build-resources/qt-everywhere-opensource-src-5.9.1.tar.gz)
     set(qt_md5 e2a13e5a80372e814da08e8b15998a79)
 
@@ -1150,14 +1148,14 @@ ExternalProject_Add(Uranium
 
 ExternalProject_Add(Cura-PostProcessing
     DEPENDS Python Uranium Savitar
-    GIT_REPOSITORY https://code.alephobjects.com/source/Cura2-PostProcessing.git
+    GIT_REPOSITORY ${CURA_POSTPROCESSING_URL}
     GIT_TAG origin/${CURA_POSTPROCESSING_TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX}
 )
 
 ExternalProject_Add(cura-binary-data
     DEPENDS Python Uranium Savitar
-    GIT_REPOSITORY https://code.alephobjects.com/diffusion/CBD/cura-binary-data.git
+    GIT_REPOSITORY ${CURA_BINARY_URL}
     GIT_TAG origin/${CURA_BINARY_TAG_OR_BRANCH}
     CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${EXTERNALPROJECT_INSTALL_PREFIX} ${EXTRA_CBD_ARGS}
 )
@@ -1540,7 +1538,7 @@ set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 set(CPACK_NSIS_EXECUTABLES_DIRECTORY ".")
 set(CPACK_NSIS_MUI_FINISHPAGE_RUN "cura-lulzbot.exe")
 set(CPACK_NSIS_MENU_LINKS
-    "https://https://code.alephobjects.com/project/profile/10" "Cura Development Resources"
+    "https://code.alephobjects.com/project/profile/10" "Cura Development Resources"
 )
 if(BUILD_OS_WIN32)
     set(CPACK_NSIS_PACKAGE_ARCHITECTURE "32")
